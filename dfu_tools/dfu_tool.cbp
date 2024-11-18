@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="dfu_tool" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/dfu_tool" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="-m 1024" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="/mnt/c/Glydways/bl_tools/dfu_tools/" />
+					<Add directory="../dfu_protocol/include" />
+					<Add directory="../dfu_protocol/src" />
+					<Add directory="platform/include" />
+					<Add directory="platform/src" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/dfu_tool" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add directory="/mnt/c/Glydways/bl_tools/dfu_tools/" />
+			<Add directory="platform/include" />
+			<Add directory="platform/src" />
+		</Compiler>
+		<Unit filename="../dfu_protocol/include/dfu_client.h" />
+		<Unit filename="../dfu_protocol/include/dfu_messages.h" />
+		<Unit filename="../dfu_protocol/include/dfu_platform_utils.h" />
+		<Unit filename="../dfu_protocol/include/dfu_proto_api.h" />
+		<Unit filename="../dfu_protocol/include/dfu_proto_config.h" />
+		<Unit filename="../dfu_protocol/include/dfu_proto_private.h" />
+		<Unit filename="../dfu_protocol/src/dfu_client.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../dfu_protocol/src/dfu_messages.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../dfu_protocol/src/dfu_platform_utils.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../dfu_protocol/src/dfu_proto.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="platform/include/async_timer.h" />
+		<Unit filename="platform/include/platform_sockets.h" />
+		<Unit filename="platform/src/async_timer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="platform/src/platform_sockets.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions />
+	</Project>
+</CodeBlocks_project_file>

@@ -1,0 +1,84 @@
+# depslib dependency file v1.0
+1729626774 source:/mnt/c/Glydways/bl_tools/dfu_tools/main.c
+	<stdint.h>
+	<stdbool.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"platform_sockets.h"
+
+1729523343 source:/mnt/c/Glydways/bl_tools/dfu_protocol/src/dfu_client.c
+	"dfu_client.h"
+
+1729523538 /mnt/c/Glydways/bl_tools/dfu_protocol/include/dfu_client.h
+
+1729622045 source:/mnt/c/Glydways/bl_tools/dfu_protocol/src/dfu_messages.c
+	<stddef.h>
+	<string.h>
+	"dfu_messages.h"
+	"dfu_platform_utils.h"
+	"dfu_proto_private.h"
+
+1729622143 /mnt/c/Glydways/bl_tools/dfu_protocol/include/dfu_messages.h
+	<stdint.h>
+	<stdbool.h>
+	"dfu_proto_private.h"
+	"dfu_proto_api.h"
+
+1729622437 /mnt/c/Glydways/bl_tools/dfu_protocol/include/dfu_proto_private.h
+	"dfu_proto_api.h"
+	"async_timer.h"
+
+1729622191 /mnt/c/Glydways/bl_tools/dfu_protocol/include/dfu_proto_api.h
+	<stdint.h>
+	<stdbool.h>
+	"dfu_proto_config.h"
+
+1729520155 /mnt/c/Glydways/bl_tools/dfu_protocol/include/dfu_proto_config.h
+
+1729609562 /mnt/c/Glydways/bl_tools/dfu_tools/platform/include/async_timer.h
+	<stdint.h>
+
+1729621497 /mnt/c/Glydways/bl_tools/dfu_protocol/include/dfu_platform_utils.h
+	<stdint.h>
+
+1729620185 source:/mnt/c/Glydways/bl_tools/dfu_protocol/src/dfu_platform_utils.c
+	<stddef.h>
+	<string.h>
+	<stdint.h>
+	"dfu_platform_utils.h"
+
+1729621994 source:/mnt/c/Glydways/bl_tools/dfu_protocol/src/dfu_proto.c
+	<stdint.h>
+	<stdbool.h>
+	<stddef.h>
+	<string.h>
+	"dfu_proto_api.h"
+	"dfu_proto_private.h"
+	"async_timer.h"
+
+1729627592 /mnt/c/Glydways/bl_tools/dfu_tools/platform/include/platform_sockets.h
+	<stdio.h>
+	<stdlib.h>
+	<stdint.h>
+	<stdbool.h>
+	<string.h>
+	<unistd.h>
+	<arpa/inet.h>
+	<net/if.h>
+	<sys/ioctl.h>
+	<sys/socket.h>
+	<linux/if_packet.h>
+	<linux/if_ether.h>
+	<linux/if_arp.h>
+
+1729609870 source:/mnt/c/Glydways/bl_tools/dfu_tools/platform/src/async_timer.c
+	<stddef.h>
+	<sys/time.h>
+	<unistd.h>
+	"async_timer.h"
+
+1729627625 source:/mnt/c/Glydways/bl_tools/dfu_tools/platform/src/platform_sockets.c
+	"platform_sockets.h"
+	"dfu_platform_utils.h"
+

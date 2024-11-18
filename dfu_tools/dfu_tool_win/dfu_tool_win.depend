@@ -1,0 +1,181 @@
+# depslib dependency file v1.0
+1729523343 source:c:\glydways\bl_tools\dfu_protocol\src\dfu_client.c
+	"dfu_client.h"
+
+1729523538 c:\glydways\bl_tools\dfu_protocol\include\dfu_client.h
+
+1731597989 source:c:\glydways\bl_tools\dfu_protocol\src\dfu_messages.c
+	<stddef.h>
+	<string.h>
+	"dfu_messages.h"
+	"dfu_platform_utils.h"
+
+1731529056 c:\glydways\bl_tools\dfu_protocol\include\dfu_messages.h
+	<stdint.h>
+	<stdbool.h>
+	"dfu_proto_private.h"
+	"dfu_proto_api.h"
+
+1731444200 c:\glydways\bl_tools\dfu_protocol\include\dfu_proto_private.h
+	"dfu_proto_api.h"
+	"async_timer.h"
+
+1731527531 c:\glydways\bl_tools\dfu_protocol\include\dfu_proto_api.h
+	<stdint.h>
+	<stdbool.h>
+	"dfu_proto_config.h"
+
+1731696774 c:\glydways\bl_tools\dfu_protocol\include\dfu_proto_config.h
+
+1730236916 c:\glydways\bl_tools\dfu_tools\platform\include\async_timer.h
+	<stdint.h>
+
+1731438852 c:\glydways\bl_tools\dfu_protocol\include\dfu_platform_utils.h
+	<stdint.h>
+
+1731606643 source:c:\glydways\bl_tools\dfu_protocol\src\dfu_platform_utils.c
+	<stddef.h>
+	<string.h>
+	<stdint.h>
+	"dfu_platform_utils.h"
+
+1731697994 source:c:\glydways\bl_tools\dfu_protocol\src\dfu_proto.c
+	<stdint.h>
+	<stdbool.h>
+	<stddef.h>
+	<string.h>
+	"dfu_proto_api.h"
+	"dfu_proto_private.h"
+	"async_timer.h"
+
+1731706334 source:c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\src\ethernet_sockets.c
+	"ethernet_sockets.h"
+	"dfu_platform_utils.h"
+
+1731706135 c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\include\ethernet_sockets.h
+	<stdio.h>
+	<stdlib.h>
+	<stdint.h>
+	<stdbool.h>
+	<string.h>
+	<unistd.h>
+	"dfu_lib_config.h"
+	<arpa/inet.h>
+	<net/if.h>
+	<sys/ioctl.h>
+	<sys/socket.h>
+	<linux/if_packet.h>
+	<linux/if_ether.h>
+	<linux/if_arp.h>
+	<pcap.h>
+	<winsock2.h>
+	<iphlpapi.h>
+	<tchar.h>
+
+1729798238 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\npcap-sdk-1.13\include\pcap.h
+	<pcap/pcap.h>
+
+1729798238 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\npcap-sdk-1.13\include\pcap\pcap.h
+	<pcap/funcattrs.h>
+	<pcap/pcap-inttypes.h>
+	<winsock2.h>
+	<io.h>
+	<sys/types.h>
+	<sys/socket.h>
+	<sys/types.h>
+	<sys/time.h>
+	<pcap/socket.h>
+	<pcap/bpf.h>
+	<stdio.h>
+
+1729798238 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\npcap-sdk-1.13\include\pcap\funcattrs.h
+	<pcap/compiler-tests.h>
+	<Availability.h>
+	<sal.h>
+
+1729798238 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\npcap-sdk-1.13\include\pcap\compiler-tests.h
+
+1729798238 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\npcap-sdk-1.13\include\pcap\pcap-inttypes.h
+	<inttypes.h>
+	<inttypes.h>
+
+1729798238 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\npcap-sdk-1.13\include\pcap\socket.h
+	<windef.h>
+	<winsock2.h>
+	<ws2tcpip.h>
+	<sys/types.h>
+	<sys/socket.h>
+	<netdb.h>
+	<netinet/in.h>
+	<arpa/inet.h>
+
+1729798238 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\npcap-sdk-1.13\include\pcap\bpf.h
+	<winsock2.h>
+	<sys/types.h>
+	<pcap/funcattrs.h>
+	<pcap/dlt.h>
+
+1729798238 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\npcap-sdk-1.13\include\pcap\dlt.h
+
+1731702632 source:c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\src\iface_enet.c
+	<stddef.h>
+	<stdint.h>
+	<stdbool.h>
+	<stdio.h>
+	"iface_enet.h"
+	"dfu_lib_config.h"
+	"dfu_proto_api.h"
+
+1730125740 c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\include\iface_enet.h
+	"dfu_proto_api.h"
+	"ethernet_sockets.h"
+
+1731698560 c:\glydways\bl_tools\dfu_tools\include\dfu_lib_config.h
+
+1731722069 source:c:\glydways\bl_tools\dfu_tools\main.c
+	<stdint.h>
+	<stdbool.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<conio.h>
+	"dfu_proto_api.h"
+	"dfu_messages.h"
+	"dfu_client.h"
+	"ethernet_sockets.h"
+
+1729884653 c:\glydways\bl_tools\dfu_tools\include\dfu_lib_support.h
+	<stdint.h>
+	<stdbool.h>
+	<stddef.h>
+	"ethernet_sockets.h"
+	"dfu_proto_api.h"
+	"dfu_messages.h"
+	"dfu_lib_config.h"
+
+1731701356 source:c:\glydways\bl_tools\dfu_tools\platform\src\async_timer.c
+	<stddef.h>
+	<sys/time.h>
+	<unistd.h>
+	"async_timer.h"
+	<windows.h>
+	<sysinfoapi.h>
+	<stdio.h>
+
+1729887172 source:c:\glydways\bl_tools\dfu_tools\src\dfu_lib_support.c
+	"dfu_lib_support.h"
+	"iface_enet.h"
+
+1731701905 source:c:\glydways\bl_tools\dfu_tools\src\dfu_client.c
+	"dfu_client.h"
+	"iface_enet.h"
+
+1731529525 c:\glydways\bl_tools\dfu_tools\include\dfu_client.h
+	<stdint.h>
+	<stdbool.h>
+	<stddef.h>
+	"ethernet_sockets.h"
+	"dfu_proto_api.h"
+	"dfu_messages.h"
+	"dfu_lib_config.h"
+

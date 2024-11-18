@@ -1,0 +1,14 @@
+# Ignore patterns
+*.o
+*.a
+*.so*
+*.elf
+*.d
+*.log
+*.exe
+*.bin
+.vscode/
+/build/
+/build_linux/
+/build_test/
+/.metadata/

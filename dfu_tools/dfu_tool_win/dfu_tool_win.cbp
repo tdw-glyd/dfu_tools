@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="dfu_tool_win" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/dfu_tool_win" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="-h --mtu" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="../dfu_tool_win" />
+					<Add directory="../include" />
+					<Add directory="../platform/include" />
+					<Add directory="../../dfu_protocol/include" />
+					<Add directory="../interfaces/CAN/include" />
+					<Add directory="C:/Glydways/bl_tools/dfu_tools/dfu_tool_win/" />
+					<Add directory="../interfaces/Ethernet/include" />
+					<Add directory="npcap-sdk-1.13/Include" />
+				</Compiler>
+				<Linker>
+					<Add option="npcap-sdk-1.13\Lib\x64\wpcap.lib" />
+					<Add option="npcap-sdk-1.13\Lib\x64\Packet.lib" />
+					<Add option='&quot;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.26100.0\um\x64\iphlpapi.lib&quot;' />
+					<Add directory="npcap-sdk-1.13/Lib" />
+					<Add directory="../../../../Program Files (x86)/Windows Kits/10/Lib/10.0.26100.0/um/x64" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/dfu_tool_win" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="../../dfu_protocol/include/dfu_client.h" />
+		<Unit filename="../../dfu_protocol/include/dfu_messages.h" />
+		<Unit filename="../../dfu_protocol/include/dfu_platform_utils.h" />
+		<Unit filename="../../dfu_protocol/include/dfu_proto_api.h" />
+		<Unit filename="../../dfu_protocol/include/dfu_proto_config.h" />
+		<Unit filename="../../dfu_protocol/include/dfu_proto_private.h" />
+		<Unit filename="../../dfu_protocol/src/dfu_messages.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../dfu_protocol/src/dfu_platform_utils.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../dfu_protocol/src/dfu_proto.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../include/dfu_lib_config.h" />
+		<Unit filename="../include/dfu_lib_support.h" />
+		<Unit filename="../interfaces/Ethernet/include/ethernet_sockets.h" />
+		<Unit filename="../interfaces/Ethernet/include/iface_enet.h" />
+		<Unit filename="../interfaces/Ethernet/src/ethernet_sockets.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../interfaces/Ethernet/src/iface_enet.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../platform/include/async_timer.h" />
+		<Unit filename="../platform/src/async_timer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/dfu_client.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

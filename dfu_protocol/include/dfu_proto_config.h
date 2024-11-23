@@ -35,6 +35,13 @@
 #define IDLE_SESSION_TIMEOUT_MINS               (5)
 
 /*
+** How long to wait following SESSION_STARTING before
+** the session state reaches SESSION_ACTIVE?
+**
+*/
+#define SESSION_STARTING_TIMEOUT_MINS           (1)
+
+/*
 ** Default maximum message size This is determined by
 ** the constraints of the physical interface such as
 ** CAN, Ethernet, etc.

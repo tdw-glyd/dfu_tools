@@ -33,6 +33,7 @@
 
 #define DEBUG_INTERFACES_NAMES              (0)
 #define KEYHIT_DELAY_MS                     (10000)
+#define BLOCKS_PER_BUF                      (100)
 
 /*
 ** VERSION NUMBERS.
@@ -128,6 +129,9 @@ static uint32_t getFileSize(char *filename);
 static void printApplicationBanner(void);
 static char *_padStr(char *pStr, char padChar, int padLength);
 static cmdlineHelpHandler _getHelpHandler(char *cmd);
+static bool mainHelpHandler(int argc, char **argv);
+
+size_t _getNextBuf(FILE * handle, uint8_t *dest, uint32_t numToRead, dfuClientEnvStruct *dfuClient);
 
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -148,40 +152,17 @@ int main(int argc, char **argv)
         bool                            done = false;
         char *                          dummy = NULL;
         char *                          destStr = NULL;
-        helpTypeEnum                    helpType = HELP_TYPE_NONE;
-        char *                          cmdForHelp = NULL;
 
     #if (DEBUG_INTERFACES_NAMES==1)
         printInterfaces();
     #endif
 
         /*
-        ** Help Requested?  Either display all help or
-        ** individual command help.
+        ** Checks to see if the caller wants help.  If not,
+        ** try to handle standard command-line args.
         **
         */
-        helpType = _getHelpType(argc, argv, &cmdForHelp);
-        if (helpType == HELP_TYPE_ALL)
-        {
-            _allCommandsHelp();
-        }
-        else if (helpType == HELP_TYPE_SINGLE)
-        {
-            if ( (cmdForHelp != NULL) && (strlen(cmdForHelp) > 0) )
-            {
-                printf("\r\n '%s' help:", cmdForHelp);
-                cmdlineHelpHandler   handler = _getHelpHandler(cmdForHelp);
-                if (handler)
-                {
-                    handler(cmdForHelp);
-                }
-                else
-                {
-                    printf("\r\n No help available.  Is this a valid command?");
-                }
-            }
-        }
-        else
+        if (!mainHelpHandler(argc, argv))
         {
             /*
             ** Look for command-line handler (or help text)
@@ -194,23 +175,13 @@ int main(int argc, char **argv)
                         (flag_srch(argc, argv, cmdlineHandlers[index].longForm, 1, &paramVal))
                     )
                 {
-                    if (helpType == HELP_TYPE_NONE)
+                    if (flag_srch(argc, argv, "-dst", 1, &destStr))
                     {
                         // Sets up the interface and other parts of the client, including default MTU.
                         dfuClientEnvStruct *            dfuClient = dfuToolInitLibForInterfaceType(argc, argv);
 
                         if (dfuClient)
                         {
-                            // If there is a destination, ALWAYS try to negotiate the MTU
-                            if (
-                                (!flag_srch(argc, argv, "-m", 1, &dummy)) &&
-                                (!flag_srch(argc, argv, "--mtu", 1, &dummy)) &&
-                                (flag_srch(argc, argv, "-dst", 1, &destStr))
-                            )
-                            {
-                                cmdlineHandlerMTU(argc, argv, paramVal, dfuClient);
-                            }
-
                             // Open up a session
                             printf("\r\nOpening a session with the target...");
 
@@ -218,6 +189,18 @@ int main(int argc, char **argv)
                             {
                                 printf("Opened!");
                                 printf("\r\n");
+
+                                //
+                                // If there is a destination, ALWAYS try to negotiate the MTU. If a session
+                                // has been started, this message will be allowed by the target.
+                                //
+                                if (
+                                    (!flag_srch(argc, argv, "-m", 1, &dummy)) &&
+                                    (!flag_srch(argc, argv, "--mtu", 1, &dummy))
+                                )
+                                {
+                                    cmdlineHandlerMTU(argc, argv, paramVal, dfuClient);
+                                }
 
                                 // Call the specified command
                                 done = cmdlineHandlers[index].handler(argc, argv, paramVal, dfuClient);
@@ -245,10 +228,27 @@ int main(int argc, char **argv)
                             printf("\r\nUnable to initialize the DFU protocol object.");
                         }
                     }
+                    else
+                    {
+                        printf("\r\nNo destination device specified.");
+                    }
                 }
 
                 ++index;
             }
+
+            /*
+            ** Pause for a few seconds and also allow the user to
+            ** end now by a key press.
+            **
+            */
+            FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
+            printf("\r\n\r\nPress a key...");
+
+            TIMER_Start(&keyhitTimer);
+            do
+            {
+            } while ( (!_kbhit()) && (!TIMER_Finished(&keyhitTimer, KEYHIT_DELAY_MS)) );
         }
     }
     else
@@ -256,15 +256,7 @@ int main(int argc, char **argv)
         printf("\r\nNo command-line arguments provided!");
     }
 
-    FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
-    printf("\r\n\r\nPress a key...");
-
-    TIMER_Start(&keyhitTimer);
-    do
-    {
-    } while ( (!_kbhit()) && (!TIMER_Finished(&keyhitTimer, KEYHIT_DELAY_MS)) );
-
-
+    printf("\r\n");
     fflush(stdout);
 
     return 0;
@@ -306,6 +298,8 @@ static bool cmdlineHandlerXferImage(int argc, char **argv, char *paramVal, dfuCl
     bool                            isEncrypted;
     char *                          filenameStr = paramVal;  // argument to "-x" is the filename
     uint32_t                        imageSize;
+    ASYNC_TIMER_STRUCT              startTimer;
+    ASYNC_TIMER_STRUCT              endTimer;
 
     flag_srch(argc, argv, "-dst", 1, &destStr);
     flag_srch(argc, argv, "-i", 1, &imageIndexStr);
@@ -345,6 +339,8 @@ static bool cmdlineHandlerXferImage(int argc, char **argv, char *paramVal, dfuCl
             printf("\r\n Encrypted     : %s", isEncrypted ? "yes" : "no");
             fflush(stdout);
 
+            // TIMER_Start(&startTimer);
+
             // Open the file
             handle = fopen(filenameStr, "rb");
             if (handle)
@@ -366,6 +362,7 @@ static bool cmdlineHandlerXferImage(int argc, char **argv, char *paramVal, dfuCl
                                                        imageAddress,
                                                        isEncrypted))
                 {
+                    TIMER_Start(&startTimer);
                     printf("\n\n");
                     fflush(stdout);
 
@@ -374,8 +371,9 @@ static bool cmdlineHandlerXferImage(int argc, char **argv, char *paramVal, dfuCl
                     **
                     */
                     while ((bytesRead = fread(buffer, 1, dfuClientGetInternalMTU(dfuClient)-1, handle))> 0)
+                    // while ( (bytesRead = _getNextBuf(handle, buffer, dfuClientGetInternalMTU(dfuClient)-1, dfuClient)) > 0)
                     {
-                        printf("\r >> Transfer status: Sending [%4u] bytes...                     ", (uint32_t)bytesRead);
+                        printf("\r >> Exchange #: %5d. Sending [%4u] bytes...                     ", totalTransactions+1, (uint32_t)bytesRead);
                         fflush(stdout);
 
                         if (!dfuClientTransaction_CMD_RCV_DATA(dfuClient,
@@ -394,6 +392,7 @@ static bool cmdlineHandlerXferImage(int argc, char **argv, char *paramVal, dfuCl
                         }
                     } // while
 
+                    TIMER_Start(&endTimer);
                     printf("\r\n\r\n Sent [%u] bytes.  Total transactions: [%d]", totalSent, totalTransactions);
 
                     // Now send the "RCV_COMPLETE" transaction
@@ -418,6 +417,8 @@ static bool cmdlineHandlerXferImage(int argc, char **argv, char *paramVal, dfuCl
             {
                 printf("\r\n Failed to open [%s]!", filenameStr);
             }
+
+            printf("\r\n Total transfer time (mS): %u", (uint32_t)TIMER_GetElapsedMillisecs(&startTimer, &endTimer));
         }
         else
         {
@@ -432,6 +433,51 @@ static bool cmdlineHandlerXferImage(int argc, char **argv, char *paramVal, dfuCl
     fflush(stdout);
 
     return (ret);
+}
+
+size_t _getNextBuf(FILE * handle, uint8_t *dest, uint32_t numToRead, dfuClientEnvStruct *dfuClient)
+{
+    static uint8_t                 blockBuff[1500 * BLOCKS_PER_BUF];
+    static uint8_t *               pCurrent = &blockBuff[0];
+    static uint8_t *               pEnd = &blockBuff[0];
+    size_t                         bytesRead = 0;
+    size_t                         fileBytesRead;
+    bool                           done = false;
+
+    while (!done)
+    {
+        if (pCurrent >= pEnd)
+        {
+            fileBytesRead = fread(blockBuff, 1, sizeof(blockBuff), handle);
+            if (fileBytesRead > 0)
+            {
+                pCurrent = &blockBuff[0];
+                pEnd = &blockBuff[fileBytesRead];
+            }
+            else
+                done = true;
+        }
+
+        if (pCurrent < pEnd)
+        {
+            if (pEnd - pCurrent > numToRead)
+            {
+                memcpy(dest, pCurrent, numToRead);
+                pCurrent += numToRead;
+                bytesRead = numToRead;
+            }
+            else
+            {
+                memcpy(dest, pCurrent, pEnd-pCurrent);
+                bytesRead = pEnd-pCurrent;
+                pCurrent += pEnd-pCurrent;
+            }
+
+            done = true;
+        }
+    }
+
+    return (bytesRead);
 }
 
 
@@ -467,6 +513,7 @@ static bool cmdlineHandlerMTU(int argc, char **argv, char *paramVal, dfuClientEn
         dfuClientSetInternalMTU(dfuClient, retMTU);
 
         printf("Client MTU is: %d", retMTU);
+        printf("\r\n");
     }
 
     return (ret);
@@ -649,6 +696,7 @@ static dfuClientEnvStruct * dfuToolInitLibForInterfaceType(int argc, char **argv
         char *      paramVal;
         char *      ifaceName;
 
+        // ETHERNET ???
         if (
                (flag_srch(argc, argv, "-t", 1, &paramVal)) ||
                (flag_srch(argc, argv, "--type", 1, &paramVal))
@@ -663,6 +711,19 @@ static dfuClientEnvStruct * dfuToolInitLibForInterfaceType(int argc, char **argv
                 if (flag_srch(argc, argv, "-iface", 1, &ifaceName))
                 {
                     ret = dfuClientInit(DFUCLIENT_INTERFACE_ETHERNET, ifaceName);
+                }
+            }
+            else
+            // CAN ???
+            if (
+                   (dfuToolStrnicmp(paramVal, "c", 3) == 0) ||
+                   (dfuToolStristr(paramVal, "can") != NULL)
+               )
+            {
+                // Get interface name
+                if (flag_srch(argc, argv, "-iface", 1, &ifaceName))
+                {
+                    ret = dfuClientInit(DFUCLIENT_INTERFACE_CAN, ifaceName);
                 }
             }
         }
@@ -860,7 +921,7 @@ static void mtuHelpHandler(char *arg)
 {
     if (arg)
     {
-        printf("\r\n Negotiate the MTU with the target.");
+        printf("\r\n  Negotiates the MTU with the target.");
         printf("\r\n");
     }
 
@@ -891,21 +952,34 @@ static helpTypeEnum _getHelpType(int argc, char **argv, char **cmdForHelp)
     helpTypeEnum                ret = HELP_TYPE_NONE;
     char *                      paramVal = NULL;
 
-    if (
-            (flag_srch(argc, argv, "-h", 1, &paramVal)) ||
-            (flag_srch(argc, argv, "--help", 1, &paramVal))
-        )
+    /*
+    ** If no arguments provided, display the short-form "ALL"
+    ** help.
+    **
+    */
+    if (argc >= 2)
     {
-        if ( (paramVal != NULL) && (strlen(paramVal) > 0) )
+        if (
+                (flag_srch(argc, argv, "-h", 1, &paramVal)) ||
+                (flag_srch(argc, argv, "--help", 1, &paramVal))
+            )
         {
-            *cmdForHelp = paramVal;
-            ret = HELP_TYPE_SINGLE;
+            if ( (paramVal != NULL) && (strlen(paramVal) > 0) )
+            {
+                *cmdForHelp = paramVal;
+                ret = HELP_TYPE_SINGLE;
+            }
+            else
+            {
+                printf("\r\n >> Primary Command Help <<\r\n");
+                ret = HELP_TYPE_ALL;
+            }
         }
-        else
-        {
-            printf("\r\n >> Primary Command Help <<\r\n");
-            ret = HELP_TYPE_ALL;
-        }
+    }
+    else
+    {
+        printf("\r\n >> No command-line arguments provided!\r\n");
+        ret = HELP_TYPE_ALL;
     }
 
     return (ret);
@@ -930,6 +1004,7 @@ static void _allCommandsHelp(void)
     int                     index = 0;
     char                    helpText[128];
 
+    printf("\r\n :: Available Primary Commands ::\r\n");
     while (cmdlineHandlers[index].handler != NULL)
     {
         sprintf(helpText, "\r\n '%s' ('%s')", cmdlineHandlers[index].shortForm, cmdlineHandlers[index].longForm);
@@ -939,6 +1014,8 @@ static void _allCommandsHelp(void)
         printf(helpText);
         ++index;
     }
+    printf("\r\n\r\n");
+    fflush(stdout);
 }
 
 /*!
@@ -972,6 +1049,45 @@ static cmdlineHelpHandler _getHelpHandler(char *cmd)
                 return (cmdlineHandlers[index].helpHandler);
             }
             ++index;
+        }
+    }
+
+    return (ret);
+}
+
+static bool mainHelpHandler(int argc, char **argv)
+{
+    bool                            ret = false;
+    helpTypeEnum                    helpType = HELP_TYPE_NONE;
+    char *                          cmdForHelp = NULL;
+
+    /*
+    ** Help Requested?  Either display all help or
+    ** individual command help.
+    **
+    */
+    helpType = _getHelpType(argc, argv, &cmdForHelp);
+    if (helpType == HELP_TYPE_ALL)
+    {
+        ret = true;
+        _allCommandsHelp();
+    }
+    else if (helpType == HELP_TYPE_SINGLE)
+    {
+        if ( (cmdForHelp != NULL) && (strlen(cmdForHelp) > 0) )
+        {
+            printf("\r\n '%s' help:", cmdForHelp);
+            cmdlineHelpHandler   handler = _getHelpHandler(cmdForHelp);
+            if (handler)
+            {
+                handler(cmdForHelp);
+            }
+            else
+            {
+                printf("\r\n >> No help available.  Is this a valid command?");
+            }
+
+            ret = true;
         }
     }
 

@@ -20,6 +20,7 @@
 #include "dfu_proto_api.h"
 #include "dfu_proto_private.h"
 #include "async_timer.h"
+#include "dfu_messages.h"
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -39,10 +40,12 @@ static dfuProtocol dfuEnvs[MAX_PROTOCOL_INSTANCES];
 ** Helper prototypes
 **
 */
+static bool _dfuDidSessionTimeout(dfuProtocol * dfu);
 static void dfuInitEnv(dfuProtocol *dfu);
-static bool dfuFreeEnv(dfuProtocol * dfu);
+static dfuProtocol * dfuReserveEnv(void);
+static bool dfuReleaseEnv(dfuProtocol * dfu);
 static void dfuExecPeriodicCommands(dfuProtocol *dfu);
-static bool dfuDidNAKNoSession(dfuProtocol *dfu, dfuCommandsEnum command);
+static bool dfuShouldAllowCmdForSessionState(dfuProtocol *dfu, dfuCommandsEnum command);
 static void dfuTxMsg(dfuProtocol *dfu, uint8_t *txBuff, uint16_t txBuffLen,  dfuMsgTargetEnum target);
 
 /*
@@ -51,7 +54,7 @@ static void dfuTxMsg(dfuProtocol *dfu, uint8_t *txBuff, uint16_t txBuffLen,  dfu
 */
 static bool internalMsgHandler_CMD_NEGOTIATE_MTU(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
 static bool internalMsgHandler_CMD_BEGIN_RCV(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
-static bool internalMsgHandler_CMD_ABORT_RCV(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
+static bool internalMsgHandler_CMD_ABORT_XFER(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
 static bool internalMsgHandler_CMD_RCV_COMPLETE(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
 static bool internalMsgHandler_CMD_RCV_DATA(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
 static bool internalMsgHandler_CMD_REBOOT(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
@@ -60,38 +63,47 @@ static bool internalMsgHandler_CMD_KEEP_ALIVE(dfuProtocol * dfu, uint8_t *msg, u
 static bool internalMsgHandler_CMD_BEGIN_SESSION(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
 static bool internalMsgHandler_CMD_END_SESSION(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
 static bool internalMsgHandler_CMD_IMAGE_STATUS(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
+static bool internalMsgHandler_CMD_BEGIN_SEND(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
+static bool internalMsgHandler_CMD_SEND_DATA(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
+static bool internalMsgHandler_CMD_INSTALL_IMAGE(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
 static bool defaultCommandHandler(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 /*
-   THIS MAPS THE INTERNAL HANDLERS TO EACH COMMAND. IT ALSO
-   PROVIDES THE SIZES OF EACH VARIANT (command, response,
-   ack, nak, etc.).  The message dispatcher uses these values
-   to confirm the sizes are correct and if they are NOT,
-   will invoke the user's error callback (if one was
-   registered).
+                 THIS MAPS THE INTERNAL HANDLERS TO EACH COMMAND.
+
+   It also provides the sizes of each varient (command, response, ack, nak, etc.).
+   The message dispatcher uses these values to confirm the sizes are correct and if
+   they are NOT, will invoke the user's error callback (if one was registered).
+
+   This also sets the Session State(s) that are required for the command to be
+   dispatched.  If the current protocol state doesn't match what a given command's
+   bitmap of allowed Session States, no response will be sent.
+
+   NOTE: Command value of ZERO is illegal and should NEVER be set! This means there are
+         a maximum of 15 total commands available.
 */
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 static const dfuInternalHandlerDescriptorStruct internalMsgHandlers[MAX_COMMANDS+1] =
 {
-    {defaultCommandHandler, 				{0,0,0,0,0}				},
-    {internalMsgHandler_CMD_NEGOTIATE_MTU, 	{3,3,1,1,0}				},
-    {internalMsgHandler_CMD_BEGIN_RCV, 		{8,0,1,1,0}				},
-    {internalMsgHandler_CMD_ABORT_RCV, 		{1,0,1,1,0}				},
-    {internalMsgHandler_CMD_RCV_COMPLETE, 	{4,0,1,1,0}				},
-    {internalMsgHandler_CMD_RCV_DATA, 		{MAX_MSG_LEN,0,1,1,0}	},
-    {internalMsgHandler_CMD_REBOOT, 		{3,0,1,1,0}				},
-    {internalMsgHandler_CMD_DEVICE_STATUS, 	{1,8,1,1,8}				},
-    {internalMsgHandler_CMD_KEEP_ALIVE, 	{0,0,0,0,1}				},
-    {internalMsgHandler_CMD_BEGIN_SESSION, 	{1,5,1,1,0}				},
-    {internalMsgHandler_CMD_END_SESSION, 	{1,0,1,1,0}				},
-    {internalMsgHandler_CMD_IMAGE_STATUS, 	{5,4,1,1,0}				},
-    {defaultCommandHandler, 				{0,0,0,0,0}				},
-    {defaultCommandHandler, 				{0,0,0,0,0}				},
-    {defaultCommandHandler, 				{0,0,0,0,0}				},
-    {defaultCommandHandler, 				{0,0,0,0,0}				}
+    {defaultCommandHandler, 				{0,0,0,0,0},			SESSION_STATE_ANY                                                     },
+    {internalMsgHandler_CMD_NEGOTIATE_MTU, 	{3,3,1,1,0},			SESSION_STATE_STARTING | SESSION_STATE_ACTIVE                         },
+    {internalMsgHandler_CMD_BEGIN_RCV, 		{8,0,1,1,0},			SESSION_STATE_ACTIVE                                                  },
+    {internalMsgHandler_CMD_ABORT_XFER,     {1,0,1,1,0},			SESSION_STATE_ACTIVE                                                  },
+    {internalMsgHandler_CMD_RCV_COMPLETE, 	{4,0,1,1,0},			SESSION_STATE_ACTIVE                                                  },
+    {internalMsgHandler_CMD_RCV_DATA, 		{MAX_MSG_LEN,0,1,1,0},	SESSION_STATE_ACTIVE                                                  },
+    {internalMsgHandler_CMD_REBOOT, 		{3,0,1,1,0},			SESSION_STATE_ACTIVE                                                  },
+    {internalMsgHandler_CMD_DEVICE_STATUS, 	{1,8,1,1,8},			SESSION_STATE_INACTIVE | SESSION_STATE_ACTIVE                         },
+    {internalMsgHandler_CMD_KEEP_ALIVE, 	{0,0,0,0,1},			SESSION_STATE_ACTIVE                                                  },
+    {internalMsgHandler_CMD_BEGIN_SESSION, 	{1,5,1,1,0}, 			SESSION_STATE_INACTIVE | SESSION_STATE_ACTIVE | SESSION_STATE_STARTING},
+    {internalMsgHandler_CMD_END_SESSION, 	{1,0,1,1,0},			SESSION_STATE_ACTIVE                                                  },
+    {internalMsgHandler_CMD_IMAGE_STATUS, 	{5,4,1,1,0},			SESSION_STATE_ACTIVE                                                  },
+    {internalMsgHandler_CMD_BEGIN_SEND, 	{2,8,1,1,0},			SESSION_STATE_ACTIVE                                                  },
+    {internalMsgHandler_CMD_SEND_DATA, 	    {2,MAX_MSG_LEN,1,1,0},	SESSION_STATE_ACTIVE                                                  },
+    {internalMsgHandler_CMD_INSTALL_IMAGE,	{1,1,1,1,0},			SESSION_STATE_ACTIVE                                                  },
+    {defaultCommandHandler, 				{0,0,0,0,0},			SESSION_STATE_ACTIVE                                                  }
 };
 
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -101,7 +113,48 @@ static const dfuInternalHandlerDescriptorStruct internalMsgHandlers[MAX_COMMANDS
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 /*!
-** FUNCTION: dfuDidNAKNoSession
+** FUNCTION: _dfuDidSessionTimeout
+**
+** DESCRIPTION: Checks the timer for either a SESSION_ACTIVE state
+**              or SESSION_STARTING state.  The "SESSION_STARTING"
+**              state timeout is shorter, since it should complete
+**              much more quickly than what an "idle" session should.
+**              
+**
+** PARAMETERS: 
+**
+** RETURNS: 
+**
+** COMMENTS: 
+**
+*/
+static bool _dfuDidSessionTimeout(dfuProtocol * dfu)
+{
+    bool                    ret = false;
+
+    if (dfu->sessionState == SESSION_STATE_ACTIVE)
+    {
+        if (TIMER_Finished(&dfu->sessionTimer, (60000 * IDLE_SESSION_TIMEOUT_MINS)))
+        {
+            dfu->sessionState = SESSION_STATE_INACTIVE;
+            ret = true;
+        }
+    }
+    else
+    if (dfu->sessionState == SESSION_STATE_STARTING)
+    {
+        if (TIMER_Finished(&dfu->sessionTimer, (600000 * SESSION_STARTING_TIMEOUT_MINS)))
+        {
+            dfu->sessionState = SESSION_STATE_INACTIVE;
+            ret = true;
+        }
+    }
+
+    return (ret);
+}
+
+/*!
+** FUNCTION: dfuShouldAllowCmdForSessionState
 **
 ** DESCRIPTION: Called by the main receive-message dispatcher, this will
 **              examine the current state of the "sessionState" and if
@@ -116,19 +169,21 @@ static const dfuInternalHandlerDescriptorStruct internalMsgHandlers[MAX_COMMANDS
 ** COMMENTS:
 **
 */
-static bool dfuDidNAKNoSession(dfuProtocol *dfu, dfuCommandsEnum command)
+static bool dfuShouldAllowCmdForSessionState(dfuProtocol *dfu, dfuCommandsEnum command)
 {
     bool                        ret = false;
 
     if (VALID_ADMIN(dfu))
     {
-        if (
-               (dfu->supportedCommands[command].requiredSessionStates != SESSION_STATE_ANY) &&
-               (dfu->supportedCommands[command].requiredSessionStates != dfu->sessionState)
-           )
+        if (VALID_CMD_ID(command))
         {
-            dfuSendSimpleNAK(dfu);
-            ret = true;
+        	if (
+        			(internalMsgHandlers[command].requiredSessionStates & SESSION_STATE_ANY) ||
+					(dfu->sessionState & internalMsgHandlers[command].requiredSessionStates)
+			   )
+        	{
+        		ret = true;
+        	}
         }
     }
 
@@ -176,7 +231,6 @@ static void dfuInitEnv(dfuProtocol *dfu)
         for (index = 0; index < MAX_PERIODIC_COMMANDS; index++)
         {
             dfu->periodicCommands[index].handler = NULL;
-            dfu->periodicCommands[index].sessionStates = SESSION_STATE_ANY;
             dfu->periodicCommands[index].execIntervalMS = 0;
             dfu->periodicCommands[index].timerRunning = false;
             dfu->periodicCommands[index].userPtr = NULL;
@@ -188,7 +242,9 @@ static void dfuInitEnv(dfuProtocol *dfu)
 }
 
 /*!
-** FUNCTION: Find an unused management object in the static list,
+** FUNCTION: dfuReserveEnv
+**
+** Find an unused management object in the static list,
 **           if any.  If found, initialize to defaults and validate
 **           the object.  Return its address
 **
@@ -201,7 +257,7 @@ static void dfuInitEnv(dfuProtocol *dfu)
 ** COMMENTS:
 **
 */
-static dfuProtocol * dfuAllocEnv(void)
+static dfuProtocol * dfuReserveEnv(void)
 {
     dfuProtocol *           ret = NULL;
     int                     index;
@@ -222,7 +278,7 @@ static dfuProtocol * dfuAllocEnv(void)
 }
 
 /*!
-** FUNCTION: dfuFreeEnv
+** FUNCTION: dfuReleaseEnv
 **
 ** DESCRIPTION: Cleans up the environment passed and "returns" it to
 **              availability in the pool.
@@ -234,7 +290,7 @@ static dfuProtocol * dfuAllocEnv(void)
 ** COMMENTS:
 **
 */
-static bool dfuFreeEnv(dfuProtocol * dfu)
+static bool dfuReleaseEnv(dfuProtocol * dfu)
 {
     bool                    ret = false;
 
@@ -326,12 +382,13 @@ static void dfuExecPeriodicCommands(dfuProtocol *dfu)
 
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+//
 //                     DEFAULT INTERNAL COMMAND HANDLERS
 /*
     These are what the engine calls when it recieves a valid command.  They
     then decide if the client had registered their own handler anf if so,
     that handler is called.  If no handler has been registered they each
-    perform whatever default actions apply.
+    perform whatever default actions apply.  Most will simply do nothing.
 */
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -342,13 +399,37 @@ static bool internalMsgHandler_CMD_NEGOTIATE_MTU(dfuProtocol * dfu, uint8_t *msg
 
     if ( (VALID_ADMIN(dfu)) && (msg) && (msgLen > 0) && (VALID_MSG_TYPE(msgType)) )
     {
-        if (dfu->supportedCommands[CMD_NEGOTIATE_MTU].handler != NULL)
+        /*
+        ** This message will only be allowed when a session is "sta5rting" or ACTIVE
+        **
+        */
+        if ( (dfu->sessionState & SESSION_STATE_STARTING) || (dfu->sessionState & SESSION_STATE_ACTIVE) )
         {
-            ret = dfu->supportedCommands[CMD_NEGOTIATE_MTU].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[CMD_NEGOTIATE_MTU].userPtr);
-        }
-        else
-        {
-            ret = defaultCommandHandler(dfu, msg, msgLen, msgType);
+            /*
+            ** Call the user's installed handler.
+            **
+            */
+            if (dfu->supportedCommands[CMD_NEGOTIATE_MTU].handler != NULL)
+            {
+                ret = dfu->supportedCommands[CMD_NEGOTIATE_MTU].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[CMD_NEGOTIATE_MTU].userPtr);
+            }
+            else
+            {
+                uint8_t                 msg[128];
+
+                /*
+                ** If the user doesn't provide a handler, we send a default response
+                **
+                */
+                if (dfuBuildMsg_CMD_NEGOTIATE_MTU(dfu,
+                                                  msg,
+                                                  DEFAULT_MTU,
+                                                  MSG_TYPE_RESPONSE))
+                {
+                    // Send the response now
+                    ret = dfuSendMsg(dfu, msg, 4, DFU_TARGET_SENDER);
+                }
+            }
         }
     }
 
@@ -374,15 +455,15 @@ static bool internalMsgHandler_CMD_BEGIN_RCV(dfuProtocol * dfu, uint8_t *msg, ui
     return (ret);
 }
 
-static bool internalMsgHandler_CMD_ABORT_RCV(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
+static bool internalMsgHandler_CMD_ABORT_XFER(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
 {
     bool                    ret = false;
 
     if ( (VALID_ADMIN(dfu)) && (msg) && (msgLen > 0) && (VALID_MSG_TYPE(msgType)) )
     {
-        if (dfu->supportedCommands[CMD_ABORT_RCV].handler != NULL)
+        if (dfu->supportedCommands[CMD_ABORT_XFER].handler != NULL)
         {
-            ret = dfu->supportedCommands[CMD_ABORT_RCV].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[CMD_ABORT_RCV].userPtr);
+            ret = dfu->supportedCommands[CMD_ABORT_XFER].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[CMD_ABORT_XFER].userPtr);
         }
         else
         {
@@ -496,11 +577,17 @@ static bool internalMsgHandler_CMD_BEGIN_SESSION(dfuProtocol * dfu, uint8_t *msg
     {
         if (dfu->supportedCommands[CMD_BEGIN_SESSION].handler != NULL)
         {
+            dfu->sessionState = SESSION_STATE_STARTING;
             ret = dfu->supportedCommands[CMD_BEGIN_SESSION].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[CMD_BEGIN_SESSION].userPtr);
+            if (!ret)
+            {
+                dfu->sessionState = SESSION_STATE_INACTIVE;
+            }
         }
         else
         {
-            ret = defaultCommandHandler(dfu, msg, msgLen, msgType);
+            dfu->sessionState = SESSION_STATE_STARTING;
+            ret = true;
         }
     }
 
@@ -519,8 +606,11 @@ static bool internalMsgHandler_CMD_END_SESSION(dfuProtocol * dfu, uint8_t *msg, 
         }
         else
         {
-            ret = defaultCommandHandler(dfu, msg, msgLen, msgType);
+            dfuSendSimpleACK(dfu);
+            ret = true;
         }
+
+        dfu->sessionState = SESSION_STATE_INACTIVE;
     }
 
     return (ret);
@@ -545,6 +635,64 @@ static bool internalMsgHandler_CMD_IMAGE_STATUS(dfuProtocol * dfu, uint8_t *msg,
     return (ret);
 }
 
+static bool internalMsgHandler_CMD_BEGIN_SEND(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
+{
+    bool                ret = false;
+
+    if ( (VALID_ADMIN(dfu)) && (msg) && (msgLen > 0) && (VALID_MSG_TYPE(msgType)) )
+    {
+        if (dfu->supportedCommands[CMD_BEGIN_SEND].handler != NULL)
+        {
+            ret = dfu->supportedCommands[CMD_BEGIN_SEND].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[CMD_BEGIN_SEND].userPtr);
+        }
+        else
+        {
+            ret = defaultCommandHandler(dfu, msg, msgLen, msgType);
+        }
+    }
+
+    return (ret);
+}
+
+
+static bool internalMsgHandler_CMD_SEND_DATA(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
+{
+    bool                ret = false;
+
+    if ( (VALID_ADMIN(dfu)) && (msg) && (msgLen > 0) && (VALID_MSG_TYPE(msgType)) )
+    {
+        if (dfu->supportedCommands[CMD_BEGIN_SEND].handler != NULL)
+        {
+            ret = dfu->supportedCommands[CMD_SEND_DATA].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[CMD_SEND_DATA].userPtr);
+        }
+        else
+        {
+            ret = defaultCommandHandler(dfu, msg, msgLen, msgType);
+        }
+    }
+
+    return (ret);    
+}
+
+static bool internalMsgHandler_CMD_INSTALL_IMAGE(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
+{
+    bool                ret = false;
+
+    if ( (VALID_ADMIN(dfu)) && (msg) && (msgLen > 0) && (VALID_MSG_TYPE(msgType)) )
+    {
+        if (dfu->supportedCommands[CMD_INSTALL_IMAGE].handler != NULL)
+        {
+            ret = dfu->supportedCommands[CMD_INSTALL_IMAGE].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[CMD_INSTALL_IMAGE].userPtr);
+        }
+        else
+        {
+            ret = defaultCommandHandler(dfu, msg, msgLen, msgType);
+        }
+    }
+
+    return (ret);    
+}
+
 /*!
 ** FUNCTION: defaultCommandHandler
 **
@@ -564,6 +712,7 @@ static bool defaultCommandHandler(dfuProtocol * dfu, uint8_t *msg, uint16_t msgL
 	(void)msg;
 	(void)msgLen;
 	(void)msgType;
+	(void)dfu;
 
 #if (NAK_UNSUPPORTED_COMMANDS==1)
     return (dfuSendSimpleNAK(dfu));
@@ -579,7 +728,7 @@ static bool defaultCommandHandler(dfuProtocol * dfu, uint8_t *msg, uint16_t msgL
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 /*!
-** FUNCTION: dfuInit
+** FUNCTION: dfuCreate
 **
 ** DESCRIPTION: This MUST be called in order to start up the protocol engine.
 **              The return is an opaque pointer to the ADMIN/state structure
@@ -592,10 +741,10 @@ static bool defaultCommandHandler(dfuProtocol * dfu, uint8_t *msg, uint16_t msgL
 ** COMMENTS:
 **
 */
-dfuProtocol * dfuInit(dfuRxFunct rxFunct,
-                      dfuTxFunct txFunct,
-                      dfuErrFunct errFunct,
-                      dfuUserPtr userPtr)
+dfuProtocol * dfuCreate(dfuRxFunct rxFunct,
+                        dfuTxFunct txFunct,
+                        dfuErrFunct errFunct,
+                        dfuUserPtr userPtr)
 {
     dfuProtocol *               ret = NULL;
 
@@ -604,7 +753,7 @@ dfuProtocol * dfuInit(dfuRxFunct rxFunct,
            (txFunct)
        )
     {
-        ret = dfuAllocEnv();
+        ret = dfuReserveEnv();
         if (ret)
         {
             ret->rxFunct = rxFunct;
@@ -622,7 +771,7 @@ dfuProtocol * dfuInit(dfuRxFunct rxFunct,
 }
 
 /*!
-** FUNCTION: dfuUnInit
+** FUNCTION: dfuDestroy
 **
 ** DESCRIPTION: Clean up the library.
 **
@@ -633,13 +782,13 @@ dfuProtocol * dfuInit(dfuRxFunct rxFunct,
 ** COMMENTS:
 **
 */
-bool dfuUnInit(dfuProtocol * dfu)
+bool dfuDestroy(dfuProtocol * dfu)
 {
     bool                        ret = false;
 
     if (VALID_ADMIN(dfu))
     {
-        ret = dfuFreeEnv(dfu);
+        ret = dfuReleaseEnv(dfu);
     }
 
     return (ret);
@@ -672,6 +821,25 @@ dfuDriveStateEnum dfuDrive(dfuProtocol *dfu)
         // Run any ready periodic commands
         dfuExecPeriodicCommands(dfu);
 
+        /*
+        ** See if the session or "session startup" state have
+        ** timed-out.  If so, call any installed user
+        ** error handler.
+        **
+        */
+        if (_dfuDidSessionTimeout(dfu))
+        {
+            if (dfu->errFunct != NULL)
+            {
+                dfu->errFunct(dfu, 
+                              NULL, 
+                              0, 
+                              DFU_ERR_SESSION_TIMED_OUT, 
+                              dfu->userPtr);
+                ret = DDS_SESSION_TIMEOUT;                              
+            }            
+        }
+
         // Call to receive a message.
         msgPtr = dfu->rxFunct(dfu, &msgLen, dfu->userPtr);
 
@@ -702,12 +870,11 @@ dfuDriveStateEnum dfuDrive(dfuProtocol *dfu)
             if (dfu->lastCommand < MAX_COMMANDS)
             {
                 /*
-                ** If the command was registered as requiring a
-                ** session to be active, and one is NOT, we will
-                ** automatically NAK that command.
-                **
+                ** Check to see if the command can be handled in our
+                ** current state.  If so, go forward.  If not, ignore
+                ** it completely.
                 */
-                if (!dfuDidNAKNoSession(dfu, dfu->lastCommand))
+                if (dfuShouldAllowCmdForSessionState(dfu, dfu->lastCommand))
                 {
                     // Update the Session timer to avoid expiration
                     TIMER_Start(&dfu->sessionTimer);
@@ -735,8 +902,11 @@ dfuDriveStateEnum dfuDrive(dfuProtocol *dfu)
                             ret = DDS_ERROR;
                     	    if (internalMsgHandlers[dfu->lastCommand].handler(dfu, msgPtr, msgLen, msgType))
                             {
+                                // Retrigger the session time to keep it active
+                                TIMER_Start(&dfu->sessionTimer);
                                 ret = DDS_OK;
                             }
+                            dfu->lastCommand = 0;
                         }
                     }
                     else
@@ -788,7 +958,6 @@ dfuDriveStateEnum dfuDrive(dfuProtocol *dfu)
 bool dfuInstallCommandHandler(dfuProtocol * dfu,
                               dfuCommandsEnum command,
                               dfuCommandHandler handler,
-                              dfuSessionStateEnum requiredSessionStates,
                               dfuUserPtr userPtr)
 {
     bool                    ret = false;
@@ -799,7 +968,6 @@ bool dfuInstallCommandHandler(dfuProtocol * dfu,
         {
             dfu->supportedCommands[command].command = command;
             dfu->supportedCommands[command].handler = handler;
-            dfu->supportedCommands[command].requiredSessionStates = requiredSessionStates;
             dfu->supportedCommands[command].userPtr = userPtr;
 
             ret = true;
@@ -828,7 +996,6 @@ bool dfuRemoveCommandHandler(dfuProtocol * dfu, dfuCommandsEnum command)
     return (dfuInstallCommandHandler(dfu,
                                      command,
                                      NULL,
-                                     true,
                                      NULL));
 }
 
@@ -848,7 +1015,6 @@ bool dfuRemoveCommandHandler(dfuProtocol * dfu, dfuCommandsEnum command)
 bool dfuInstallPeriodicHandler(dfuProtocol *dfu,
                                dfuCommandHandler handler,
                                uint32_t execIntervalMS,
-                               dfuSessionStateEnum sessionStates,
                                dfuUserPtr userPtr)
 {
     bool                    ret = false;
@@ -864,7 +1030,6 @@ bool dfuInstallPeriodicHandler(dfuProtocol *dfu,
                 if ( (handler != NULL) && (execIntervalMS > 0) )
                 {
                     dfu->periodicCommands[index].handler = handler;
-                    dfu->periodicCommands[index].sessionStates = sessionStates;
                     dfu->periodicCommands[index].execIntervalMS = execIntervalMS;
                     dfu->periodicCommands[index].userPtr = userPtr;
                     dfu->periodicCommands[index].signature = PERIODIC_COMMAND_SIGNATURE;
@@ -1031,35 +1196,6 @@ bool dfuSendSimpleNAK(dfuProtocol *dfu)
 }
 
 /*!
-** FUNCTION: dfuSetSessionState
-**
-** DESCRIPTION: Something external has to set whether a session is
-**              ACTIVE or INACTIVE.
-**
-** PARAMETERS:
-**
-** RETURNS:
-**
-** COMMENTS:
-**
-*/
-bool dfuSetSessionState(dfuProtocol *dfu, dfuSessionStateEnum sessionState)
-{
-    bool                    ret = false;
-
-    if (
-           (VALID_ADMIN(dfu)) &&
-           ( (sessionState == SESSION_STATE_INACTIVE) || (sessionState == SESSION_STATE_ACTIVE) )
-       )
-    {
-        dfu->sessionState = sessionState;
-        ret = true;
-    }
-
-    return (ret);
-}
-
-/*!
 ** FUNCTION: dfuIsSessionActive
 **
 ** DESCRIPTION: Returns whether or not a session is active.
@@ -1077,7 +1213,108 @@ bool dfuIsSessionActive(dfuProtocol * dfu)
 
     if (VALID_ADMIN(dfu))
     {
-        ret = (bool)(dfu->sessionState == SESSION_STATE_ACTIVE);
+        ret = (bool)(dfu->sessionState & SESSION_STATE_ACTIVE);
+    }
+
+    return (ret);
+}
+
+/*!
+** FUNCTION: dfuSetSessionActive
+**
+** DESCRIPTION:
+**
+** PARAMETERS:
+**
+** RETURNS:
+**
+** COMMENTS:
+**
+*/
+bool dfuSetSessionActive(dfuProtocol * dfu)
+{
+    bool                ret = false;
+
+    if (VALID_ADMIN(dfu))
+    {
+        // Begin SESSION timer
+        TIMER_Start(&dfu->sessionTimer);
+        dfu->sessionState = SESSION_STATE_ACTIVE;
+        ret = true;
+    }
+
+    return (ret);
+}
+
+/*!
+** FUNCTION: dfuSetSessionStarting
+**
+** DESCRIPTION:
+**
+** PARAMETERS:
+**
+** RETURNS:
+**
+** COMMENTS:
+**
+*/
+bool dfuSetSessionStarting(dfuProtocol * dfu)
+{
+    bool                ret = false;
+
+    if (VALID_ADMIN(dfu))
+    {
+        TIMER_Start(&dfu->sessionTimer);
+        dfu->sessionState = SESSION_STATE_STARTING;
+        ret = true;
+    }
+
+    return (ret);
+}
+
+/*!
+** FUNCTION: dfuSetSessionInActive
+**
+** DESCRIPTION:
+**
+** PARAMETERS:
+**
+** RETURNS:
+**
+** COMMENTS:
+**
+*/
+bool dfuSetSessionInActive(dfuProtocol * dfu)
+{
+    bool                ret = false;
+
+    if (VALID_ADMIN(dfu))
+    {
+        ret = dfuSetSessionState(dfu, SESSION_STATE_INACTIVE);
+    }
+
+    return (ret);
+}
+
+/*!
+** FUNCTION: dfuIsSessionStarting
+**
+** DESCRIPTION:
+**
+** PARAMETERS:
+**
+** RETURNS:
+**
+** COMMENTS:
+**
+*/
+bool dfuIsSessionStarting(dfuProtocol * dfu)
+{
+    bool                    ret = false;
+
+    if (VALID_ADMIN(dfu))
+    {
+        ret = (bool)(dfu->sessionState & SESSION_STATE_STARTING);
     }
 
     return (ret);
@@ -1241,6 +1478,59 @@ uint16_t dfuGetUptimeMins(dfuProtocol *dfu)
                 ret = (uint16_t)(deltaMS / ONE_MINUTE_MILLSECONDS);
             }
         }
+    }
+
+    return (ret);
+}
+
+/*!
+** FUNCTION: dfuSetSessionState
+**
+** DESCRIPTION: This will OR the value of the "sessionStates"
+**              bit-map in with the current value of the
+**              protocol session state.
+**
+** PARAMETERS:
+**
+** RETURNS:
+**
+** COMMENTS:
+**
+*/
+bool dfuSetSessionState(dfuProtocol *dfu, uint8_t sessionStates)
+{
+    bool                        ret = false;
+
+    if (VALID_ADMIN(dfu))
+    {
+       dfu->sessionState |= sessionStates;
+       ret = true;
+    }
+
+    return (ret);
+}
+
+/*!
+** FUNCTION: dfuClearSessionState
+**
+** DESCRIPTION: OR's the complement of the "sessionState" bitmask
+**              with the current value of the protocol session state.
+**
+** PARAMETERS:
+**
+** RETURNS:
+**
+** COMMENTS:
+**
+*/
+bool dfuClearSessionState(dfuProtocol *dfu, uint8_t sessionStates)
+{
+    bool                        ret = false;
+
+    if (VALID_ADMIN(dfu))
+    {
+        dfu->sessionState &= ~sessionStates;
+        ret = true;
     }
 
     return (ret);

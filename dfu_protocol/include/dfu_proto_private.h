@@ -48,19 +48,25 @@
 #define HDR_COMMAND_BIT_MASK                (0xF0)
 #define HDR_MSG_TYPE_BIT_MASK               (0x07)
 
+
+/*
+** Session state enumeration.  
+** Allows commands to be executed
+** depending on the state of the protocol 
+** session.
+**
+*/
+#define SESSION_STATE_INACTIVE  (0x01)
+#define SESSION_STATE_STARTING  (0x02)
+#define SESSION_STATE_ACTIVE 	(0x04)
+#define SESSION_STATE_ANY 		(0x80)
+
 /*
 ** Describes the handler for each supported command.
 **
 */
 typedef struct
 {
-    /*
-    ** If TRUE, the command will be NAK'd if
-    ** no session has been established.
-    **
-    */
-    dfuSessionStateEnum         requiredSessionStates;
-
     // Command enumeration value
     dfuCommandsEnum             command;
 
@@ -78,7 +84,6 @@ typedef struct
 typedef bool (* dfuInternalCommandHandler)(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
 
 
-
 /*
 ** This associates each internal command handler with the allowed message
 ** size for each variant of that command (response, NAK, ACK, etc...)
@@ -90,6 +95,7 @@ typedef struct
 {
     dfuInternalCommandHandler                   handler;
     size_t                     					msgTypeSizes[MAX_MSG_TYPES];
+    uint8_t                                     requiredSessionStates;
 }dfuInternalHandlerDescriptorStruct;
 
 
@@ -105,7 +111,6 @@ typedef struct
 {
     dfuCommandHandler           handler;
     void                       *userPtr;
-    dfuSessionStateEnum         sessionStates;
     uint32_t                    execIntervalMS;
     ASYNC_TIMER_STRUCT          timer;
     bool                        timerRunning;
@@ -160,7 +165,15 @@ struct dfuProtocol
     */
     ASYNC_TIMER_STRUCT          sessionTimer;
     uint32_t                    sessionTimeoutMS;
-    dfuSessionStateEnum         sessionState;
+    uint8_t         			sessionState;
+
+    /*
+    ** Protocol states, like SESSION STARTING,
+    ** RECEIVING IMAGE, etc.  Union of all
+    ** state structures.
+    **
+    */
+    dfuProtocolStatesUnion      protocolState;
 
     /*
     ** List of client-registered command handlers.
@@ -208,8 +221,6 @@ struct dfuProtocol
 
 // Inverts the state of the "toggle" bit in the ADMIN
 #define INVERT_TOGGLE(dfu)  (dfu->toggle = dfu->toggle ^ HDR_TOGGLE_BIT_MASK)
-
-
 
 
 #if defined(__cplusplus)

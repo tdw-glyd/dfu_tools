@@ -207,7 +207,13 @@ bool dfuClientSetDestination(dfuClientEnvStruct * env, char *dest);
 ** COMMENTS:
 **
 */
-bool dfuClientRawTransaction(dfuClientEnvStruct * env, uint8_t *msg, uint16_t msgLen, bool broadcast, uint32_t timeout);
+bool dfuClientRawTransaction(dfuClientEnvStruct * env,
+                             char *dest,
+                             dfuCommandHandler responseHandler,
+                             uint8_t *msg, 
+                             uint16_t msgLen, 
+                             bool broadcast, 
+                             uint32_t timeout);
 
 /*!
 ** FUNCTION: dfuClientSetTransactionComplete

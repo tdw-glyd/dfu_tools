@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="-h --mtu" />
+				<Option parameters='-x C:\Glydways\bl_demo\sample_app\generate\src\Clock_Ip_Cfg.c -iface &quot;\Device\NPF_{DADC3966-80F0-48A8-8F57-0188FDB7DB8D}&quot; -dst 66:55:44:33:22:11 --type ethernet -i 1 -a 0x00600000 -e 1 ' />
 				<Compiler>
 					<Add option="-g" />
 					<Add directory="../dfu_tool_win" />

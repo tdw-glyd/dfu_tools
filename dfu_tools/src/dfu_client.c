@@ -19,6 +19,10 @@
 static bool dfuClientInitEnv(dfuClientEnvStruct *env);
 static dfuClientEnvStruct *dfuClientAllocEnv(void);
 static bool dfuClientFreeEnv(dfuClientEnvStruct *env);
+static bool dfuClientInstallResponseHandler(dfuCommandsEnum command,
+                                            dfuCommandHandler responseHandler,
+                                            dfuClientEnvStruct * env);
+static bool dfuClientRemoveResponseHandler(dfuClientEnvStruct * env);
 
 /*
 ** How many library interaces can be active at the same time?
@@ -31,7 +35,7 @@ static bool dfuClientFreeEnv(dfuClientEnvStruct *env);
 ** Holds instance-specific data.
 **
 */
-#define DFU_TOOL_ENV_SIGNATURE      (0x08E189AC)
+#define DFU_CLIENT_ENV_SIGNATURE      (0x08E189AC)
 struct dfuClientEnvStruct
 {
     uint32_t                        signature;
@@ -52,6 +56,7 @@ struct dfuClientEnvStruct
     // NOT YET IMPLEMENATED
 
     bool                        transactionComplete;
+    dfuCommandsEnum             transactionCommand;
 };
 
 /*
@@ -65,7 +70,7 @@ static dfuClientEnvStruct         envs[MAX_INTERFACES];
 ** Handy macros
 **
 */
-#define VALID_ENV(env) ( (env != NULL) && (env->signature == DFU_TOOL_ENV_SIGNATURE) )
+#define VALID_ENV(env) ( (env != NULL) && (env->signature == DFU_CLIENT_ENV_SIGNATURE) )
 
 
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -140,40 +145,95 @@ dfuClientEnvStruct * dfuClientInit(dfuClientInterfaceTypeEnum interfaceType, con
 **
 ** RETURNS:
 **
-** COMMENTS:
+** COMMENTS: Since the caller is expected to provide a valid message, we
+**           extract the COMMAND value directly from it and use it to
+**           let us install the response callback handler for that command
+**           value and to match response to command, etc.  The caller of 
+**           this function only needs to give us the message, the destination
+**           and a few other bits for us to perform the transaction.
 **
 */
-bool dfuClientRawTransaction(dfuClientEnvStruct * env, uint8_t *msg, uint16_t msgLen, bool broadcast, uint32_t timeout)
+bool dfuClientRawTransaction(dfuClientEnvStruct * env,
+                             char *dest,
+                             dfuCommandHandler responseHandler,
+                             uint8_t *msg,
+                             uint16_t msgLen,
+                             bool broadcast,
+                             uint32_t timeout)
 {
     bool                            ret = false;
 
-    if ( (VALID_ENV(env)) && (env->dfu) && (msg) && (msgLen) )
+    if (
+           (VALID_ENV(env)) &&
+           (responseHandler) &&
+           (env->dfu) &&
+           (msg) &&
+           (msgLen)
+       )
     {
         ASYNC_TIMER_STRUCT                  timer;
+        dfuCommandsEnum                     command;
 
-        // Send the message
+        /*
+        ** Extract the command value and validate
+        **
+        */
+        command = CMD_FROM_MSG(msg);
+        if (!VALID_CMD_ID(command))
+        {
+            return (ret);
+        }
+
+        // First, set up to send to the desired target
+        dfuClientSetDestination(env, dest);
+
+        // Now install the response handler.
+        dfuClientInstallResponseHandler(command,
+                                        responseHandler,
+                                        env);
+
+        /*
+        ** Now, send the message and wait for the response handler to
+        ** either indicate success, or a timeout to occur.
+        */
         if (dfuSendMsg(env->dfu, msg, msgLen, (broadcast ? DFU_TARGET_ANY : DFU_TARGET_SENDER)))
         {
             dfuDriveStateEnum               driveState;
 
+            // Init the transaction state
             dfuClientSetTransactionComplete(env, false);
 
+            /*
+            ** Loop, waiting for either a response or a timeout.
+            **
+            */
             TIMER_Start(&timer);
             do
             {
-                // Drive
+                // Drive, calling DFU main protocol "drive" method
                 driveState = dfuDrive(env->dfu);
 
-                // Check result
-                if (env->transactionComplete == true)
+                /*
+                ** If a response handler was invoked and it returns
+                ** TRUE, we get back a "DDS_OK" that tells us the 
+                ** transaction has completed.  If that doesn't
+                ** happen within the timeout period, we exit with
+                ** FALSE as a result.
+                **
+                */
+                if (driveState == DDS_OK)
                 {
-                    ret = (driveState == DDS_OK);
+                    ret = true;
+                    dfuClientSetTransactionComplete(env, true);
                     break;
                 }
 
-                //Sleep(0);
+                Sleep(0);
             } while (!TIMER_Finished(&timer, timeout));
         }
+
+        // Automatically remove the response handler for the command value.
+        dfuClientRemoveResponseHandler(env);
     }
 
     return (ret);
@@ -317,6 +377,29 @@ uint16_t dfuClientGetInternalMTU(dfuClientEnvStruct *env)
 //                        PUBLIC TRANSACTION FUNCTIONS
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+/*
+** "Transactions" consist of two parts:
+**
+**    1. The publicly-visible specific transaction API function.  
+**    2. The internally-visible function that will be called if and when a
+**       response to that command arrives.
+**
+** 
+** The first function uses the "dfu_message" library to construct the desired
+** comamnd message, then calls the "raw transaction" function, passing in
+** the newly-constructed message, the destination, the handler for the 
+** response and a timeout for no-or-invalid response.  That function
+** then calls the main DFU protocol engine "drive" function.  Since
+** the interface will have installed media driver functions, "drive"
+** will call the proper response handler we just installed when a response
+** message arrives, and if that function likes what it sees, the tran
+** transaction is considered complete. 
+**
+** Since the response handler callback is passed our client environment
+** data, we can use that to set the received values, etc. as needed
+** for that particular transaction.
+**
+*/
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -353,16 +436,6 @@ uint32_t dfuClientTransaction_CMD_BEGIN_SESSION(dfuClientEnvStruct *dfuClient,
     {
         uint8_t                      msg[128];
 
-        // Set up to send to the desired target
-        dfuClientSetDestination(dfuClient, dest);
-
-        // Register the MTU handler
-        dfuInstallCommandHandler(GET_DFU(dfuClient),
-                                 CMD_BEGIN_SESSION,
-                                 responseHandler_CMD_BEGIN_SESSION,
-                                 SESSION_STATE_ANY,
-                                 dfuClient);
-
         // Build a message
         if (dfuBuildMsg_CMD_BEGIN_SESSION(GET_DFU(dfuClient),
                                           msg,
@@ -371,14 +444,17 @@ uint32_t dfuClientTransaction_CMD_BEGIN_SESSION(dfuClientEnvStruct *dfuClient,
             uint32_t                challengePW;
 
             dfuClient->userPtr = &challengePW;
-            if (dfuClientRawTransaction(dfuClient, msg, 1, false, timeoutMS))
+            if (dfuClientRawTransaction(dfuClient,
+                                        dest,
+                                        responseHandler_CMD_BEGIN_SESSION,
+                                        msg,
+                                        1,
+                                        false,
+                                        timeoutMS))
             {
                 ret = challengePW;
             }
         }
-
-        // Remove response handler
-        dfuRemoveCommandHandler(GET_DFU(dfuClient), CMD_NEGOTIATE_MTU);
     }
 
     return (ret);
@@ -391,10 +467,9 @@ static bool responseHandler_CMD_BEGIN_SESSION(dfuProtocol * dfu, uint8_t *msg, u
 
     if ( (VALID_ENV(env)) && (msgType == MSG_TYPE_ACK) )
     {
+        dfuSetSessionActive(dfu);  // TEMPORARY
         ret = true;
     }
-
-     dfuClientSetTransactionComplete(env, true);
 
     return (ret);
 }
@@ -431,29 +506,22 @@ bool dfuClientTransaction_CMD_END_SESSION(dfuClientEnvStruct *dfuClient,
     {
         uint8_t                      msg[128];
 
-        // Set up to send to the desired target
-        dfuClientSetDestination(dfuClient, dest);
-
-        // Register the MTU handler
-        dfuInstallCommandHandler(GET_DFU(dfuClient),
-                                CMD_END_SESSION,
-                                responseHandler_CMD_END_SESSION,
-                                SESSION_STATE_ANY,
-                                dfuClient);
-
         // Build a message
         if (dfuBuildMsg_CMD_END_SESSION(GET_DFU(dfuClient),
                                         msg,
                                         MSG_TYPE_COMMAND))
         {
-            if (dfuClientRawTransaction(dfuClient, msg, 1, false, timeoutMS))
+            if (dfuClientRawTransaction(dfuClient,
+                                        dest,
+                                        responseHandler_CMD_END_SESSION,
+                                        msg,
+                                        1,
+                                        false,
+                                        timeoutMS))
             {
                 ret = true;
             }
         }
-
-        // Remove response handler
-        dfuRemoveCommandHandler(GET_DFU(dfuClient), CMD_NEGOTIATE_MTU);
     }
 
     return (ret);
@@ -468,8 +536,6 @@ static bool responseHandler_CMD_END_SESSION(dfuProtocol * dfu, uint8_t *msg, uin
     {
         ret = true;
     }
-
-     dfuClientSetTransactionComplete(env, true);
 
     return (ret);
 }
@@ -510,31 +576,24 @@ uint16_t dfuClientTransaction_CMD_NEGOTIATE_MTU(dfuClientEnvStruct *dfuClient,
         uint8_t                      msg[128];
         uint16_t                     resultMTU;
 
-        // Set up to send to the desired target
-        dfuClientSetDestination(dfuClient, dest);
-
-        // Register the MTU handler
-        dfuInstallCommandHandler(GET_DFU(dfuClient),
-                                CMD_NEGOTIATE_MTU,
-                                responseHandler_CMD_NEGOTIATE_MTU,
-                                SESSION_STATE_ANY,
-                                dfuClient);
-
         // Build a message
         if (dfuBuildMsg_CMD_NEGOTIATE_MTU(GET_DFU(dfuClient),
-                                        msg,
-                                        myMTU,
-                                        MSG_TYPE_COMMAND))
+                                          msg,
+                                          myMTU,
+                                          MSG_TYPE_COMMAND))
         {
             dfuClient->userPtr = &resultMTU; // save a pointer to the result value
-            if (dfuClientRawTransaction(dfuClient, msg, 3, false, timeoutMS))
+            if (dfuClientRawTransaction(dfuClient,
+                                        dest,
+                                        responseHandler_CMD_NEGOTIATE_MTU,
+                                        msg,
+                                        3,
+                                        false,
+                                        timeoutMS))
             {
                 ret = resultMTU;
             }
         }
-
-        // Remove response handler
-        dfuRemoveCommandHandler(GET_DFU(dfuClient), CMD_NEGOTIATE_MTU);
     }
 
     return (ret);
@@ -573,9 +632,6 @@ static bool responseHandler_CMD_NEGOTIATE_MTU(dfuProtocol * dfu, uint8_t *msg, u
                 *((uint16_t *)env->userPtr) = mtu;
             }
         }
-
-        // Finish the transaction
-        dfuClientSetTransactionComplete(env, true);
     }
 
     return (ret);
@@ -618,16 +674,6 @@ bool dfuClientTransaction_CMD_BEGIN_RCV(dfuClientEnvStruct *dfuClient,
     {
         uint8_t                      msg[128];
 
-        // Set up to send to the desired target
-        dfuClientSetDestination(dfuClient, dest);
-
-        // Register the MTU handler
-        dfuInstallCommandHandler(GET_DFU(dfuClient),
-                                CMD_BEGIN_RCV,
-                                responseHandler_CMD_BEGIN_RCV,
-                                SESSION_STATE_ANY,
-                                dfuClient);
-
         // Build a message
         if (dfuBuildMsg_CMD_BEGIN_RCV(GET_DFU(dfuClient),
                                       msg,
@@ -637,11 +683,14 @@ bool dfuClientTransaction_CMD_BEGIN_RCV(dfuClientEnvStruct *dfuClient,
                                       imageAddress,
                                       MSG_TYPE_COMMAND))
         {
-            ret = dfuClientRawTransaction(dfuClient, msg, 8, false, timeoutMS);
+            ret = dfuClientRawTransaction(dfuClient,
+                                          dest,
+                                          responseHandler_CMD_BEGIN_RCV,
+                                          msg,
+                                          8,
+                                          false,
+                                          timeoutMS);
         }
-
-        // Remove response handler
-        dfuRemoveCommandHandler(GET_DFU(dfuClient), CMD_BEGIN_RCV);
     }
 
     return (ret);
@@ -656,8 +705,6 @@ static bool responseHandler_CMD_BEGIN_RCV(dfuProtocol * dfu, uint8_t *msg, uint1
     {
         ret = true;
     }
-
-     dfuClientSetTransactionComplete(env, true);
 
     return (ret);
 }
@@ -698,16 +745,6 @@ bool dfuClientTransaction_CMD_RCV_DATA(dfuClientEnvStruct *dfuClient,
 
         memset(msg, 0xFF, sizeof(msg));
 
-        // Set up to send to the desired target
-        dfuClientSetDestination(dfuClient, dest);
-
-        // Set up to handle the response
-        dfuInstallCommandHandler(GET_DFU(dfuClient),
-                                 CMD_RCV_DATA,
-                                 responseHandler_CMD_RCV_DATA,
-                                 SESSION_STATE_ANY,
-                                 dfuClient);
-
         // Build the message
         if (dfuBuildMsg_CMD_RCV_DATA(GET_DFU(dfuClient),
                                      msg,
@@ -716,14 +753,13 @@ bool dfuClientTransaction_CMD_RCV_DATA(dfuClientEnvStruct *dfuClient,
                                      MSG_TYPE_COMMAND))
         {
             ret = dfuClientRawTransaction(dfuClient,
+                                          dest,
+                                          responseHandler_CMD_RCV_DATA,
                                           msg,
                                           dfuClientGetInternalMTU(dfuClient),
                                           false,
                                           timeoutMS);
         }
-
-        // Remove response handler
-        dfuRemoveCommandHandler(GET_DFU(dfuClient), CMD_RCV_DATA);
     }
 
     return (ret);
@@ -738,8 +774,6 @@ static bool responseHandler_CMD_RCV_DATA(dfuProtocol * dfu, uint8_t *msg, uint16
     {
         ret = true;
     }
-
-    dfuClientSetTransactionComplete(env, true);
 
     return (ret);
 }
@@ -778,30 +812,19 @@ bool dfuClientTransaction_CMD_RCV_COMPLETE(dfuClientEnvStruct *dfuClient,
     {
         uint8_t                     msg[128];
 
-        // Set up to send to the desired target
-        dfuClientSetDestination(dfuClient, dest);
-
-        // Set up to handle the response
-        dfuInstallCommandHandler(GET_DFU(dfuClient),
-                                CMD_RCV_COMPLETE,
-                                responseHandler_CMD_RCV_COMPLETE,
-                                SESSION_STATE_ANY,
-                                dfuClient);
-
         if (dfuBuildMsg_CMD_RCV_COMPLETE(GET_DFU(dfuClient),
                                          msg,
                                          totalBytesXferred,
                                          MSG_TYPE_COMMAND))
         {
             ret = dfuClientRawTransaction(dfuClient,
+                                          dest,
+                                          responseHandler_CMD_RCV_COMPLETE,
                                           msg,
                                           4,
                                           false,
                                           timeoutMS);
         }
-
-        // Remove response handler
-        dfuRemoveCommandHandler(GET_DFU(dfuClient), CMD_RCV_COMPLETE);
     }
 
     return (ret);
@@ -818,8 +841,6 @@ static bool responseHandler_CMD_RCV_COMPLETE(dfuProtocol * dfu, uint8_t *msg, ui
         ret = true;
     }
 
-    dfuClientSetTransactionComplete(env, true);
-
     return (ret);
 }
 
@@ -828,6 +849,84 @@ static bool responseHandler_CMD_RCV_COMPLETE(dfuProtocol * dfu, uint8_t *msg, ui
 //                         INTERNAL SUPPORT FUNCTIONS
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+/*!
+** FUNCTION: dfuClientInstallResponseHandler
+**
+** DESCRIPTION: Installs the desired response handler for a specified command.
+**              Saves the command so that we can automatically remove
+**              the handler once a transaction completes (either with
+**              success or failure)
+**
+** PARAMETERS:
+**
+** RETURNS:
+**
+** COMMENTS:
+**
+*/
+static bool dfuClientInstallResponseHandler(dfuCommandsEnum command,
+                                            dfuCommandHandler responseHandler,
+                                            dfuClientEnvStruct * env)
+{
+    bool                    ret = true;
+
+    if (
+           (env) &&
+           (responseHandler) &&
+           (VALID_CMD_ID(command))
+       )
+    {
+        if (dfuInstallCommandHandler(GET_DFU(env),
+                                     command,
+                                     responseHandler,
+                                     env))
+        {
+            // 
+            // Save the command value so we can uninstall 
+            // the response handler when the transaction
+            // completes.
+            //
+            env->transactionCommand = command;
+            ret = true;
+        }
+    }
+
+    return (ret);
+}
+
+/*!
+** FUNCTION: dfuClientRemoveResponseHandler
+**
+** DESCRIPTION: Removes any existing response handler for the most-recent
+**              command transaction.
+**
+** PARAMETERS:
+**
+** RETURNS:
+**
+** COMMENTS:
+**
+*/
+static bool dfuClientRemoveResponseHandler(dfuClientEnvStruct * env)
+{
+    bool                    ret = false;
+
+    if (
+           (env) &&
+           (VALID_CMD_ID(env->transactionCommand))
+       )
+    {
+        if (dfuRemoveCommandHandler(GET_DFU(env), env->transactionCommand))
+        {
+            // The the command value to invalid.
+            env->transactionCommand = 0;
+            ret = true;
+        }
+    }
+
+    return (ret);
+}
 
 /*!
 ** FUNCTION: dfuClientInitEnv
@@ -848,7 +947,7 @@ static bool dfuClientInitEnv(dfuClientEnvStruct *env)
     if (env)
     {
         env->dfu = NULL;
-        env->signature = DFU_TOOL_ENV_SIGNATURE;
+        env->signature = DFU_CLIENT_ENV_SIGNATURE;
         ret = true;
     }
 
@@ -876,7 +975,7 @@ static dfuClientEnvStruct *dfuClientAllocEnv(void)
 
     for (index = 0; index < MAX_INTERFACES; index++)
     {
-        if (envs[index].signature != DFU_TOOL_ENV_SIGNATURE)
+        if (envs[index].signature != DFU_CLIENT_ENV_SIGNATURE)
         {
             ret = &envs[index];
             if (dfuClientInitEnv(&envs[index]))
@@ -910,7 +1009,7 @@ static bool dfuClientFreeEnv(dfuClientEnvStruct *env)
     {
         if (env->dfu)
         {
-            dfuUnInit(env->dfu);
+            dfuDestroy(env->dfu);
         }
 
         ret = dfuClientInitEnv(env);

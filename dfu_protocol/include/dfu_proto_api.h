@@ -88,7 +88,7 @@ typedef enum
 {
     CMD_NEGOTIATE_MTU = 0x01,
     CMD_BEGIN_RCV = 0x02,
-    CMD_ABORT_RCV = 0x03,
+    CMD_ABORT_XFER = 0x03,
     CMD_RCV_COMPLETE = 0x04,
     CMD_RCV_DATA = 0x05,
     CMD_REBOOT = 0x06,
@@ -96,11 +96,16 @@ typedef enum
     CMD_KEEP_ALIVE = 0x08,
     CMD_BEGIN_SESSION = 0x09,
     CMD_END_SESSION = 0x0A,
-    CMD_IMAGE_STATUS = 0x0B
+    CMD_IMAGE_STATUS = 0x0B,
+    CMD_BEGIN_SEND = 0x0C,
+    CMD_SEND_DATA = 0x0D,
+    CMD_INSTALL_IMAGE = 0x0E,
+
+    CMD_LAST_COMMAND = 0x0F
 }dfuCommandsEnum;
 
 /*
-** Indicates the type of message.
+** MESSAGE TYPES
 **
 */
 #define MAX_MSG_TYPES            (5)
@@ -132,8 +137,7 @@ typedef enum
 }dfuDriveStateEnum;
 
 /*
-** Errors that the library can generate.  Passed to the 
-** error handler callback to indicate the issue.
+** ERROR ENUMERATION
 **
 */
 typedef enum
@@ -160,20 +164,6 @@ typedef enum
 }dfuMsgTargetEnum;
 
 /*
-** Session state enumeration.  
-** Allows commands to be executed
-** depending on the state of the protocol 
-** session.
-**
-*/
-typedef enum
-{
-    SESSION_STATE_INACTIVE,
-    SESSION_STATE_ACTIVE,
-    SESSION_STATE_ANY
-}dfuSessionStateEnum;
-
-/*
 ** DEVICE TYPES
 **
 **  THESE NEED TO BE UNIVERSAL! ALL SYSTEMS MUST USE
@@ -198,7 +188,8 @@ typedef enum
 //  THESE FUNCTION POINTER TYPES PROVIDE THE 
 //  LIBRARY WITH RX, TX AND ERROR HANDLERS. THESE
 //  ARE REGISTERED WITH THE LIBRARY WHEN IT IS 
-//  INITIALIZED.
+//  INITIALIZED.  THIS ALLOWS THE LIBRARY TO BE
+//  PLATFORM INDEPENDENT
 //
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -248,7 +239,7 @@ typedef void (* dfuErrFunct)(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, d
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //
-//  USER MUST IMPLEMENT COMMAND HANDLERS USING 
+//  USER MUST IMPLEMENT EVERY COMMAND HANDLER USING 
 //  FUNCTIONS WITH THIS SIGNATURE
 //
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -269,6 +260,70 @@ typedef void (* dfuErrFunct)(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, d
 */
 typedef bool (* dfuCommandHandler)(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType, dfuUserPtr userPtr);
 
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//          DFU PROTOCOL STATE STRUCTURES
+/*
+    Depending on what state the protocol is in, one
+    of these state structures will be active.  
+    The current state of a given instance of the 
+    protocol engine will contain the union of all
+    of the following, with one being acive at a 
+    time.
+*/
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+typedef struct
+{
+    uint32_t                signature;
+}dfuIdleStateStruct;
+
+
+typedef struct
+{
+    uint32_t                signature;
+}dfuSessionStartingStateStruct;
+
+typedef struct
+{
+    uint32_t                signature;
+}dfuSessionStartedStateStruct;
+
+
+typedef struct 
+{
+    uint32_t                signature;
+}dfuReceivingImageStateStruct;
+
+
+typedef union 
+{
+    dfuIdleStateStruct                  idleState;
+    dfuSessionStartingStateStruct       sessionStartingState;
+    dfuSessionStartedStateStruct        sessionStartedState;
+    dfuReceivingImageStateStruct        receivingImageState;
+}dfuProtocolStatesUnion;
+
+
+// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+//                              HELPFUL MACROS
+// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+/*
+** Is the COMMAND value valid?
+**
+*/
+#define VALID_CMD_ID(cmd)      (bool) ((cmd > 0) && (cmd <= CMD_LAST_COMMAND) )
+
+/*
+** Return the COMMAND value from the message header
+**
+*/
+#define CMD_FROM_MSG(msg)       (((uint8_t)msg[0] & HDR_COMMAND_BIT_MASK) >> 4)
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -280,7 +335,7 @@ extern "C" {
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 /*!
-** FUNCTION: dfuInit
+** FUNCTION: dfuCreate
 **
 ** DESCRIPTION: This MUST be called in order to start up the protocol engine.
 **              The return is an opaque pointer to the ADMIN/state structure
@@ -293,13 +348,13 @@ extern "C" {
 ** COMMENTS: 
 **
 */
-dfuProtocol * dfuInit(dfuRxFunct rxFunct, 
-                      dfuTxFunct txFunct,
-                      dfuErrFunct errFunct, 
-                      dfuUserPtr userPtr);
+dfuProtocol * dfuCreate(dfuRxFunct rxFunct, 
+                        dfuTxFunct txFunct,
+                        dfuErrFunct errFunct, 
+                        dfuUserPtr userPtr);
 
 /*!
-** FUNCTION: dfuUnInit
+** FUNCTION: dfuDestroy
 **
 ** DESCRIPTION: Clean up the library.
 **
@@ -310,7 +365,7 @@ dfuProtocol * dfuInit(dfuRxFunct rxFunct,
 ** COMMENTS: 
 **
 */
-bool dfuUnInit(dfuProtocol * dfu);                      
+bool dfuDestroy(dfuProtocol * dfu);                      
 
 /*!
 ** FUNCTION: dfuDrive
@@ -346,7 +401,6 @@ dfuDriveStateEnum dfuDrive(dfuProtocol *dfu);
 bool dfuInstallCommandHandler(dfuProtocol * dfu, 
                               dfuCommandsEnum command,
                               dfuCommandHandler handler,
-                              dfuSessionStateEnum requiredSessionStates,
                               dfuUserPtr userPtr);
 
 /*!
@@ -382,7 +436,6 @@ bool dfuRemoveCommandHandler(dfuProtocol * dfu, dfuCommandsEnum command);
 bool dfuInstallPeriodicHandler(dfuProtocol *dfu, 
                                dfuCommandHandler handler, 
                                uint32_t execIntervalMS, 
-                               dfuSessionStateEnum sessionStates,
                                dfuUserPtr userPtr);
 
 
@@ -462,21 +515,6 @@ bool dfuSendSimpleACK(dfuProtocol *dfu);
 bool dfuSendSimpleNAK(dfuProtocol *dfu);
 
 /*!
-** FUNCTION: dfuSetSessionState
-**
-** DESCRIPTION: Something external has to set whether a session is
-**              ACTIVE or INACTIVE.  
-**
-** PARAMETERS: 
-**
-** RETURNS: 
-**
-** COMMENTS: 
-**
-*/
-bool dfuSetSessionState(dfuProtocol *dfu, dfuSessionStateEnum sessionState);
-
-/*!
 ** FUNCTION: dfuIsSessionActive
 **
 ** DESCRIPTION: Returns whether or not a session is active.
@@ -489,6 +527,63 @@ bool dfuSetSessionState(dfuProtocol *dfu, dfuSessionStateEnum sessionState);
 **
 */
 bool dfuIsSessionActive(dfuProtocol * dfu);
+
+/*!
+** FUNCTION: dfuSetSessionActive
+**
+** DESCRIPTION: 
+**
+** PARAMETERS: 
+**
+** RETURNS: 
+**
+** COMMENTS: 
+**
+*/
+bool dfuSetSessionActive(dfuProtocol * dfu);
+
+
+/*!
+** FUNCTION: dfuSetSessionStarting
+**
+** DESCRIPTION: 
+**
+** PARAMETERS: 
+**
+** RETURNS: 
+**
+** COMMENTS: 
+**
+*/
+bool dfuSetSessionStarting(dfuProtocol * dfu);
+
+/*!
+** FUNCTION: dfuSetSessionInActive
+**
+** DESCRIPTION: 
+**
+** PARAMETERS: 
+**
+** RETURNS: 
+**
+** COMMENTS: 
+**
+*/
+bool dfuSetSessionInActive(dfuProtocol * dfu);
+
+/*!
+** FUNCTION: dfuIsSessionStarting
+**
+** DESCRIPTION: 
+**
+** PARAMETERS: 
+**
+** RETURNS: 
+**
+** COMMENTS: 
+**
+*/
+bool dfuIsSessionStarting(dfuProtocol * dfu);
 
 /*!
 ** FUNCTION: dfuSetDeviceStatusBits
@@ -574,6 +669,37 @@ uint16_t dfuGetMTU(dfuProtocol *dfu);
 **
 */
 uint16_t dfuGetUptimeMins(dfuProtocol *dfu);
+
+/*!
+** FUNCTION: dfuSetSessionState
+**
+** DESCRIPTION: This will OR the value of the "sessionStates"
+**              bit-map in with the current value of the 
+**              protocol session state.
+**
+** PARAMETERS: 
+**
+** RETURNS: 
+**
+** COMMENTS: 
+**
+*/
+bool dfuSetSessionState(dfuProtocol *dfu, uint8_t sessionStates);
+
+/*!
+** FUNCTION: dfuClearSessionState
+**
+** DESCRIPTION: OR's the complement of the "sessionState" bitmask
+**              with the current value of the protocol session state.
+**
+** PARAMETERS: 
+**
+** RETURNS: 
+**
+** COMMENTS: 
+**
+*/
+bool dfuClearSessionState(dfuProtocol *dfu, uint8_t sessionStates);
 
 #if defined(__cplusplus)
 }

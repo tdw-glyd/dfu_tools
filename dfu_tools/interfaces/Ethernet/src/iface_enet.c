@@ -95,10 +95,10 @@ ifaceEthEnvStruct * dfuClientEthernetInit(dfuProtocol **callerDFU, const char *i
                 get_mac_address(interfaceName, &ret->socketHandle, ret->myMAC);
 
                 // Get the protocol library set up.
-                ret->dfu = dfuInit(dfuClientEnetRxCallback,
-                                   dfuClientEnetTxCallback,
-                                   dfuClientEnetErrCallback,
-                                   (void *)ret);
+                ret->dfu = dfuCreate(dfuClientEnetRxCallback,
+                                     dfuClientEnetTxCallback,
+                                     dfuClientEnetErrCallback,
+                                     (void *)ret);
                 if (ret->dfu)
                 {
                     dfuSetMTU(ret->dfu, MAX_ETHERNET_MSG_LEN);
@@ -286,7 +286,6 @@ uint8_t *dfuClientEnetRxCallback(dfuProtocol * dfu, uint16_t * rxBuffLen, dfuUse
 
         res = receive_ethernet_message(&env->socketHandle, env->msgBuff, rxBuffLen, NULL);
 
-        //if ( (res) && (*rxBuffLen <= dfuGetMTU(env->dfu)) )
         if ( (res) && (rxBuffLen) )
         {
             uint8_t                     srcMAC[6];

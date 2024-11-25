@@ -50,7 +50,7 @@
 
 
 /*
-** Session state enumeration.  
+** Session state bit-masks.  
 ** Allows commands to be executed
 ** depending on the state of the protocol 
 ** session.
@@ -81,7 +81,7 @@ typedef struct
 ** Internal COMMAND handler function type
 **
 */
-typedef bool (* dfuInternalCommandHandler)(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
+typedef bool (* dfuInternalCommandHandler)(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
 
 
 /*
@@ -110,7 +110,7 @@ typedef struct
 typedef struct
 {
     dfuCommandHandler           handler;
-    void                       *userPtr;
+    void *                      userPtr;
     uint32_t                    execIntervalMS;
     ASYNC_TIMER_STRUCT          timer;
     bool                        timerRunning;

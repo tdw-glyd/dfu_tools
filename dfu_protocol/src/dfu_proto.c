@@ -52,21 +52,21 @@ static void dfuTxMsg(dfuProtocol *dfu, uint8_t *txBuff, uint16_t txBuffLen,  dfu
 ** Internal Message-Handler Prototypes
 **
 */
-static bool internalMsgHandler_CMD_NEGOTIATE_MTU(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
-static bool internalMsgHandler_CMD_BEGIN_RCV(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
-static bool internalMsgHandler_CMD_ABORT_XFER(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
-static bool internalMsgHandler_CMD_RCV_COMPLETE(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
-static bool internalMsgHandler_CMD_RCV_DATA(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
-static bool internalMsgHandler_CMD_REBOOT(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
-static bool internalMsgHandler_CMD_DEVICE_STATUS(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
-static bool internalMsgHandler_CMD_KEEP_ALIVE(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
-static bool internalMsgHandler_CMD_BEGIN_SESSION(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
-static bool internalMsgHandler_CMD_END_SESSION(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
-static bool internalMsgHandler_CMD_IMAGE_STATUS(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
-static bool internalMsgHandler_CMD_BEGIN_SEND(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
-static bool internalMsgHandler_CMD_SEND_DATA(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
-static bool internalMsgHandler_CMD_INSTALL_IMAGE(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
-static bool defaultCommandHandler(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
+static bool internalMsgHandler_CMD_NEGOTIATE_MTU(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
+static bool internalMsgHandler_CMD_BEGIN_RCV(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
+static bool internalMsgHandler_CMD_ABORT_XFER(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
+static bool internalMsgHandler_CMD_RCV_COMPLETE(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
+static bool internalMsgHandler_CMD_RCV_DATA(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
+static bool internalMsgHandler_CMD_REBOOT(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
+static bool internalMsgHandler_CMD_DEVICE_STATUS(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
+static bool internalMsgHandler_CMD_KEEP_ALIVE(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
+static bool internalMsgHandler_CMD_BEGIN_SESSION(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
+static bool internalMsgHandler_CMD_END_SESSION(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
+static bool internalMsgHandler_CMD_IMAGE_STATUS(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
+static bool internalMsgHandler_CMD_BEGIN_SEND(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
+static bool internalMsgHandler_CMD_SEND_DATA(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
+static bool internalMsgHandler_CMD_INSTALL_IMAGE(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
+static bool defaultCommandHandler(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType);
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -385,15 +385,15 @@ static void dfuExecPeriodicCommands(dfuProtocol *dfu)
 //
 //                     DEFAULT INTERNAL COMMAND HANDLERS
 /*
-    These are what the engine calls when it recieves a valid command.  They
-    then decide if the client had registered their own handler anf if so,
+    These are what the engine calls when it receives a valid command.  They
+    then decide if the client had registered their own handler and if so,
     that handler is called.  If no handler has been registered they each
     perform whatever default actions apply.  Most will simply do nothing.
 */
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-static bool internalMsgHandler_CMD_NEGOTIATE_MTU(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
+static bool internalMsgHandler_CMD_NEGOTIATE_MTU(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
 {
     bool                    ret = false;
 
@@ -409,9 +409,9 @@ static bool internalMsgHandler_CMD_NEGOTIATE_MTU(dfuProtocol * dfu, uint8_t *msg
             ** Call the user's installed handler.
             **
             */
-            if (dfu->supportedCommands[CMD_NEGOTIATE_MTU].handler != NULL)
+            if (dfu->supportedCommands[command].handler != NULL)
             {
-                ret = dfu->supportedCommands[CMD_NEGOTIATE_MTU].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[CMD_NEGOTIATE_MTU].userPtr);
+                ret = dfu->supportedCommands[command].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[command].userPtr);
             }
             else
             {
@@ -436,149 +436,149 @@ static bool internalMsgHandler_CMD_NEGOTIATE_MTU(dfuProtocol * dfu, uint8_t *msg
     return (ret);
 }
 
-static bool internalMsgHandler_CMD_BEGIN_RCV(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
+static bool internalMsgHandler_CMD_BEGIN_RCV(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
 {
     bool                    ret = false;
 
     if ( (VALID_ADMIN(dfu)) && (msg) && (msgLen > 0) && (VALID_MSG_TYPE(msgType)) )
     {
-        if (dfu->supportedCommands[CMD_BEGIN_RCV].handler != NULL)
+        if (dfu->supportedCommands[command].handler != NULL)
         {
-            ret = dfu->supportedCommands[CMD_BEGIN_RCV].handler(dfu, msg, msgLen, msgType,  dfu->supportedCommands[CMD_BEGIN_RCV].userPtr);
+            ret = dfu->supportedCommands[command].handler(dfu, msg, msgLen, msgType,  dfu->supportedCommands[command].userPtr);
         }
         else
         {
-            ret = defaultCommandHandler(dfu, msg, msgLen, msgType);
+            ret = defaultCommandHandler(dfu, command, msg, msgLen, msgType);
         }
     }
 
     return (ret);
 }
 
-static bool internalMsgHandler_CMD_ABORT_XFER(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
+static bool internalMsgHandler_CMD_ABORT_XFER(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
 {
     bool                    ret = false;
 
     if ( (VALID_ADMIN(dfu)) && (msg) && (msgLen > 0) && (VALID_MSG_TYPE(msgType)) )
     {
-        if (dfu->supportedCommands[CMD_ABORT_XFER].handler != NULL)
+        if (dfu->supportedCommands[command].handler != NULL)
         {
-            ret = dfu->supportedCommands[CMD_ABORT_XFER].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[CMD_ABORT_XFER].userPtr);
+            ret = dfu->supportedCommands[command].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[command].userPtr);
         }
         else
         {
-            ret = defaultCommandHandler(dfu, msg, msgLen, msgType);
+            ret = defaultCommandHandler(dfu, command, msg, msgLen, msgType);
         }
     }
 
     return (ret);
 }
 
-static bool internalMsgHandler_CMD_RCV_COMPLETE(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
+static bool internalMsgHandler_CMD_RCV_COMPLETE(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
 {
     bool                    ret = false;
 
     if ( (VALID_ADMIN(dfu)) && (msg) && (msgLen > 0) && (VALID_MSG_TYPE(msgType)) )
     {
-        if (dfu->supportedCommands[CMD_RCV_COMPLETE].handler != NULL)
+        if (dfu->supportedCommands[command].handler != NULL)
         {
-            ret = dfu->supportedCommands[CMD_RCV_COMPLETE].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[CMD_RCV_COMPLETE].userPtr);
+            ret = dfu->supportedCommands[command].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[command].userPtr);
         }
         else
         {
-            ret = defaultCommandHandler(dfu, msg, msgLen, msgType);
+            ret = defaultCommandHandler(dfu, command, msg, msgLen, msgType);
         }
     }
 
     return (ret);
 }
 
-static bool internalMsgHandler_CMD_RCV_DATA(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
+static bool internalMsgHandler_CMD_RCV_DATA(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
 {
     bool                    ret = false;
 
     if ( (VALID_ADMIN(dfu)) && (msg) && (msgLen > 0) && (VALID_MSG_TYPE(msgType)) )
     {
-        if (dfu->supportedCommands[CMD_RCV_DATA].handler != NULL)
+        if (dfu->supportedCommands[command].handler != NULL)
         {
-            ret = dfu->supportedCommands[CMD_RCV_DATA].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[CMD_RCV_DATA].userPtr);
+            ret = dfu->supportedCommands[command].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[command].userPtr);
         }
         else
         {
-            ret = defaultCommandHandler(dfu, msg, msgLen, msgType);
+            ret = defaultCommandHandler(dfu, command, msg, msgLen, msgType);
         }
     }
 
     return (ret);
 }
 
-static bool internalMsgHandler_CMD_REBOOT(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
+static bool internalMsgHandler_CMD_REBOOT(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
 {
     bool                    ret = false;
 
     if ( (VALID_ADMIN(dfu)) && (msg) && (msgLen > 0) && (VALID_MSG_TYPE(msgType)) )
     {
-        if (dfu->supportedCommands[CMD_REBOOT].handler != NULL)
+        if (dfu->supportedCommands[command].handler != NULL)
         {
-            ret = dfu->supportedCommands[CMD_REBOOT].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[CMD_REBOOT].userPtr);
+            ret = dfu->supportedCommands[command].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[command].userPtr);
         }
         else
         {
-            ret = defaultCommandHandler(dfu, msg, msgLen, msgType);
+            ret = defaultCommandHandler(dfu, command, msg, msgLen, msgType);
         }
     }
 
     return (ret);
 }
 
-static bool internalMsgHandler_CMD_DEVICE_STATUS(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
+static bool internalMsgHandler_CMD_DEVICE_STATUS(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
 {
     bool                    ret = false;
 
     if ( (VALID_ADMIN(dfu)) && (msg) && (msgLen > 0) && (VALID_MSG_TYPE(msgType)) )
     {
-        if (dfu->supportedCommands[CMD_DEVICE_STATUS].handler != NULL)
+        if (dfu->supportedCommands[command].handler != NULL)
         {
-            ret = dfu->supportedCommands[CMD_DEVICE_STATUS].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[CMD_DEVICE_STATUS].userPtr);
+            ret = dfu->supportedCommands[command].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[command].userPtr);
         }
         else
         {
-            ret = defaultCommandHandler(dfu, msg, msgLen, msgType);
+            ret = defaultCommandHandler(dfu, command, msg, msgLen, msgType);
         }
     }
 
     return (ret);
 }
 
-static bool internalMsgHandler_CMD_KEEP_ALIVE(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
+static bool internalMsgHandler_CMD_KEEP_ALIVE(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
 {
     bool                    ret = false;
 
     if ( (VALID_ADMIN(dfu)) && (msg) && (msgLen > 0) && (VALID_MSG_TYPE(msgType)) )
     {
-        if (dfu->supportedCommands[CMD_KEEP_ALIVE].handler != NULL)
+        if (dfu->supportedCommands[command].handler != NULL)
         {
-            ret = dfu->supportedCommands[CMD_KEEP_ALIVE].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[CMD_KEEP_ALIVE].userPtr);
+            ret = dfu->supportedCommands[command].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[command].userPtr);
         }
         else
         {
-            ret = defaultCommandHandler(dfu, msg, msgLen, msgType);
+            ret = defaultCommandHandler(dfu, command, msg, msgLen, msgType);
         }
     }
 
     return (ret);
 }
 
-static bool internalMsgHandler_CMD_BEGIN_SESSION(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
+static bool internalMsgHandler_CMD_BEGIN_SESSION(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
 {
     bool                    ret = false;
 
     if ( (VALID_ADMIN(dfu)) && (msg) && (msgLen > 0) && (VALID_MSG_TYPE(msgType)) )
     {
-        if (dfu->supportedCommands[CMD_BEGIN_SESSION].handler != NULL)
+        if (dfu->supportedCommands[command].handler != NULL)
         {
             dfu->sessionState = SESSION_STATE_STARTING;
-            ret = dfu->supportedCommands[CMD_BEGIN_SESSION].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[CMD_BEGIN_SESSION].userPtr);
+            ret = dfu->supportedCommands[command].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[command].userPtr);
             if (!ret)
             {
                 dfu->sessionState = SESSION_STATE_INACTIVE;
@@ -594,15 +594,15 @@ static bool internalMsgHandler_CMD_BEGIN_SESSION(dfuProtocol * dfu, uint8_t *msg
     return (ret);
 }
 
-static bool internalMsgHandler_CMD_END_SESSION(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
+static bool internalMsgHandler_CMD_END_SESSION(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
 {
     bool                    ret = false;
 
     if ( (VALID_ADMIN(dfu)) && (msg) && (msgLen > 0) && (VALID_MSG_TYPE(msgType)) )
     {
-        if (dfu->supportedCommands[CMD_END_SESSION].handler != NULL)
+        if (dfu->supportedCommands[command].handler != NULL)
         {
-            ret = dfu->supportedCommands[CMD_END_SESSION].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[CMD_END_SESSION].userPtr);
+            ret = dfu->supportedCommands[command].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[command].userPtr);
         }
         else
         {
@@ -616,38 +616,38 @@ static bool internalMsgHandler_CMD_END_SESSION(dfuProtocol * dfu, uint8_t *msg, 
     return (ret);
 }
 
-static bool internalMsgHandler_CMD_IMAGE_STATUS(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
+static bool internalMsgHandler_CMD_IMAGE_STATUS(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
 {
     bool                    ret = false;
 
     if ( (VALID_ADMIN(dfu)) && (msg) && (msgLen > 0) && (VALID_MSG_TYPE(msgType)) )
     {
-        if (dfu->supportedCommands[CMD_IMAGE_STATUS].handler != NULL)
+        if (dfu->supportedCommands[command].handler != NULL)
         {
-            ret = dfu->supportedCommands[CMD_IMAGE_STATUS].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[CMD_IMAGE_STATUS].userPtr);
+            ret = dfu->supportedCommands[command].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[command].userPtr);
         }
         else
         {
-            ret = defaultCommandHandler(dfu, msg, msgLen, msgType);
+            ret = defaultCommandHandler(dfu, command, msg, msgLen, msgType);
         }
     }
 
     return (ret);
 }
 
-static bool internalMsgHandler_CMD_BEGIN_SEND(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
+static bool internalMsgHandler_CMD_BEGIN_SEND(dfuProtocol * dfu, dfuCommandsEnum command,uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
 {
     bool                ret = false;
 
     if ( (VALID_ADMIN(dfu)) && (msg) && (msgLen > 0) && (VALID_MSG_TYPE(msgType)) )
     {
-        if (dfu->supportedCommands[CMD_BEGIN_SEND].handler != NULL)
+        if (dfu->supportedCommands[command].handler != NULL)
         {
-            ret = dfu->supportedCommands[CMD_BEGIN_SEND].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[CMD_BEGIN_SEND].userPtr);
+            ret = dfu->supportedCommands[command].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[command].userPtr);
         }
         else
         {
-            ret = defaultCommandHandler(dfu, msg, msgLen, msgType);
+            ret = defaultCommandHandler(dfu, command, msg, msgLen, msgType);
         }
     }
 
@@ -655,38 +655,38 @@ static bool internalMsgHandler_CMD_BEGIN_SEND(dfuProtocol * dfu, uint8_t *msg, u
 }
 
 
-static bool internalMsgHandler_CMD_SEND_DATA(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
+static bool internalMsgHandler_CMD_SEND_DATA(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
 {
     bool                ret = false;
 
     if ( (VALID_ADMIN(dfu)) && (msg) && (msgLen > 0) && (VALID_MSG_TYPE(msgType)) )
     {
-        if (dfu->supportedCommands[CMD_BEGIN_SEND].handler != NULL)
+        if (dfu->supportedCommands[command].handler != NULL)
         {
-            ret = dfu->supportedCommands[CMD_SEND_DATA].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[CMD_SEND_DATA].userPtr);
+            ret = dfu->supportedCommands[command].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[command].userPtr);
         }
         else
         {
-            ret = defaultCommandHandler(dfu, msg, msgLen, msgType);
+            ret = defaultCommandHandler(dfu, command, msg, msgLen, msgType);
         }
     }
 
     return (ret);    
 }
 
-static bool internalMsgHandler_CMD_INSTALL_IMAGE(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
+static bool internalMsgHandler_CMD_INSTALL_IMAGE(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
 {
     bool                ret = false;
 
     if ( (VALID_ADMIN(dfu)) && (msg) && (msgLen > 0) && (VALID_MSG_TYPE(msgType)) )
     {
-        if (dfu->supportedCommands[CMD_INSTALL_IMAGE].handler != NULL)
+        if (dfu->supportedCommands[command].handler != NULL)
         {
-            ret = dfu->supportedCommands[CMD_INSTALL_IMAGE].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[CMD_INSTALL_IMAGE].userPtr);
+            ret = dfu->supportedCommands[command].handler(dfu, msg, msgLen, msgType, dfu->supportedCommands[command].userPtr);
         }
         else
         {
-            ret = defaultCommandHandler(dfu, msg, msgLen, msgType);
+            ret = defaultCommandHandler(dfu, command, msg, msgLen, msgType);
         }
     }
 
@@ -707,7 +707,7 @@ static bool internalMsgHandler_CMD_INSTALL_IMAGE(dfuProtocol * dfu, uint8_t *msg
 ** COMMENTS:
 **
 */
-static bool defaultCommandHandler(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
+static bool defaultCommandHandler(dfuProtocol * dfu, dfuCommandsEnum command, uint8_t *msg, uint16_t msgLen, dfuMsgTypeEnum msgType)
 {
 	(void)msg;
 	(void)msgLen;
@@ -900,7 +900,7 @@ dfuDriveStateEnum dfuDrive(dfuProtocol *dfu)
                         else
                         {
                             ret = DDS_ERROR;
-                    	    if (internalMsgHandlers[dfu->lastCommand].handler(dfu, msgPtr, msgLen, msgType))
+                    	    if (internalMsgHandlers[dfu->lastCommand].handler(dfu, dfu->lastCommand, msgPtr, msgLen, msgType))
                             {
                                 // Retrigger the session time to keep it active
                                 TIMER_Start(&dfu->sessionTimer);

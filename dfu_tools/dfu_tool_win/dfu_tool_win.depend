@@ -16,7 +16,7 @@
 	"dfu_proto_private.h"
 	"dfu_proto_api.h"
 
-1732285593 c:\glydways\bl_tools\dfu_protocol\include\dfu_proto_private.h
+1732543755 c:\glydways\bl_tools\dfu_protocol\include\dfu_proto_private.h
 	"dfu_proto_api.h"
 	"async_timer.h"
 
@@ -39,7 +39,7 @@
 	<stdint.h>
 	"dfu_platform_utils.h"
 
-1732289447 source:c:\glydways\bl_tools\dfu_protocol\src\dfu_proto.c
+1732569353 source:c:\glydways\bl_tools\dfu_protocol\src\dfu_proto.c
 	<stdint.h>
 	<stdbool.h>
 	<stddef.h>

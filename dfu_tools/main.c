@@ -31,6 +31,19 @@
 #include "async_timer.h"
 
 
+// TEST %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// #include <openssl/rsa.h>
+#include <openssl/evp.h>
+#include <openssl/pem.h>
+#include <openssl/err.h>
+static void testOpenSSL(void);
+uint8_t * encrypt_data_with_public_key(const char *pubkey_filename,
+                                       void *valueToEncrypt,
+                                       uint32_t encryptLength,
+                                       bool shouldSave,
+                                       const char *output_filename);
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 #define DEBUG_INTERFACES_NAMES              (0)
 #define KEYHIT_DELAY_MS                     (10000)
 #define BLOCKS_PER_BUF                      (100)
@@ -130,8 +143,12 @@ static void printApplicationBanner(void);
 static char *_padStr(char *pStr, char padChar, int padLength);
 static cmdlineHelpHandler _getHelpHandler(char *cmd);
 static bool mainHelpHandler(int argc, char **argv);
-
-size_t _getNextBuf(FILE * handle, uint8_t *dest, uint32_t numToRead, dfuClientEnvStruct *dfuClient);
+static bool xferImage(char *filenameStr,
+                      char *destStr,
+                      uint8_t imageIndex,
+                      uint32_t imageAddress,
+                      bool isEncrypted,
+                      dfuClientEnvStruct *dfuClient);
 
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -144,6 +161,10 @@ int main(int argc, char **argv)
     char                    *paramVal = NULL;
     ASYNC_TIMER_STRUCT       keyhitTimer;
 
+    // TEST %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    testOpenSSL();
+    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
     printApplicationBanner();
 
     if (argc > 0)
@@ -152,6 +173,8 @@ int main(int argc, char **argv)
         bool                            done = false;
         char *                          dummy = NULL;
         char *                          destStr = NULL;
+        char *                          devTypeStr = NULL;
+        char *                          devVariantStr = NULL;
 
     #if (DEBUG_INTERFACES_NAMES==1)
         printInterfaces();
@@ -164,6 +187,9 @@ int main(int argc, char **argv)
         */
         if (!mainHelpHandler(argc, argv))
         {
+            flag_srch(argc, argv, "-devtype", 1, &devTypeStr);
+            flag_srch(argc, argv, "-variant", 1, &devVariantStr);
+
             /*
             ** Look for command-line handler (or help text)
             **
@@ -179,13 +205,28 @@ int main(int argc, char **argv)
                     {
                         // Sets up the interface and other parts of the client, including default MTU.
                         dfuClientEnvStruct *            dfuClient = dfuToolInitLibForInterfaceType(argc, argv);
+                        uint8_t                         devType = 255;
+                        uint8_t                         devVariant = 255;
 
-                        if (dfuClient)
+                        if ( (devTypeStr) && (devVariantStr) )
                         {
+                            devType = atoi(devTypeStr);
+                            devVariant = atoi(devVariantStr);
+                        }
+
+                        if ( (dfuClient) && (devType < 255) && (devVariant < 255) )
+                        {
+                            uint32_t                    challengePW = 0;
+
                             // Open up a session
                             printf("\r\nOpening a session with the target...");
 
-                            if (dfuClientTransaction_CMD_BEGIN_SESSION(dfuClient, DEFAULT_TRANSACTION_TIMEOUT_MS, destStr))
+                            challengePW = dfuClientTransaction_CMD_BEGIN_SESSION(dfuClient,
+                                                                                 devType,
+                                                                                 devVariant,
+                                                                                 DEFAULT_TRANSACTION_TIMEOUT_MS,
+                                                                                 destStr);
+                            if (challengePW != 0)
                             {
                                 printf("Opened!");
                                 printf("\r\n");
@@ -268,27 +309,9 @@ int main(int argc, char **argv)
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-
-/*!
-** FUNCTION: cmdlineHandlerSendImage
-**
-** DESCRIPTION: Transfer an image to the target.
-**
-** PARAMETERS:
-**              - "-x" ("--xfer") <image file name>
-**              - "-dst" ("--dest") <destination MAC ID>
-**              - "-i" ("--index") <image index>
-**              - "-a" ("--address") <storage address>
-**              - "-e" ("--encrypted") <true or false>
-**
-** RETURNS:
-**
-** COMMENTS:
-**
-*/
-static bool cmdlineHandlerXferImage(int argc, char **argv, char *paramVal, dfuClientEnvStruct *dfuClient)
+static bool cmdlineHandlerXferImage(int argc, char **argv, char *filenameStr, dfuClientEnvStruct *dfuClient)
 {
-    bool                            ret = true;
+    bool                            ret = false;
     char *                          destStr = NULL;
     char *                          imageIndexStr = NULL;
     uint8_t                         imageIndex;
@@ -296,10 +319,6 @@ static bool cmdlineHandlerXferImage(int argc, char **argv, char *paramVal, dfuCl
     uint32_t                        imageAddress;
     char *                          isEncryptedStr = NULL;
     bool                            isEncrypted;
-    char *                          filenameStr = paramVal;  // argument to "-x" is the filename
-    uint32_t                        imageSize;
-    ASYNC_TIMER_STRUCT              startTimer;
-    ASYNC_TIMER_STRUCT              endTimer;
 
     flag_srch(argc, argv, "-dst", 1, &destStr);
     flag_srch(argc, argv, "-i", 1, &imageIndexStr);
@@ -314,8 +333,13 @@ static bool cmdlineHandlerXferImage(int argc, char **argv, char *paramVal, dfuCl
             (filenameStr)
        )
     {
+        // Get the numeric image index
         imageIndex = atoi(imageIndexStr);
+
+        // Get the numeric image address
         imageAddress = strtoul(imageAddressStr, NULL, 0);
+
+        // Get the "isEncrypted" flag as a boolean
         if (
                (strstr(isEncryptedStr, "true") != NULL) ||
                (strstr(isEncryptedStr, "True") != NULL) ||
@@ -326,6 +350,46 @@ static bool cmdlineHandlerXferImage(int argc, char **argv, char *paramVal, dfuCl
             isEncrypted = true;
         }
 
+        ret = xferImage(filenameStr,
+                        destStr,
+                        imageIndex,
+                        imageAddress,
+                        isEncrypted,
+                        dfuClient);
+    }
+
+    return (ret);
+}
+
+/*!
+** FUNCTION: xferImage
+**
+** DESCRIPTION: Transfer an image to the target.
+**
+** PARAMETERS:
+**
+** RETURNS:
+**
+** COMMENTS:
+**
+*/
+static bool xferImage(char *filenameStr,
+                      char *destStr,
+                      uint8_t imageIndex,
+                      uint32_t imageAddress,
+                      bool isEncrypted,
+                      dfuClientEnvStruct *dfuClient)
+{
+    bool                            ret = true;
+    uint32_t                        imageSize;
+    ASYNC_TIMER_STRUCT              startTimer;
+    ASYNC_TIMER_STRUCT              endTimer;
+
+    if (
+            (destStr) &&
+            (filenameStr)
+       )
+    {
         imageSize = getFileSize(filenameStr);
 
         if (imageSize > 0)
@@ -371,7 +435,6 @@ static bool cmdlineHandlerXferImage(int argc, char **argv, char *paramVal, dfuCl
                     **
                     */
                     while ((bytesRead = fread(buffer, 1, dfuClientGetInternalMTU(dfuClient)-1, handle))> 0)
-                    // while ( (bytesRead = _getNextBuf(handle, buffer, dfuClientGetInternalMTU(dfuClient)-1, dfuClient)) > 0)
                     {
                         printf("\r >> Exchange #: %5d. Sending [%4u] bytes...                     ", totalTransactions+1, (uint32_t)bytesRead);
                         fflush(stdout);
@@ -434,52 +497,6 @@ static bool cmdlineHandlerXferImage(int argc, char **argv, char *paramVal, dfuCl
 
     return (ret);
 }
-
-size_t _getNextBuf(FILE * handle, uint8_t *dest, uint32_t numToRead, dfuClientEnvStruct *dfuClient)
-{
-    static uint8_t                 blockBuff[1500 * BLOCKS_PER_BUF];
-    static uint8_t *               pCurrent = &blockBuff[0];
-    static uint8_t *               pEnd = &blockBuff[0];
-    size_t                         bytesRead = 0;
-    size_t                         fileBytesRead;
-    bool                           done = false;
-
-    while (!done)
-    {
-        if (pCurrent >= pEnd)
-        {
-            fileBytesRead = fread(blockBuff, 1, sizeof(blockBuff), handle);
-            if (fileBytesRead > 0)
-            {
-                pCurrent = &blockBuff[0];
-                pEnd = &blockBuff[fileBytesRead];
-            }
-            else
-                done = true;
-        }
-
-        if (pCurrent < pEnd)
-        {
-            if (pEnd - pCurrent > numToRead)
-            {
-                memcpy(dest, pCurrent, numToRead);
-                pCurrent += numToRead;
-                bytesRead = numToRead;
-            }
-            else
-            {
-                memcpy(dest, pCurrent, pEnd-pCurrent);
-                bytesRead = pEnd-pCurrent;
-                pCurrent += pEnd-pCurrent;
-            }
-
-            done = true;
-        }
-    }
-
-    return (bytesRead);
-}
-
 
 /*!
 ** FUNCTION: cmdlineHandlerMTU
@@ -1093,3 +1110,127 @@ static bool mainHelpHandler(int argc, char **argv)
 
     return (ret);
 }
+
+
+// Function to encrypt a uint32_t using a public key
+uint8_t * encrypt_data_with_public_key(const char *pubkey_filename,
+                                       void *valueToEncrypt,
+                                       uint32_t encryptLength,
+                                       bool shouldSave,
+                                       const char *output_filename)
+{
+    uint8_t                 *ret = NULL;
+    EVP_PKEY                *pkey = NULL;
+    EVP_PKEY_CTX            *ctx = NULL;
+    unsigned char           *encrypted_data = NULL;
+    size_t                   encrypted_len = 0;
+
+    // Initialize openSSL
+    OPENSSL_init_crypto(0, NULL);
+    printf("\r\nOpenSSL Version: %s", OpenSSL_version(OPENSSL_VERSION));
+
+    // Read in the public key
+    BIO * bio = BIO_new_file(pubkey_filename, "r");
+    if (!bio)
+    {
+        printf("\r\nError creating BIO object!");
+        goto cleanup;
+    }
+
+    // Read the public key into an EVP_PKEY structure
+    pkey = PEM_read_bio_PUBKEY(bio, NULL, NULL, NULL);
+    ERR_clear_error();
+
+    // Create a context for encryption
+    ctx = EVP_PKEY_CTX_new(pkey, NULL);
+    if (!ctx)
+    {
+        fprintf(stderr, "Error: Failed to create EVP context: %s\n", ERR_error_string(ERR_get_error(), NULL));
+        goto cleanup;
+    }
+
+    // Initialize the context for encryption
+    if (EVP_PKEY_encrypt_init(ctx) <= 0)
+    {
+        fprintf(stderr, "Error: Failed to initialize encryption: %s\n", ERR_error_string(ERR_get_error(), NULL));
+        goto cleanup;
+    }
+
+    // Determine the buffer length for the encrypted data
+    if (EVP_PKEY_encrypt(ctx, NULL, &encrypted_len, (unsigned char *)valueToEncrypt, encryptLength) <= 0)
+    {
+        fprintf(stderr, "Error: Failed to determine encrypted length: %s\n", ERR_error_string(ERR_get_error(), NULL));
+        goto cleanup;
+    }
+
+    // Allocate memory for the encrypted data
+    encrypted_data = malloc(encrypted_len);
+    if (!encrypted_data)
+    {
+        fprintf(stderr, "Error: Failed to allocate memory for encrypted data.\n");
+        goto cleanup;
+    }
+
+    // Perform the encryption
+    if (EVP_PKEY_encrypt(ctx, encrypted_data, &encrypted_len, (unsigned char *)valueToEncrypt, encryptLength) <= 0)
+    {
+        fprintf(stderr, "Error: Encryption failed: %s\n", ERR_error_string(ERR_get_error(), NULL));
+        goto cleanup;
+    }
+
+    //
+    // Should we save the encrypted value?
+    //
+    if ( (shouldSave) && (output_filename != NULL) )
+    {
+        // Write the encrypted data to the output file
+        FILE *output_file = fopen(output_filename, "wb");
+        if (!output_file)
+        {
+            fprintf(stderr, "Error: Failed to open output file: %s\n", output_filename);
+            goto cleanup;
+        }
+        fwrite(encrypted_data, 1, encrypted_len, output_file);
+        fclose(output_file);
+    }
+
+    printf("\r\nEncryption successful.");
+
+
+cleanup:
+    if (bio) BIO_free(bio);
+    if (pkey) EVP_PKEY_free(pkey);
+    if (ctx) EVP_PKEY_CTX_free(ctx);
+    if (encrypted_data)
+    {
+        if (shouldSave)
+        {
+            free(encrypted_data);
+            printf(" Encrypted data written to: %s\n", output_filename);
+        }
+        else
+            ret = encrypted_data;
+    }
+
+    EVP_cleanup();
+    ERR_free_strings();
+
+    return ret;
+}
+
+// Main function
+static void testOpenSSL(void)
+{
+    const char      *pubkey_filename = "c:/public_key.pem"; // Path to the public key file
+    const char      *output_filename = "c:/encrypted.bin"; // Output file to store encrypted data
+    uint32_t         value = 123456789; // Value to encrypt
+
+    printf("Encrypting value %u using public key from %s...\n", value, pubkey_filename);
+    encrypt_data_with_public_key(pubkey_filename,
+                                 &value,
+                                 sizeof(value),
+                                 true,
+                                 output_filename);
+    return;
+}
+

@@ -133,7 +133,7 @@
 
 1731698560 c:\glydways\bl_tools\dfu_tools\include\dfu_lib_config.h
 
-1732292889 source:c:\glydways\bl_tools\dfu_tools\main.c
+1734557456 source:c:\glydways\bl_tools\dfu_tools\main.c
 	<stdint.h>
 	<stdbool.h>
 	<stdio.h>
@@ -145,6 +145,9 @@
 	"dfu_client.h"
 	"ethernet_sockets.h"
 	"async_timer.h"
+	<openssl/evp.h>
+	<openssl/pem.h>
+	<openssl/err.h>
 
 1729884653 c:\glydways\bl_tools\dfu_tools\include\dfu_lib_support.h
 	<stdint.h>
@@ -182,4 +185,1176 @@
 	"dfu_client_config.h"
 
 1731939319 c:\glydways\bl_tools\dfu_tools\include\dfu_client_config.h
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium.h
+	"sodium/version.h"
+	"sodium/core.h"
+	"sodium/crypto_aead_aegis128l.h"
+	"sodium/crypto_aead_aegis256.h"
+	"sodium/crypto_aead_aes256gcm.h"
+	"sodium/crypto_aead_chacha20poly1305.h"
+	"sodium/crypto_aead_xchacha20poly1305.h"
+	"sodium/crypto_auth.h"
+	"sodium/crypto_auth_hmacsha256.h"
+	"sodium/crypto_auth_hmacsha512.h"
+	"sodium/crypto_auth_hmacsha512256.h"
+	"sodium/crypto_box.h"
+	"sodium/crypto_box_curve25519xsalsa20poly1305.h"
+	"sodium/crypto_core_hchacha20.h"
+	"sodium/crypto_core_hsalsa20.h"
+	"sodium/crypto_core_salsa20.h"
+	"sodium/crypto_core_salsa2012.h"
+	"sodium/crypto_core_salsa208.h"
+	"sodium/crypto_generichash.h"
+	"sodium/crypto_generichash_blake2b.h"
+	"sodium/crypto_hash.h"
+	"sodium/crypto_hash_sha256.h"
+	"sodium/crypto_hash_sha512.h"
+	"sodium/crypto_kdf.h"
+	"sodium/crypto_kdf_hkdf_sha256.h"
+	"sodium/crypto_kdf_hkdf_sha512.h"
+	"sodium/crypto_kdf_blake2b.h"
+	"sodium/crypto_kdf_hkdf_sha256.h"
+	"sodium/crypto_kdf_hkdf_sha512.h"
+	"sodium/crypto_kx.h"
+	"sodium/crypto_onetimeauth.h"
+	"sodium/crypto_onetimeauth_poly1305.h"
+	"sodium/crypto_pwhash.h"
+	"sodium/crypto_pwhash_argon2i.h"
+	"sodium/crypto_scalarmult.h"
+	"sodium/crypto_scalarmult_curve25519.h"
+	"sodium/crypto_secretbox.h"
+	"sodium/crypto_secretbox_xsalsa20poly1305.h"
+	"sodium/crypto_secretstream_xchacha20poly1305.h"
+	"sodium/crypto_shorthash.h"
+	"sodium/crypto_shorthash_siphash24.h"
+	"sodium/crypto_sign.h"
+	"sodium/crypto_sign_ed25519.h"
+	"sodium/crypto_stream.h"
+	"sodium/crypto_stream_chacha20.h"
+	"sodium/crypto_stream_salsa20.h"
+	"sodium/crypto_stream_xsalsa20.h"
+	"sodium/crypto_verify_16.h"
+	"sodium/crypto_verify_32.h"
+	"sodium/crypto_verify_64.h"
+	"sodium/randombytes.h"
+	"sodium/randombytes_internal_random.h"
+	"sodium/randombytes_sysrandom.h"
+	"sodium/runtime.h"
+	"sodium/utils.h"
+	"sodium/crypto_box_curve25519xchacha20poly1305.h"
+	"sodium/crypto_core_ed25519.h"
+	"sodium/crypto_core_ristretto255.h"
+	"sodium/crypto_pwhash_scryptsalsa208sha256.h"
+	"sodium/crypto_scalarmult_ed25519.h"
+	"sodium/crypto_scalarmult_ristretto255.h"
+	"sodium/crypto_secretbox_xchacha20poly1305.h"
+	"sodium/crypto_stream_salsa2012.h"
+	"sodium/crypto_stream_salsa208.h"
+	"sodium/crypto_stream_xchacha20.h"
+
+1734469022 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\version.h
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\export.h
+	<stddef.h>
+	<stdint.h>
+	<limits.h>
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\core.h
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_aead_aegis128l.h
+	<stddef.h>
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_aead_aegis256.h
+	<stddef.h>
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_aead_aes256gcm.h
+	<stddef.h>
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_aead_chacha20poly1305.h
+	<stddef.h>
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_aead_xchacha20poly1305.h
+	<stddef.h>
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_auth.h
+	<stddef.h>
+	"crypto_auth_hmacsha512256.h"
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_auth_hmacsha512256.h
+	<stddef.h>
+	"crypto_auth_hmacsha512.h"
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_auth_hmacsha512.h
+	<stddef.h>
+	"crypto_hash_sha512.h"
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_hash_sha512.h
+	<stddef.h>
+	<stdint.h>
+	<stdlib.h>
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_auth_hmacsha256.h
+	<stddef.h>
+	"crypto_hash_sha256.h"
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_hash_sha256.h
+	<stddef.h>
+	<stdint.h>
+	<stdlib.h>
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_box.h
+	<stddef.h>
+	"crypto_box_curve25519xsalsa20poly1305.h"
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_box_curve25519xsalsa20poly1305.h
+	<stddef.h>
+	"crypto_stream_xsalsa20.h"
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_stream_xsalsa20.h
+	<stddef.h>
+	<stdint.h>
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_core_hchacha20.h
+	<stddef.h>
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_core_hsalsa20.h
+	<stddef.h>
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_core_salsa20.h
+	<stddef.h>
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_core_salsa2012.h
+	<stddef.h>
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_core_salsa208.h
+	<stddef.h>
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_generichash.h
+	<stddef.h>
+	"crypto_generichash_blake2b.h"
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_generichash_blake2b.h
+	<stddef.h>
+	<stdint.h>
+	<stdlib.h>
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_hash.h
+	<stddef.h>
+	"crypto_hash_sha512.h"
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_kdf.h
+	<stddef.h>
+	<stdint.h>
+	"crypto_kdf_blake2b.h"
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_kdf_blake2b.h
+	<stddef.h>
+	<stdint.h>
+	<stdlib.h>
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_kdf_hkdf_sha256.h
+	<stddef.h>
+	<stdint.h>
+	<stdlib.h>
+	"crypto_kdf.h"
+	"crypto_auth_hmacsha256.h"
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_kdf_hkdf_sha512.h
+	<stddef.h>
+	<stdint.h>
+	<stdlib.h>
+	"crypto_kdf.h"
+	"crypto_auth_hmacsha512.h"
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_kx.h
+	<stddef.h>
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_onetimeauth.h
+	<stddef.h>
+	"crypto_onetimeauth_poly1305.h"
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_onetimeauth_poly1305.h
+	<stdint.h>
+	<stdio.h>
+	<stdlib.h>
+	<sys/types.h>
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_pwhash.h
+	<stddef.h>
+	"crypto_pwhash_argon2i.h"
+	"crypto_pwhash_argon2id.h"
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_pwhash_argon2i.h
+	<limits.h>
+	<stddef.h>
+	<stdint.h>
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_pwhash_argon2id.h
+	<limits.h>
+	<stddef.h>
+	<stdint.h>
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_scalarmult.h
+	<stddef.h>
+	"crypto_scalarmult_curve25519.h"
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_scalarmult_curve25519.h
+	<stddef.h>
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_secretbox.h
+	<stddef.h>
+	"crypto_secretbox_xsalsa20poly1305.h"
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_secretbox_xsalsa20poly1305.h
+	<stddef.h>
+	"crypto_stream_xsalsa20.h"
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_secretstream_xchacha20poly1305.h
+	<stddef.h>
+	"crypto_aead_xchacha20poly1305.h"
+	"crypto_stream_chacha20.h"
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_stream_chacha20.h
+	<stddef.h>
+	<stdint.h>
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_shorthash.h
+	<stddef.h>
+	"crypto_shorthash_siphash24.h"
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_shorthash_siphash24.h
+	<stddef.h>
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_sign.h
+	<stddef.h>
+	"crypto_sign_ed25519.h"
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_sign_ed25519.h
+	<stddef.h>
+	"crypto_hash_sha512.h"
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_stream.h
+	<stddef.h>
+	"crypto_stream_xsalsa20.h"
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_stream_salsa20.h
+	<stddef.h>
+	<stdint.h>
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_verify_16.h
+	<stddef.h>
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_verify_32.h
+	<stddef.h>
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_verify_64.h
+	<stddef.h>
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\randombytes.h
+	<stddef.h>
+	<stdint.h>
+	<sys/types.h>
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\randombytes_internal_random.h
+	"export.h"
+	"randombytes.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\randombytes_sysrandom.h
+	"export.h"
+	"randombytes.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\runtime.h
+	"export.h"
+
+1734469022 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\utils.h
+	<stddef.h>
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_box_curve25519xchacha20poly1305.h
+	<stddef.h>
+	"crypto_stream_xchacha20.h"
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_stream_xchacha20.h
+	<stddef.h>
+	<stdint.h>
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_core_ed25519.h
+	<stddef.h>
+	"export.h"
+
+1734469020 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_core_ristretto255.h
+	<stddef.h>
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_pwhash_scryptsalsa208sha256.h
+	<limits.h>
+	<stddef.h>
+	<stdint.h>
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_scalarmult_ed25519.h
+	<stddef.h>
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_scalarmult_ristretto255.h
+	<stddef.h>
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_secretbox_xchacha20poly1305.h
+	<stddef.h>
+	"crypto_stream_xchacha20.h"
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_stream_salsa2012.h
+	<stddef.h>
+	"export.h"
+
+1734469021 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\libsodium\include\sodium\crypto_stream_salsa208.h
+	<stddef.h>
+	"export.h"
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\rsa.h
+	<openssl/macros.h>
+	<openssl/opensslconf.h>
+	<openssl/asn1.h>
+	<openssl/bio.h>
+	<openssl/crypto.h>
+	<openssl/types.h>
+	<openssl/bn.h>
+	<openssl/rsaerr.h>
+	<openssl/safestack.h>
+	<stdio.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\macros.h
+	<openssl/opensslconf.h>
+	<openssl/opensslv.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\opensslconf.h
+	<openssl/configuration.h>
+	<openssl/macros.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\configuration.h
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\opensslv.h
+	<openssl/macros.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\asn1.h
+	<openssl/macros.h>
+	<stdio.h>
+	<time.h>
+	<openssl/e_os2.h>
+	<openssl/opensslconf.h>
+	<openssl/bio.h>
+	<openssl/safestack.h>
+	<openssl/asn1err.h>
+	<openssl/symhacks.h>
+	<openssl/types.h>
+	<openssl/bn.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\e_os2.h
+	<openssl/macros.h>
+	<openssl/opensslconf.h>
+	<strings.h>
+	<spthread.h>
+	<pthread.h>
+	<inttypes.h>
+	<stdint.h>
+	<sys/types.h>
+	<stdint.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\bio.h
+	<openssl/macros.h>
+	<openssl/e_os2.h>
+	<stdio.h>
+	<stdarg.h>
+	<openssl/crypto.h>
+	<openssl/bioerr.h>
+	<openssl/core.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\crypto.h
+	<openssl/macros.h>
+	<stdlib.h>
+	<time.h>
+	<openssl/e_os2.h>
+	<stdio.h>
+	<openssl/safestack.h>
+	<openssl/opensslv.h>
+	<openssl/types.h>
+	<openssl/opensslconf.h>
+	<openssl/cryptoerr.h>
+	<openssl/core.h>
+	<openssl/ebcdic.h>
+	<openssl/symhacks.h>
+	<openssl/opensslv.h>
+	<spthread.h>
+	<pthread.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\safestack.h
+	<openssl/macros.h>
+	<openssl/stack.h>
+	<openssl/e_os2.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\stack.h
+	<openssl/macros.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\types.h
+	<limits.h>
+	<openssl/e_os2.h>
+	<openssl/safestack.h>
+	<openssl/macros.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\cryptoerr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\symhacks.h
+	<openssl/macros.h>
+	<openssl/e_os2.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\cryptoerr_legacy.h
+	<openssl/macros.h>
+	<openssl/symhacks.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\core.h
+	<stddef.h>
+	<openssl/types.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\ebcdic.h
+	<openssl/macros.h>
+	<stdlib.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\bioerr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\asn1err.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\bn.h
+	<openssl/macros.h>
+	<openssl/e_os2.h>
+	<stdio.h>
+	<openssl/opensslconf.h>
+	<openssl/types.h>
+	<openssl/crypto.h>
+	<openssl/bnerr.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\bnerr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\rsaerr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\pem.h
+	<openssl/macros.h>
+	<openssl/e_os2.h>
+	<openssl/bio.h>
+	<openssl/safestack.h>
+	<openssl/evp.h>
+	<openssl/x509.h>
+	<openssl/pemerr.h>
+	<stdio.h>
+	<openssl/symhacks.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\evp.h
+	<openssl/macros.h>
+	<stdarg.h>
+	<stdio.h>
+	<openssl/opensslconf.h>
+	<openssl/types.h>
+	<openssl/core.h>
+	<openssl/core_dispatch.h>
+	<openssl/symhacks.h>
+	<openssl/bio.h>
+	<openssl/evperr.h>
+	<openssl/params.h>
+	<openssl/objects.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\core_dispatch.h
+	<stdarg.h>
+	<openssl/core.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\evperr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\params.h
+	<openssl/core.h>
+	<openssl/bn.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\objects.h
+	<openssl/macros.h>
+	<openssl/obj_mac.h>
+	<openssl/bio.h>
+	<openssl/asn1.h>
+	<openssl/objectserr.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\obj_mac.h
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\objectserr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\x509.h
+	<openssl/macros.h>
+	<openssl/e_os2.h>
+	<openssl/types.h>
+	<openssl/symhacks.h>
+	<openssl/buffer.h>
+	<openssl/evp.h>
+	<openssl/bio.h>
+	<openssl/asn1.h>
+	<openssl/safestack.h>
+	<openssl/ec.h>
+	<openssl/rsa.h>
+	<openssl/dsa.h>
+	<openssl/dh.h>
+	<openssl/sha.h>
+	<openssl/x509err.h>
+	<stdio.h>
+	<openssl/x509_vfy.h>
+	<openssl/pkcs7.h>
+	<openssl/http.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\buffer.h
+	<openssl/macros.h>
+	<openssl/types.h>
+	<openssl/crypto.h>
+	<openssl/buffererr.h>
+	<stddef.h>
+	<sys/types.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\buffererr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\ec.h
+	<openssl/macros.h>
+	<openssl/opensslconf.h>
+	<openssl/types.h>
+	<string.h>
+	<stdio.h>
+	<openssl/asn1.h>
+	<openssl/symhacks.h>
+	<openssl/bn.h>
+	<openssl/ecerr.h>
+	<openssl/params.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\ecerr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\dsa.h
+	<openssl/macros.h>
+	<openssl/opensslconf.h>
+	<openssl/types.h>
+	<stdlib.h>
+	<openssl/e_os2.h>
+	<openssl/asn1.h>
+	<openssl/bio.h>
+	<openssl/crypto.h>
+	<openssl/bn.h>
+	<openssl/dh.h>
+	<openssl/dsaerr.h>
+	<stdio.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\dh.h
+	<openssl/macros.h>
+	<openssl/opensslconf.h>
+	<openssl/types.h>
+	<stdlib.h>
+	<stdio.h>
+	<openssl/e_os2.h>
+	<openssl/bio.h>
+	<openssl/asn1.h>
+	<openssl/bn.h>
+	<openssl/dherr.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\dherr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\dsaerr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\sha.h
+	<openssl/macros.h>
+	<openssl/e_os2.h>
+	<stddef.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\x509err.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\x509_vfy.h
+	<openssl/macros.h>
+	<openssl/x509.h>
+	<openssl/opensslconf.h>
+	<openssl/lhash.h>
+	<openssl/bio.h>
+	<openssl/crypto.h>
+	<openssl/symhacks.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\lhash.h
+	<openssl/macros.h>
+	<openssl/e_os2.h>
+	<openssl/bio.h>
+	<stdio.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\pkcs7.h
+	<openssl/macros.h>
+	<openssl/asn1.h>
+	<openssl/bio.h>
+	<openssl/e_os2.h>
+	<openssl/symhacks.h>
+	<openssl/types.h>
+	<openssl/pkcs7err.h>
+	<stdio.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\pkcs7err.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\http.h
+	<openssl/opensslconf.h>
+	<openssl/bio.h>
+	<openssl/asn1.h>
+	<openssl/conf.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\conf.h
+	<openssl/macros.h>
+	<openssl/bio.h>
+	<openssl/lhash.h>
+	<openssl/safestack.h>
+	<openssl/e_os2.h>
+	<openssl/types.h>
+	<openssl/conferr.h>
+	<stdio.h>
+	<openssl/conftypes.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\conferr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\conftypes.h
+	<openssl/conf.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\pemerr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1717528883 c:\program files\firedaemon openssl 3\include\openssl\err.h
+	<openssl/macros.h>
+	<openssl/e_os2.h>
+	<stdio.h>
+	<stdlib.h>
+	<openssl/types.h>
+	<openssl/bio.h>
+	<openssl/lhash.h>
+	<openssl/cryptoerr_legacy.h>
+	<limits.h>
+	<errno.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\evp.h
+	<openssl/macros.h>
+	<stdarg.h>
+	<stdio.h>
+	<openssl/opensslconf.h>
+	<openssl/types.h>
+	<openssl/core.h>
+	<openssl/core_dispatch.h>
+	<openssl/symhacks.h>
+	<openssl/bio.h>
+	<openssl/evperr.h>
+	<openssl/params.h>
+	<openssl/objects.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\macros.h
+	<openssl/opensslconf.h>
+	<openssl/opensslv.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\opensslconf.h
+	<openssl/configuration.h>
+	<openssl/macros.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\configuration.h
+
+1730015521 c:\msys64\mingw64\include\openssl\opensslv.h
+	<openssl/macros.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\types.h
+	<limits.h>
+	<openssl/e_os2.h>
+	<openssl/safestack.h>
+	<openssl/macros.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\e_os2.h
+	<openssl/macros.h>
+	<openssl/opensslconf.h>
+	<strings.h>
+	<spthread.h>
+	<pthread.h>
+	<sys/types.h>
+	<inttypes.h>
+	<stdint.h>
+	<sys/types.h>
+	<stdint.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\safestack.h
+	<openssl/macros.h>
+	<openssl/stack.h>
+	<openssl/e_os2.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\stack.h
+	<openssl/macros.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\core.h
+	<stddef.h>
+	<openssl/types.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\core_dispatch.h
+	<stdarg.h>
+	<openssl/core.h>
+	<openssl/indicator.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\indicator.h
+	<openssl/params.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\params.h
+	<openssl/core.h>
+	<openssl/bn.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\bn.h
+	<openssl/macros.h>
+	<openssl/e_os2.h>
+	<stdio.h>
+	<openssl/opensslconf.h>
+	<openssl/types.h>
+	<openssl/crypto.h>
+	<openssl/bnerr.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\crypto.h
+	<openssl/macros.h>
+	<stdlib.h>
+	<time.h>
+	<openssl/e_os2.h>
+	<stdio.h>
+	<openssl/safestack.h>
+	<openssl/opensslv.h>
+	<openssl/types.h>
+	<openssl/opensslconf.h>
+	<openssl/cryptoerr.h>
+	<openssl/core.h>
+	<openssl/ebcdic.h>
+	<openssl/symhacks.h>
+	<openssl/opensslv.h>
+	<spthread.h>
+	<pthread.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\cryptoerr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\symhacks.h
+	<openssl/macros.h>
+	<openssl/e_os2.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\cryptoerr_legacy.h
+	<openssl/macros.h>
+	<openssl/symhacks.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\ebcdic.h
+	<openssl/macros.h>
+	<stdlib.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\bnerr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\bio.h
+	<openssl/macros.h>
+	<openssl/e_os2.h>
+	<stdio.h>
+	<stdarg.h>
+	<openssl/crypto.h>
+	<openssl/bioerr.h>
+	<openssl/core.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\bioerr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\evperr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\objects.h
+	<openssl/macros.h>
+	<openssl/obj_mac.h>
+	<openssl/bio.h>
+	<openssl/asn1.h>
+	<openssl/objectserr.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\obj_mac.h
+
+1730015521 c:\msys64\mingw64\include\openssl\asn1.h
+	<openssl/macros.h>
+	<stdio.h>
+	<time.h>
+	<openssl/e_os2.h>
+	<openssl/opensslconf.h>
+	<openssl/bio.h>
+	<openssl/safestack.h>
+	<openssl/asn1err.h>
+	<openssl/symhacks.h>
+	<openssl/types.h>
+	<openssl/bn.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\asn1err.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\objectserr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\pem.h
+	<openssl/macros.h>
+	<openssl/e_os2.h>
+	<openssl/bio.h>
+	<openssl/safestack.h>
+	<openssl/evp.h>
+	<openssl/x509.h>
+	<openssl/pemerr.h>
+	<stdio.h>
+	<openssl/symhacks.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\x509.h
+	<openssl/macros.h>
+	<openssl/e_os2.h>
+	<openssl/types.h>
+	<openssl/symhacks.h>
+	<openssl/buffer.h>
+	<openssl/evp.h>
+	<openssl/bio.h>
+	<openssl/asn1.h>
+	<openssl/safestack.h>
+	<openssl/ec.h>
+	<openssl/rsa.h>
+	<openssl/dsa.h>
+	<openssl/dh.h>
+	<openssl/sha.h>
+	<openssl/x509err.h>
+	<stdio.h>
+	<openssl/x509_vfy.h>
+	<openssl/pkcs7.h>
+	<openssl/http.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\buffer.h
+	<openssl/macros.h>
+	<openssl/types.h>
+	<openssl/crypto.h>
+	<openssl/buffererr.h>
+	<stddef.h>
+	<sys/types.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\buffererr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\ec.h
+	<openssl/macros.h>
+	<openssl/opensslconf.h>
+	<openssl/types.h>
+	<string.h>
+	<stdio.h>
+	<openssl/asn1.h>
+	<openssl/symhacks.h>
+	<openssl/bn.h>
+	<openssl/ecerr.h>
+	<openssl/params.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\ecerr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\rsa.h
+	<openssl/macros.h>
+	<openssl/opensslconf.h>
+	<openssl/asn1.h>
+	<openssl/bio.h>
+	<openssl/crypto.h>
+	<openssl/types.h>
+	<openssl/bn.h>
+	<openssl/rsaerr.h>
+	<openssl/safestack.h>
+	<stdio.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\rsaerr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\dsa.h
+	<openssl/macros.h>
+	<openssl/opensslconf.h>
+	<openssl/types.h>
+	<stdlib.h>
+	<openssl/e_os2.h>
+	<openssl/asn1.h>
+	<openssl/bio.h>
+	<openssl/crypto.h>
+	<openssl/bn.h>
+	<openssl/dh.h>
+	<openssl/dsaerr.h>
+	<stdio.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\dh.h
+	<openssl/macros.h>
+	<openssl/opensslconf.h>
+	<openssl/types.h>
+	<stdlib.h>
+	<stdio.h>
+	<openssl/e_os2.h>
+	<openssl/bio.h>
+	<openssl/asn1.h>
+	<openssl/bn.h>
+	<openssl/dherr.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\dherr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\dsaerr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\sha.h
+	<openssl/macros.h>
+	<openssl/e_os2.h>
+	<stddef.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\x509err.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\x509_vfy.h
+	<openssl/macros.h>
+	<openssl/x509.h>
+	<openssl/opensslconf.h>
+	<openssl/lhash.h>
+	<openssl/bio.h>
+	<openssl/crypto.h>
+	<openssl/symhacks.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\lhash.h
+	<openssl/macros.h>
+	<openssl/e_os2.h>
+	<openssl/bio.h>
+	<stdio.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\pkcs7.h
+	<openssl/macros.h>
+	<openssl/asn1.h>
+	<openssl/bio.h>
+	<openssl/e_os2.h>
+	<openssl/symhacks.h>
+	<openssl/types.h>
+	<openssl/pkcs7err.h>
+	<stdio.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\pkcs7err.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\http.h
+	<openssl/opensslconf.h>
+	<openssl/bio.h>
+	<openssl/asn1.h>
+	<openssl/conf.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\conf.h
+	<openssl/macros.h>
+	<openssl/bio.h>
+	<openssl/lhash.h>
+	<openssl/safestack.h>
+	<openssl/e_os2.h>
+	<openssl/types.h>
+	<openssl/conferr.h>
+	<stdio.h>
+	<openssl/conftypes.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\conferr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\conftypes.h
+	<openssl/conf.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\pemerr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\err.h
+	<openssl/macros.h>
+	<openssl/e_os2.h>
+	<stdio.h>
+	<stdlib.h>
+	<openssl/types.h>
+	<openssl/bio.h>
+	<openssl/lhash.h>
+	<openssl/cryptoerr_legacy.h>
+	<limits.h>
+	<errno.h>
+
+1734562654 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client.c
+	"dfu_client.h"
+	"iface_enet.h"
+
+1734556281 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client.h
+	<stdint.h>
+	<stdbool.h>
+	<stddef.h>
+	"ethernet_sockets.h"
+	"dfu_proto_api.h"
+	"dfu_messages.h"
+	"dfu_client_config.h"
+
+1734446034 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_proto_api.h
+	<stdint.h>
+	<stdbool.h>
+	"dfu_proto_config.h"
+
+1732226009 c:\glydways\bl_tools\dfu_tools\include\dfu_proto_config.h
+
+1734562579 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_messages.h
+	<stdint.h>
+	<stdbool.h>
+	"dfu_proto_private.h"
+	"dfu_proto_api.h"
+
+1734561238 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_proto_private.h
+	"dfu_proto_api.h"
+	"async_timer.h"
+
+1734562561 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_messages.c
+	<stddef.h>
+	<string.h>
+	"dfu_messages.h"
+	"dfu_platform_utils.h"
+
+1731438852 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_platform_utils.h
+	<stdint.h>
+
+1731606643 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_platform_utils.c
+	<stddef.h>
+	<string.h>
+	<stdint.h>
+	"dfu_platform_utils.h"
+
+1734561258 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_proto.c
+	<stdint.h>
+	<stdbool.h>
+	<stddef.h>
+	<string.h>
+	"dfu_proto_api.h"
+	"dfu_proto_private.h"
+	"async_timer.h"
+	"dfu_messages.h"
+
+1734551499 source:c:\glydways\bl_tools\dfu_tools\crypto\src\dfu_client_crypto.c
+	<openssl/evp.h>
+	<openssl/pem.h>
+	<openssl/err.h>
+	"dfu_client_crypto.h"
+
+1734551446 c:\glydways\bl_tools\dfu_tools\crypto\include\dfu_client_crypto.h
+	<stdint.h>
+	<stdbool.h>
 

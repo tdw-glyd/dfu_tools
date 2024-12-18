@@ -11,13 +11,12 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters='-x C:\Glydways\bl_demo\sample_app\generate\src\Clock_Ip_Cfg.c -iface &quot;\Device\NPF_{DADC3966-80F0-48A8-8F57-0188FDB7DB8D}&quot; -dst 66:55:44:33:22:11 --type ethernet -i 1 -a 0x00600000 -e 1 ' />
+				<Option parameters='-x C:\Glydways\bl_demo\sample_app\generate\src\Clock_Ip_Cfg.c -iface &quot;\Device\NPF_{DADC3966-80F0-48A8-8F57-0188FDB7DB8D}&quot; -dst 66:55:44:33:22:11 --type ethernet -i 1 -a 0x00600000 -e 1 -devtype 0 -variant 5' />
 				<Compiler>
 					<Add option="-g" />
 					<Add directory="../dfu_tool_win" />
 					<Add directory="../include" />
 					<Add directory="../platform/include" />
-					<Add directory="../../dfu_protocol/include" />
 					<Add directory="../interfaces/CAN/include" />
 					<Add directory="C:/Glydways/bl_tools/dfu_tools/dfu_tool_win/" />
 					<Add directory="../interfaces/Ethernet/include" />
@@ -46,20 +45,31 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add directory="../../../../msys64/mingw64/include" />
+			<Add directory="../crypto/include" />
+			<Add directory="../../../B2/dfu_protocol/dfu_client/include" />
+			<Add directory="../../../B2/dfu_protocol/dfu_core/include" />
+			<Add directory="../include" />
 		</Compiler>
-		<Unit filename="../../dfu_protocol/include/dfu_client.h" />
-		<Unit filename="../../dfu_protocol/include/dfu_messages.h" />
-		<Unit filename="../../dfu_protocol/include/dfu_platform_utils.h" />
-		<Unit filename="../../dfu_protocol/include/dfu_proto_api.h" />
-		<Unit filename="../../dfu_protocol/include/dfu_proto_config.h" />
-		<Unit filename="../../dfu_protocol/include/dfu_proto_private.h" />
-		<Unit filename="../../dfu_protocol/src/dfu_messages.c">
+		<Linker>
+			<Add option="-lssl -lcrypto" />
+			<Add library="ssl" />
+			<Add library="crypto" />
+			<Add directory="../../../../msys64/mingw64/lib" />
+		</Linker>
+		<Unit filename="../../../B2/dfu_protocol/dfu_client/src/dfu_client.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../dfu_protocol/src/dfu_platform_utils.c">
+		<Unit filename="../../../B2/dfu_protocol/dfu_core/src/dfu_messages.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../dfu_protocol/src/dfu_proto.c">
+		<Unit filename="../../../B2/dfu_protocol/dfu_core/src/dfu_platform_utils.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../B2/dfu_protocol/dfu_core/src/dfu_proto.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../crypto/src/dfu_client_crypto.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../include/dfu_lib_config.h" />
@@ -77,9 +87,6 @@
 		</Unit>
 		<Unit filename="../platform/include/async_timer.h" />
 		<Unit filename="../platform/src/async_timer.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../src/dfu_client.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>

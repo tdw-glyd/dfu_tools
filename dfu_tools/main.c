@@ -29,6 +29,8 @@
 #include "dfu_client.h"
 #include "ethernet_sockets.h"
 #include "async_timer.h"
+#include "image_xfer.h"
+#include "general_utils.h"
 
 
 // TEST %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -132,23 +134,12 @@ static cmdlineDispatchStruct cmdlineHandlers [] =
 static int printInterfaces(void);
 #endif
 static int flag_srch(int argc, char **argv, const char *flag, int get_value, char **rtn);
-static int dfuToolStrnicmp(const char *s1, const char *s2, size_t n);
-static char * dfuToolStristr(const char *haystack, const char *needle);
 static dfuClientEnvStruct * dfuToolInitLibForInterfaceType(int argc, char **argv);
 static helpTypeEnum _getHelpType(int argc, char **argv, char **cmdForHelp);
 static void _allCommandsHelp(void);
-static char * _strip_quotes(char *str);
-static uint32_t getFileSize(char *filename);
 static void printApplicationBanner(void);
-static char *_padStr(char *pStr, char padChar, int padLength);
 static cmdlineHelpHandler _getHelpHandler(char *cmd);
 static bool mainHelpHandler(int argc, char **argv);
-static bool xferImage(char *filenameStr,
-                      char *destStr,
-                      uint8_t imageIndex,
-                      uint32_t imageAddress,
-                      bool isEncrypted,
-                      dfuClientEnvStruct *dfuClient);
 
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -362,143 +353,6 @@ static bool cmdlineHandlerXferImage(int argc, char **argv, char *filenameStr, df
 }
 
 /*!
-** FUNCTION: xferImage
-**
-** DESCRIPTION: Transfer an image to the target.
-**
-** PARAMETERS:
-**
-** RETURNS:
-**
-** COMMENTS:
-**
-*/
-static bool xferImage(char *filenameStr,
-                      char *destStr,
-                      uint8_t imageIndex,
-                      uint32_t imageAddress,
-                      bool isEncrypted,
-                      dfuClientEnvStruct *dfuClient)
-{
-    bool                            ret = true;
-    uint32_t                        imageSize;
-    ASYNC_TIMER_STRUCT              startTimer;
-    ASYNC_TIMER_STRUCT              endTimer;
-
-    if (
-            (destStr) &&
-            (filenameStr)
-       )
-    {
-        imageSize = getFileSize(filenameStr);
-
-        if (imageSize > 0)
-        {
-            FILE *                      handle;
-
-            printf("\r\n Sending       : %s", filenameStr);
-            printf("\r\n File size     : %u bytes", imageSize);
-            printf("\r\n Image Index   : %d", imageIndex);
-            printf("\r\n FLASH Address : 0x%08X", imageAddress);
-            printf("\r\n Encrypted     : %s", isEncrypted ? "yes" : "no");
-            fflush(stdout);
-
-            // TIMER_Start(&startTimer);
-
-            // Open the file
-            handle = fopen(filenameStr, "rb");
-            if (handle)
-            {
-                uint8_t                         buffer[1500];
-                size_t                          bytesRead = 0;
-                uint32_t                        totalSent = 0;
-                uint32_t                        totalTransactions = 0;
-
-                /*
-                ** First, get the transfer started
-                **
-                */
-                if (dfuClientTransaction_CMD_BEGIN_RCV(dfuClient,
-                                                       DEFAULT_TRANSACTION_TIMEOUT_MS,
-                                                       destStr,
-                                                       imageIndex,
-                                                       imageSize,
-                                                       imageAddress,
-                                                       isEncrypted))
-                {
-                    TIMER_Start(&startTimer);
-                    printf("\n\n");
-                    fflush(stdout);
-
-                    /*
-                    ** Send all of the image file data
-                    **
-                    */
-                    while ((bytesRead = fread(buffer, 1, dfuClientGetInternalMTU(dfuClient)-1, handle))> 0)
-                    {
-                        printf("\r >> Exchange #: %5d. Sending [%4u] bytes...                     ", totalTransactions+1, (uint32_t)bytesRead);
-                        fflush(stdout);
-
-                        if (!dfuClientTransaction_CMD_RCV_DATA(dfuClient,
-                                                               DEFAULT_TRANSACTION_TIMEOUT_MS,
-                                                               destStr,
-                                                               buffer,
-                                                               dfuClientGetInternalMTU(dfuClient)))
-                        {
-                            printf("\r Client rejected image WRITE operation!          ");
-                            break;
-                        }
-                        else
-                        {
-                            totalSent += bytesRead;
-                            ++totalTransactions;
-                        }
-                    } // while
-
-                    TIMER_Start(&endTimer);
-                    printf("\r\n\r\n Sent [%u] bytes.  Total transactions: [%d]", totalSent, totalTransactions);
-
-                    // Now send the "RCV_COMPLETE" transaction
-                    if (!dfuClientTransaction_CMD_RCV_COMPLETE(dfuClient,
-                                                               DEFAULT_TRANSACTION_TIMEOUT_MS,
-                                                               destStr,
-                                                               totalSent))
-                    {
-                        printf("\r\n Target did not accept RCV_COMPLETE command!");
-                    }
-
-                    fflush(stdout);
-                }
-                else
-                {
-                    printf("\r\n Target did not accept BEGIN_RCV command!");
-                }
-
-                fclose(handle);
-            }
-            else
-            {
-                printf("\r\n Failed to open [%s]!", filenameStr);
-            }
-
-            printf("\r\n Total transfer time (mS): %u", (uint32_t)TIMER_GetElapsedMillisecs(&startTimer, &endTimer));
-        }
-        else
-        {
-            printf("\r\n File size was ZERO!");
-        }
-    }
-    else
-    {
-        printf("\r\n Invalid or missing parameters!");
-    }
-
-    fflush(stdout);
-
-    return (ret);
-}
-
-/*!
 ** FUNCTION: cmdlineHandlerMTU
 **
 ** DESCRIPTION: Get the target's MTU so we know how to manage future transactions.
@@ -582,7 +436,7 @@ static int flag_srch(int argc, char **argv, const char *flag, int get_value, cha
             i++;
             if( get_value && i < argc )
             {
-                *rtn = (char *)_strip_quotes(argv[i]);
+                *rtn = (char *)dfuToolStripQuotes(argv[i]);
             }
             else
                 *rtn = NULL;
@@ -592,38 +446,6 @@ static int flag_srch(int argc, char **argv, const char *flag, int get_value, cha
 
     // Failure exit here, so return to user with FALSE
     return( 0 );
-}
-
-/*!
-** FUNCTION: _strip_quotes
-**
-** DESCRIPTION: Remove any double-quotes from the string passed.
-**
-** PARAMETERS:
-**
-** RETURNS:
-**
-** COMMENTS:
-**
-*/
-static char * _strip_quotes(char *str)
-{
-    char *src = str, *dst = str;
-
-    // Iterate through the string
-    while (*src) {
-        // Copy character if it's not a quote
-        if (*src != '"') {
-            *dst = *src;
-            dst++;
-        }
-        src++;
-    }
-
-    // Null-terminate the result string
-    *dst = '\0';
-
-    return (str);
 }
 
 /*!
@@ -747,148 +569,6 @@ static dfuClientEnvStruct * dfuToolInitLibForInterfaceType(int argc, char **argv
     }
 
     return (ret);
-}
-
-/*!
-** FUNCTION: dfuToolStrnicmp
-**
-** DESCRIPTION: Case-insensitive string comparison
-**
-** PARAMETERS:
-**
-** RETURNS: 0 if a match.  Non-zero otherwise
-**
-** COMMENTS:
-**
-*/
-static int dfuToolStrnicmp(const char *s1, const char *s2, size_t n)
-{
-    uint8_t                 c1;
-    uint8_t                 c2;
-
-    if ( (s1) && (s2) )
-    {
-        while (n-- != 0 && (*s1 || *s2))
-        {
-            c1 = *(const unsigned char *)s1++;
-            if ('a' <= c1 && c1 <= 'z')
-                c1 += ('A' - 'a');
-            c2 = *(const unsigned char *)s2++;
-            if ('a' <= c2 && c2 <= 'z')
-                c2 += ('A' - 'a');
-            if (c1 != c2)
-                return c1 - c2;
-        }
-    }
-
-    return 0;
-}
-
-/*!
-** FUNCTION: dfuToolStristr
-**
-** DESCRIPTION: Does a case-insensitve search for "needle" in
-**              the "haystack".  If found, returns the address
-**              where it was found. If not found, returns NULL
-**
-** PARAMETERS:
-**
-** RETURNS:
-**
-** COMMENTS:
-**
-*/
-static char * dfuToolStristr(const char *haystack, const char *needle)
-{
-    int c = tolower((unsigned char)*needle);
-    if (c == '\0')
-        return (char *)haystack;
-
-    for (; *haystack; haystack++)
-    {
-        if (tolower((unsigned char)*haystack) == c)
-        {
-            size_t              i;
-
-            for (i = 0;;)
-            {
-                if (needle[++i] == '\0')
-                    return (char *)haystack;
-
-                if (tolower((unsigned char)haystack[i]) != tolower((unsigned char)needle[i]))
-                    break;
-            }
-        }
-    }
-
-    return NULL;
-}
-
-/*!
-** FUNCTION: getFileSize
-**
-** DESCRIPTION: Returns the length of the named file.
-**
-** PARAMETERS:
-**
-** RETURNS:
-**
-** COMMENTS:
-**
-*/
-static uint32_t getFileSize(char *filename)
-{
-    uint32_t             ret = 0;
-
-    if ((filename) && (strlen(filename)) )
-    {
-        FILE *                  handle = fopen(filename, "r+b");
-
-        if (handle)
-        {
-            fseek(handle, 0, SEEK_END);
-            ret = (uint32_t)ftell(handle);
-            fclose(handle);
-        }
-    }
-
-    return (ret);
-}
-
-/*!
-** FUNCTION: _padStr
-**
-** DESCRIPTION: Pad a string to the desired length using the
-**              specified character as the padding.
-**
-** PARAMETERS:
-**
-** RETURNS:
-**
-** COMMENTS:
-**
-*/
-static char *_padStr(char *pStr, char padChar, int padLength)
-{
-    int             i;
-    char           *pLocal;
-    int             localLen;
-
-    if ( (pStr) && (strlen(pStr) < (size_t)padLength) )
-    {
-        pLocal = pStr + strlen(pStr);
-        localLen = (padLength - strlen(pStr));
-        for (i = 0; i < localLen; i++)
-        {
-            *pLocal = padChar;
-            pLocal++;
-            *pLocal = 0x00;
-        }
-
-        return (pStr);
-    }
-
-    return (NULL);
 }
 
 /*!
@@ -1025,7 +705,7 @@ static void _allCommandsHelp(void)
     while (cmdlineHandlers[index].handler != NULL)
     {
         sprintf(helpText, "\r\n '%s' ('%s')", cmdlineHandlers[index].shortForm, cmdlineHandlers[index].longForm);
-        _padStr(helpText, ' ', 20);
+        dfuToolPadStr(helpText, ' ', 20);
         strcat(helpText, ": ");
         strcat(helpText, cmdlineHandlers[index].shortHelp != NULL ? cmdlineHandlers[index].shortHelp : "No Help");
         printf(helpText);

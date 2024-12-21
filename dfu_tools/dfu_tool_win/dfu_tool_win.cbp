@@ -69,9 +69,20 @@
 		<Unit filename="../../../B2/dfu_protocol/dfu_core/src/dfu_proto.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../crypto.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../crypto/src/dfu_client_crypto.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../general_utils.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../general_utils.h" />
+		<Unit filename="../image_xfer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../image_xfer.h" />
 		<Unit filename="../include/dfu_lib_config.h" />
 		<Unit filename="../include/dfu_lib_support.h" />
 		<Unit filename="../interfaces/Ethernet/include/ethernet_sockets.h" />

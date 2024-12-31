@@ -133,7 +133,7 @@
 
 1731698560 c:\glydways\bl_tools\dfu_tools\include\dfu_lib_config.h
 
-1734557456 source:c:\glydways\bl_tools\dfu_tools\main.c
+1735684345 source:c:\glydways\bl_tools\dfu_tools\main.c
 	<stdint.h>
 	<stdbool.h>
 	<stdio.h>
@@ -145,6 +145,9 @@
 	"dfu_client.h"
 	"ethernet_sockets.h"
 	"async_timer.h"
+	"image_xfer.h"
+	"general_utils.h"
+	"server.h"
 	<openssl/evp.h>
 	<openssl/pem.h>
 	<openssl/err.h>
@@ -1293,11 +1296,11 @@
 	<limits.h>
 	<errno.h>
 
-1734562654 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client.c
+1735671358 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client.c
 	"dfu_client.h"
 	"iface_enet.h"
 
-1734556281 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client.h
+1735671379 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client.h
 	<stdint.h>
 	<stdbool.h>
 	<stddef.h>
@@ -1306,24 +1309,24 @@
 	"dfu_messages.h"
 	"dfu_client_config.h"
 
-1734446034 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_proto_api.h
+1734623658 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_proto_api.h
 	<stdint.h>
 	<stdbool.h>
 	"dfu_proto_config.h"
 
 1732226009 c:\glydways\bl_tools\dfu_tools\include\dfu_proto_config.h
 
-1734562579 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_messages.h
+1734713249 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_messages.h
 	<stdint.h>
 	<stdbool.h>
 	"dfu_proto_private.h"
 	"dfu_proto_api.h"
 
-1734561238 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_proto_private.h
+1734624224 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_proto_private.h
 	"dfu_proto_api.h"
 	"async_timer.h"
 
-1734562561 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_messages.c
+1734713223 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_messages.c
 	<stddef.h>
 	<string.h>
 	"dfu_messages.h"
@@ -1338,7 +1341,7 @@
 	<stdint.h>
 	"dfu_platform_utils.h"
 
-1734561258 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_proto.c
+1734631271 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_proto.c
 	<stdint.h>
 	<stdbool.h>
 	<stddef.h>
@@ -1354,7 +1357,66 @@
 	<openssl/err.h>
 	"dfu_client_crypto.h"
 
-1734551446 c:\glydways\bl_tools\dfu_tools\crypto\include\dfu_client_crypto.h
+1735658820 c:\glydways\bl_tools\dfu_tools\crypto\include\dfu_client_crypto.h
+	<stdio.h>
 	<stdint.h>
 	<stdbool.h>
+
+1734731006 source:c:\glydways\bl_tools\dfu_tools\general_utils.c
+	<stdio.h>
+	<string.h>
+	<stddef.h>
+	<conio.h>
+	<ctype.h>
+	"general_utils.h"
+
+1734731023 c:\glydways\bl_tools\dfu_tools\general_utils.h
+	<stdint.h>
+	<stdbool.h>
+
+1734730574 source:c:\glydways\bl_tools\dfu_tools\image_xfer.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<conio.h>
+	"image_xfer.h"
+	"general_utils.h"
+	"dfu_proto_api.h"
+	"dfu_messages.h"
+	"dfu_client.h"
+	"ethernet_sockets.h"
+	"async_timer.h"
+
+1734730368 c:\glydways\bl_tools\dfu_tools\image_xfer.h
+	<stdint.h>
+	<stdbool.h>
+	"dfu_client.h"
+
+1735678086 source:c:\glydways\bl_tools\dfu_tools\sequence_ops.c
+	<stdio.h>
+	"dfu_client_config.h"
+	"sequence_ops.h"
+	"dfu_client_crypto.h"
+	"image_xfer.h"
+
+1735671792 c:\glydways\bl_tools\dfu_tools\sequence_ops.h
+	"dfu_client.h"
+
+1735686275 source:c:\glydways\bl_tools\dfu_tools\server.c
+	<stdio.h>
+	<stdint.h>
+	<stdbool.h>
+	"server.h"
+	"async_timer.h"
+	"general_utils.h"
+
+1735686579 c:\glydways\bl_tools\dfu_tools\server.h
+	<stdlib.h>
+	<string.h>
+	<winsock2.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<unistd.h>
+	<fcntl.h>
+	"dfu_client.h"
 

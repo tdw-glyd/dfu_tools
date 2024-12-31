@@ -31,6 +31,7 @@
 #include "async_timer.h"
 #include "image_xfer.h"
 #include "general_utils.h"
+#include "server.h"
 
 
 // TEST %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -153,10 +154,12 @@ int main(int argc, char **argv)
     ASYNC_TIMER_STRUCT       keyhitTimer;
 
     // TEST %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    testOpenSSL();
+    // testOpenSSL();
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     printApplicationBanner();
+
+    serverRun(NULL, NULL, NULL, NULL, 0);
 
     if (argc > 0)
     {

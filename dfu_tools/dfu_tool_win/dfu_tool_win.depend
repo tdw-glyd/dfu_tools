@@ -133,7 +133,7 @@
 
 1731698560 c:\glydways\bl_tools\dfu_tools\include\dfu_lib_config.h
 
-1735684345 source:c:\glydways\bl_tools\dfu_tools\main.c
+1735866092 source:c:\glydways\bl_tools\dfu_tools\main.c
 	<stdint.h>
 	<stdbool.h>
 	<stdio.h>
@@ -147,6 +147,7 @@
 	"async_timer.h"
 	"image_xfer.h"
 	"general_utils.h"
+	"sequence_ops.h"
 	"server.h"
 	<openssl/evp.h>
 	<openssl/pem.h>
@@ -1296,7 +1297,7 @@
 	<limits.h>
 	<errno.h>
 
-1735671358 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client.c
+1735849285 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client.c
 	"dfu_client.h"
 	"iface_enet.h"
 
@@ -1316,17 +1317,17 @@
 
 1732226009 c:\glydways\bl_tools\dfu_tools\include\dfu_proto_config.h
 
-1734713249 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_messages.h
+1735851938 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_messages.h
 	<stdint.h>
 	<stdbool.h>
 	"dfu_proto_private.h"
 	"dfu_proto_api.h"
 
-1734624224 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_proto_private.h
+1735855979 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_proto_private.h
 	"dfu_proto_api.h"
 	"async_timer.h"
 
-1734713223 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_messages.c
+1735865143 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_messages.c
 	<stddef.h>
 	<string.h>
 	"dfu_messages.h"
@@ -1341,7 +1342,7 @@
 	<stdint.h>
 	"dfu_platform_utils.h"
 
-1734631271 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_proto.c
+1735866595 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_proto.c
 	<stdint.h>
 	<stdbool.h>
 	<stddef.h>
@@ -1374,7 +1375,7 @@
 	<stdint.h>
 	<stdbool.h>
 
-1734730574 source:c:\glydways\bl_tools\dfu_tools\image_xfer.c
+1735851526 source:c:\glydways\bl_tools\dfu_tools\image_xfer.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -1392,17 +1393,17 @@
 	<stdbool.h>
 	"dfu_client.h"
 
-1735678086 source:c:\glydways\bl_tools\dfu_tools\sequence_ops.c
+1735840418 source:c:\glydways\bl_tools\dfu_tools\sequence_ops.c
 	<stdio.h>
 	"dfu_client_config.h"
 	"sequence_ops.h"
 	"dfu_client_crypto.h"
 	"image_xfer.h"
 
-1735671792 c:\glydways\bl_tools\dfu_tools\sequence_ops.h
+1735841361 c:\glydways\bl_tools\dfu_tools\sequence_ops.h
 	"dfu_client.h"
 
-1735686275 source:c:\glydways\bl_tools\dfu_tools\server.c
+1735686922 source:c:\glydways\bl_tools\dfu_tools\server.c
 	<stdio.h>
 	<stdint.h>
 	<stdbool.h>

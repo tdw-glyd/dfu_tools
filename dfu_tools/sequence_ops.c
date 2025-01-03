@@ -92,12 +92,12 @@ static bool _imageIndexMustBeEncrypted(uint8_t imageIndex);
 bool sequenceBeginSession(dfuClientEnvStruct * dfuClient,
                           uint8_t devType,
                           uint8_t devVariant,
-                          char * destinationString,
+                          char * dest,
                           char * challengePubKeyFilename)
 {
     bool                    ret = false;
 
-    if ( (dfuClient) && (destinationString) )
+    if ( (dfuClient) && (dest) )
     {
         uint32_t                    challengePW;
 
@@ -109,7 +109,7 @@ bool sequenceBeginSession(dfuClientEnvStruct * dfuClient,
                                                              devType,
                                                              devVariant,
                                                              SO_TRANSACTION_TIMEOUT_MS,
-                                                             destinationString);
+                                                             dest);
         if (challengePW != 0)
         {
             uint8_t *               encryptedChallenge = NULL;
@@ -119,7 +119,7 @@ bool sequenceBeginSession(dfuClientEnvStruct * dfuClient,
             ** we can now determine the MTU to use.
             **
             */
-            sequenceNegotiateMTU(dfuClient, destinationString);
+            sequenceNegotiateMTU(dfuClient, dest);
 
             /*
             ** Now that we have the challenge password from the target,
@@ -138,7 +138,7 @@ bool sequenceBeginSession(dfuClientEnvStruct * dfuClient,
                                                     DEFAULT_ENCRYPTED_CHALLENGE_FILENAME,
                                                     IMAGE_INDEX_SESSION_PASSWORD,
                                                     0,
-                                                    destinationString))
+                                                    dest))
                 {
                     //
                     // Successfully sent the encrypted challenge key. Delete
@@ -307,6 +307,65 @@ bool sequenceRebootTarget(dfuClientEnvStruct * dfuClient, char * dest, uint16_t 
 
     return (ret);
 }
+
+/*!
+** FUNCTION: macroSequenceInstallImage
+**
+** DESCRIPTION: This is a "macro" sequence, in that it uses
+**              other sequences to perform a top-level
+**              operation.  In this case:
+**
+**   1. Sets up a session
+**   2. Negotiates the MTU
+**   3. Transfers the specified image to the target.
+**   4. Instructs the target to install that image.
+**   5. If TRUE, tells the target to reboot.
+**
+** PARAMETERS: 
+**
+** RETURNS: 
+**
+** COMMENTS: 
+**
+*/
+bool macroSequenceInstallImage(dfuClientEnvStruct * dfuClient,
+                               uint8_t devType,
+                               uint8_t devVariant,
+                               char * dest,
+                               char * challengePubKeyFilename,
+                               char *imageFilename,
+                               uint8_t imageIndex,
+                               uint32_t imageAddress,
+                               bool shouldReboot,
+                               uint16_t rebootDelayMS                              
+                              )
+{
+    bool                        ret = false;
+    
+    if (sequenceBeginSession(dfuClient,
+                             devType,
+                             devVariant,
+                             dest,
+                             challengePubKeyFilename))
+    {
+        if (sequenceTransferAndInstallImage(dfuClient,
+                                            imageFilename,
+                                            imageIndex,
+                                            imageAddress,
+                                            dest))
+        {
+            ret = true;
+
+            // Should we reboot the target now?
+            if (shouldReboot)
+            {
+                ret = sequenceRebootTarget(dfuClient, dest, rebootDelayMS);
+            }
+        }                                                    
+    }                                 
+
+    return (ret);
+}                              
 
 
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$

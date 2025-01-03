@@ -116,7 +116,7 @@ bool xferImage(char *filenameStr,
                                                                XFER_TRANSACTION_TIMEOUT_MS,
                                                                destStr,
                                                                buffer,
-                                                               dfuClientGetInternalMTU(dfuClient)))
+                                                               bytesRead))
                         {
                             printf("\r Client rejected image WRITE operation!          ");
                             break;

@@ -31,6 +31,7 @@
 #include "async_timer.h"
 #include "image_xfer.h"
 #include "general_utils.h"
+#include "sequence_ops.h"
 #include "server.h"
 
 
@@ -153,13 +154,36 @@ int main(int argc, char **argv)
     char                    *paramVal = NULL;
     ASYNC_TIMER_STRUCT       keyhitTimer;
 
+
     // TEST %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     // testOpenSSL();
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     printApplicationBanner();
 
-    serverRun(NULL, NULL, NULL, NULL, 0);
+
+    // TEST ONLY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    dfuClientEnvStruct *            dfuClient = dfuClientInit(DFUCLIENT_INTERFACE_ETHERNET,  "\\Device\\NPF_{DADC3966-80F0-48A8-8F57-0188FDB7DB8D}");
+
+    macroSequenceInstallImage(
+                              dfuClient,
+                              0,
+                              5,
+                              "66:55:44:33:22:11",
+                              "c://public_key.pem",
+                              NULL,
+                              0,
+                              0,
+                              false,
+                              1000
+                              );
+
+    sequenceEndSession(dfuClient, "66:55:44:33:22:11");
+    return (0);
+
+
+    // serverRun(NULL, NULL, NULL, NULL, 0);
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     if (argc > 0)
     {

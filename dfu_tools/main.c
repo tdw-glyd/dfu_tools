@@ -171,8 +171,8 @@ int main(int argc, char **argv)
                               5,
                               "66:55:44:33:22:11",
                               "c://public_key.pem",
-                              NULL,
-                              0,
+                              "c://sample_app.enc",
+                              1,
                               0,
                               false,
                               1000

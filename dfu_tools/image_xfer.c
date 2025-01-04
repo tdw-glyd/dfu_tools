@@ -69,6 +69,7 @@ bool xferImage(char *filenameStr,
         {
             FILE *                      handle;
 
+            printf("\r\n *** IMAGE TRANSFER ***");
             printf("\r\n Sending       : %s", filenameStr);
             printf("\r\n File size     : %u bytes", imageSize);
             printf("\r\n Image Index   : %d", imageIndex);
@@ -107,7 +108,7 @@ bool xferImage(char *filenameStr,
                     ** Send all of the image file data
                     **
                     */
-                    while ((bytesRead = fread(buffer, 1, dfuClientGetInternalMTU(dfuClient)-1, handle))> 0)
+                    while ((bytesRead = fread(buffer, 1, dfuClientGetInternalMTU(dfuClient)-3, handle))> 0)
                     {
                         printf("\r >> Exchange #: %5d. Sending [%4u] bytes...                     ", totalTransactions+1, (uint32_t)bytesRead);
                         fflush(stdout);
@@ -167,6 +168,7 @@ bool xferImage(char *filenameStr,
         printf("\r\n Invalid or missing parameters!");
     }
 
+    printf("\r\n");
     fflush(stdout);
 
     return (ret);

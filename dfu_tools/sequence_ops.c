@@ -147,6 +147,9 @@ bool sequenceBeginSession(dfuClientEnvStruct * dfuClient,
                     //
                     DELETE_ENCRYPTED_CHALLENGE();
 
+                    // Set the Session state to ACTIVE
+                    dfuSetSessionActive(dfuClientGetDFU(dfuClient));
+
                     ret = true;
                 }
             }
@@ -178,6 +181,8 @@ bool sequenceEndSession(dfuClientEnvStruct * dfuClient, char * dest)
         ret = dfuClientTransaction_CMD_END_SESSION(dfuClient,
                                                  SO_TRANSACTION_TIMEOUT_MS,
                                                  dest);
+
+        dfuSetSessionInActive(dfuClientGetDFU(dfuClient));
     }
 
     return (ret);
@@ -218,6 +223,8 @@ bool sequenceTransferAndInstallImage(dfuClientEnvStruct * dfuClient,
                       SHOULD_IMAGE_BE_ENCRYPTED(imageIndex),
                       dfuClient))
         {
+            printf("\r\n Installing image...");
+
             // Perform the "INSTALL_IMAGE" transaction.
             if (dfuClientTransaction_CMD_INSTALL_IMAGE(dfuClient,
                                                        SO_TRANSACTION_TIMEOUT_MS,
@@ -225,7 +232,14 @@ bool sequenceTransferAndInstallImage(dfuClientEnvStruct * dfuClient,
             {
                 // Image installed successfully!
                 ret = true;
+                printf("Success!");
             }
+            else
+            {
+                printf("Failed!");
+            }
+
+            printf("\r\n\r\n");
         }
     }
 
@@ -266,7 +280,7 @@ bool sequenceNegotiateMTU(dfuClientEnvStruct * dfuClient, char * dest)
 
             // Set the internal MTU
             dfuClientSetInternalMTU(dfuClient, retMTU);
-            
+
             ret = true;
         }
     }
@@ -321,11 +335,11 @@ bool sequenceRebootTarget(dfuClientEnvStruct * dfuClient, char * dest, uint16_t 
 **   4. Instructs the target to install that image.
 **   5. If TRUE, tells the target to reboot.
 **
-** PARAMETERS: 
+** PARAMETERS:
 **
-** RETURNS: 
+** RETURNS:
 **
-** COMMENTS: 
+** COMMENTS:
 **
 */
 bool macroSequenceInstallImage(dfuClientEnvStruct * dfuClient,
@@ -337,17 +351,25 @@ bool macroSequenceInstallImage(dfuClientEnvStruct * dfuClient,
                                uint8_t imageIndex,
                                uint32_t imageAddress,
                                bool shouldReboot,
-                               uint16_t rebootDelayMS                              
+                               uint16_t rebootDelayMS
                               )
 {
     bool                        ret = false;
-    
+
+    //
+    // Sends the START_SESSION, then transfers the encrypted
+    // challenge back and "installs" it.  If that succeeds,
+    // we are successfully in a Session
+    //
     if (sequenceBeginSession(dfuClient,
                              devType,
                              devVariant,
                              dest,
                              challengePubKeyFilename))
     {
+        //
+        // Send the requested image file
+        //
         if (sequenceTransferAndInstallImage(dfuClient,
                                             imageFilename,
                                             imageIndex,
@@ -361,11 +383,11 @@ bool macroSequenceInstallImage(dfuClientEnvStruct * dfuClient,
             {
                 ret = sequenceRebootTarget(dfuClient, dest, rebootDelayMS);
             }
-        }                                                    
-    }                                 
+        }
+    }
 
     return (ret);
-}                              
+}
 
 
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$

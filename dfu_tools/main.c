@@ -171,7 +171,7 @@ int main(int argc, char **argv)
                               5,
                               "66:55:44:33:22:11",
                               "c://public_key.pem",
-                              "c://sample_app.enc",
+                              "C:/Glydways/bl_tools/image_builder/image_builder/sample_app.img",
                               1,
                               0,
                               false,

@@ -108,7 +108,7 @@ bool xferImage(char *filenameStr,
                     ** Send all of the image file data
                     **
                     */
-                    while ((bytesRead = fread(buffer, 1, dfuClientGetInternalMTU(dfuClient)-3, handle))> 0)
+                    while ((bytesRead = fread(buffer, 1, dfuClientGetInternalMTU(dfuClient)-3, handle)) > 0)
                     {
                         printf("\r >> Exchange #: %5d. Sending [%4u] bytes...                     ", totalTransactions+1, (uint32_t)bytesRead);
                         fflush(stdout);

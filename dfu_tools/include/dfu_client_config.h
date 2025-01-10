@@ -25,7 +25,7 @@
 ** How big of an Ethernet frame can we send?
 **
 */
-#define MAX_ETHERNET_MSG_LEN                                         (384+1U)
+#define MAX_ETHERNET_MSG_LEN                                         (384+3U)
 
 /*
 ** Set this to the max CAN interfaces

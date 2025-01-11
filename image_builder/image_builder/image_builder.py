@@ -78,7 +78,7 @@ def create_metadata_binary(file_name, image_index, flash_base_address, device_ty
     )
 
     return metadata
-
+"""
 def aes_ctr_encrypt_with_iv_and_tag(input_file, key_file, image_index, flash_base_address,
                                     device_type, device_variant, version, core_affinity, image_tag=None):
     # Read the AES key (128 bits = 16 bytes)
@@ -135,9 +135,71 @@ def aes_ctr_encrypt_with_iv_and_tag(input_file, key_file, image_index, flash_bas
     print("Key (hex):", key.hex())
     print("IV (hex):", iv.hex())
     print("Tag (hex):", tag.hex())
+"""
+
+def aes_ctr_encrypt_with_iv_and_tag(input_file, key_file, image_index, flash_base_address,
+                                    device_type, device_variant, version, core_affinity, image_tag=None):
+    # Read the AES key (128 bits = 16 bytes)
+    with open(key_file, 'rb') as f:
+        key = f.read()
+        assert len(key) == 16, "Key must be 128 bits (16 bytes)"
+
+    # Generate a random IV (96 bits = 12 bytes)
+    iv = token_bytes(12)
+    tag = token_bytes(12)
+
+    # Create metadata binary
+    metadata = create_metadata_binary(input_file, image_index, flash_base_address, device_type,
+                                      device_variant, version, image_tag, core_affinity)
+
+    # Read the plaintext firmware file
+    with open(input_file, 'rb') as f:
+        firmware_data = f.read()
+
+    # TEST ONLY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    unenc_output_file = os.path.splitext(input_file)[0] + ".une"
+    with open(unenc_output_file, 'wb') as handle:
+        handle.write(metadata)
+        handle.write(firmware_data)
+    # ######################################################
+
+    combined_data = metadata + firmware_data
+
+    # Initialize AES-CTR cipher
+    cipher = Cipher(algorithms.AES(key), modes.CTR(iv + b'\x00\x00\x00\x01'), backend=default_backend())
+
+    encryptor = cipher.encryptor()
+    cipher_data = encryptor.update(combined_data)
+    encryptor.finalize()
+
+    # Add 2-byte filler (A5, 5A) between the tag and metadata
+    filler = b'\xA5\x5A\xAA\x55'
+
+    # Prepare the output filename with ".img" extension
+    output_file = os.path.splitext(input_file)[0] + ".img"
+
+    # Prepend the IV and Authentication Tag to the encrypted data
+    with open(output_file, 'wb') as f:
+        f.write(tag)         # Write the IV
+        f.write(iv)          # Write the Authentication Tag
+        f.write(filler)      # Write the padding bytes
+        f.write(cipher_data) # Write the ciphertext
+        f.flush()
+
+    # Print details
+    print("Encryption complete!")
+    print(" Input file:", input_file)
+    print("Output file:", output_file)
+    print("  Key (hex):", key.hex())
+    print("   IV (hex):", iv.hex())
+    print("  Tag (hex):", tag.hex())
+
 
 def aes_gcm_encrypt_with_iv_and_tag(input_file, key_file, image_index, flash_base_address,
                                     device_type, device_variant, version, core_affinity, image_tag=None):
+
+    BLOCK_SIZE = 128
+
     # Read the AES key (128 bits = 16 bytes)
     with open(key_file, 'rb') as f:
         key = f.read()
@@ -152,25 +214,35 @@ def aes_gcm_encrypt_with_iv_and_tag(input_file, key_file, image_index, flash_bas
 
     # Read the plaintext firmware file
     with open(input_file, 'rb') as f:
-        #firmware_data = f.read()
-        firmware_data = f.read(os.path.getsize(input_file))
+        firmware_data = f.read()
 
-    # Combine metadata and firmware data
-    combined_data = metadata + firmware_data
-    # combined_data = firmware_data
+    # Pad firmware to 128-byte blocks if needed
+    padding_len = (BLOCK_SIZE - len(firmware_data) % BLOCK_SIZE) % BLOCK_SIZE
+    padded_firmware = firmware_data + (b'\x00' * padding_len)
 
     # TEST ONLY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     unenc_output_file = os.path.splitext(input_file)[0] + ".une"
     with open(unenc_output_file, 'wb') as handle:
-        handle.write(combined_data)
+        handle.write(metadata)
+        handle.write(padded_firmware)
     # ######################################################
 
     # Initialize AES-GCM cipher
-    cipher = Cipher(algorithms.AES(key), modes.GCM(iv), backend=default_backend())
+    cipher = Cipher(algorithms.AES(key),
+                    modes.GCM(iv),
+                    backend=default_backend())
     encryptor = cipher.encryptor()
 
-    # Encrypt the combined data
-    ciphertext = encryptor.update(combined_data) + encryptor.finalize()
+    # Encrypt the metadata
+    encrypted_metadata = encryptor.update(metadata)
+
+    encrypted_firmware = b''
+    for i in range(0, len(padded_firmware), BLOCK_SIZE):
+        block = padded_firmware[i:i + BLOCK_SIZE]
+        encrypted_firmware += encryptor.update(block)
+
+    # Finalize and get authentication tag
+    encryptor.finalize()
 
     # Authentication tag (16 bytes for AES-GCM)
     tag = encryptor.tag
@@ -183,18 +255,22 @@ def aes_gcm_encrypt_with_iv_and_tag(input_file, key_file, image_index, flash_bas
 
     # Prepend the IV and Authentication Tag to the encrypted data
     with open(output_file, 'wb') as f:
-        f.write(iv)         # Write the IV
-        f.write(tag)        # Write the Authentication Tag
-        f.write(filler)    # Write the padding bytes
-        f.write(ciphertext) # Write the ciphertext
+        f.write(iv)          # Write the IV
+        f.write(tag)         # Write the Authentication Tag
+        f.write(filler)      # Write the padding bytes
+        f.write(encrypted_metadata)
+        f.write(encrypted_firmware)  # Write the ciphertext
 
     # Print details
-    print("Encryption complete!")
-    print("Input file:", input_file)
-    print("Output file:", output_file)
-    print("Key (hex):", key.hex())
-    print("IV (hex):", iv.hex())
-    print("Tag (hex):", tag.hex())
+    print(" Encryption complete:")
+    print("       Input file:", input_file)
+    print("      Output file:", output_file)
+    print("        Key (hex):", key.hex())
+    print("         IV (hex):", iv.hex())
+    print("        Tag (hex):", tag.hex())
+    print("  Metadata length:", len(metadata))
+    print("      Orig Length:", os.path.getsize(input_file))
+    print("     Image Length:", os.path.getsize(output_file))
 
 
 # Main function to handle command-line arguments
@@ -217,7 +293,7 @@ if __name__ == "__main__":
     image_tag = sys.argv[9] if len(sys.argv) > 9 else None
 
     # Perform encryption
-    aes_ctr_encrypt_with_iv_and_tag(firmware_file, aes_key_file, image_index, flash_base_address,
+    aes_gcm_encrypt_with_iv_and_tag(firmware_file, aes_key_file, image_index, flash_base_address,
                                     device_type, device_variant, version, core_affinity, image_tag)
 
     """

@@ -174,7 +174,7 @@ int main(int argc, char **argv)
                               "C:/Glydways/bl_tools/image_builder/image_builder/sample_app.img",
                               1,
                               0,
-                              false,
+                              true,
                               1000
                               );
 

@@ -314,9 +314,9 @@ bool sequenceRebootTarget(dfuClientEnvStruct * dfuClient, char * dest, uint16_t 
     {
         // Do the transaction to REBOOT the target.
         ret = dfuClientTransaction_CMD_REBOOT(dfuClient,
-                                            SO_TRANSACTION_TIMEOUT_MS,
-                                            dest,
-                                            localRebootDelay);
+                                              SO_TRANSACTION_TIMEOUT_MS,
+                                              dest,
+                                              localRebootDelay);
     }
 
     return (ret);
@@ -381,7 +381,9 @@ bool macroSequenceInstallImage(dfuClientEnvStruct * dfuClient,
             // Should we reboot the target now?
             if (shouldReboot)
             {
+                printf("\r\n\r\n Rebooting target: ");
                 ret = sequenceRebootTarget(dfuClient, dest, rebootDelayMS);
+                printf("%s", (ret ? "Success" : "Failed!"));
             }
         }
     }

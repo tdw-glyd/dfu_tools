@@ -133,8 +133,8 @@ def aes_gcm_encrypt_with_iv_and_tag(input_file, key_file, image_index, flash_bas
     # Prepend the IV and Authentication Tag to the encrypted data
     with open(output_file, 'wb') as f:
         f.write(iv)          # Write the IV
+        f.write(filler)      # Write the padding bytes (to align to 16-bytes)
         f.write(tag)         # Write the Authentication Tag
-        f.write(filler)      # Write the padding bytes
         f.write(encrypted_metadata)
         f.write(encrypted_firmware)  # Write the ciphertext
 

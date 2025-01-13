@@ -112,6 +112,28 @@ unsigned char TIMER_Start(ASYNC_TIMER_STRUCT *pTimer)
     return (0);
 }
 
+unsigned char TIMER_Running(ASYNC_TIMER_STRUCT* pTimer)
+{
+    unsigned char               ret = 0;
+
+    if ( (pTimer) && (pTimer->timerRunning) )
+    {
+        ret = 1;
+    }
+
+    return ret;
+}
+
+void TIMER_Cancel(ASYNC_TIMER_STRUCT *pTimer)
+{
+    if (pTimer)
+    {
+        pTimer->timerRunning = 0;
+    }
+
+    return;
+}
+
 /*!
 ** FUNCTION: TIMER_Finished
 **
@@ -134,6 +156,10 @@ unsigned char TIMER_Finished(ASYNC_TIMER_STRUCT *pTimer, uint64_t Timeout)
         uint32_t        lDiff = lTime - pTimer->capturedMS;
 
         ret = (uint8_t) ( lDiff >= Timeout );
+        if (ret)
+        {
+            pTimer->timerRunning = 0;
+        }
     }
 
     return (ret);

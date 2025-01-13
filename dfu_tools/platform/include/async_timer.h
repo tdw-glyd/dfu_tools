@@ -85,6 +85,9 @@ unsigned char TIMER_Start(ASYNC_TIMER_STRUCT *pTimer);
 */
 unsigned char TIMER_Finished(ASYNC_TIMER_STRUCT *pTimer, uint64_t Timeout);
 
+unsigned char TIMER_Running(ASYNC_TIMER_STRUCT* pTimer);
+void TIMER_Cancel(ASYNC_TIMER_STRUCT *pTimer);
+
 /*
 ** FUNCTION: TIMER_GetElapsedMillisecs
 **

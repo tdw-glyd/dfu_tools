@@ -98,7 +98,8 @@ ifaceEthEnvStruct * dfuClientEthernetInit(dfuProtocol **callerDFU, const char *i
                 ret->dfu = dfuCreate(dfuClientEnetRxCallback,
                                      dfuClientEnetTxCallback,
                                      dfuClientEnetErrCallback,
-                                     (void *)ret);
+                                     (void *)ret,
+                                     0);
                 if (ret->dfu)
                 {
                     dfuSetMTU(ret->dfu, MAX_ETHERNET_MSG_LEN);

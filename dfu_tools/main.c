@@ -169,6 +169,7 @@ int main(int argc, char **argv)
                               dfuClient,
                               0,
                               5,
+                              //"FF:FF:FF:FF:FF:FF",
                               "66:55:44:33:22:11",
                               "c://public_key.pem",
                               "C:/Glydways/bl_tools/image_builder/image_builder/sample_app.img",
@@ -179,6 +180,7 @@ int main(int argc, char **argv)
                               );
 
     sequenceEndSession(dfuClient, "66:55:44:33:22:11");
+    //sequenceEndSession(dfuClient, "FF:FF:FF:FF:FF:FF");
     return (0);
 
 

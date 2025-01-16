@@ -297,7 +297,7 @@ uint8_t *receive_ethernet_message(dfu_sock_t *socketHandle, uint8_t *destBuff, u
         }
         else
         {
-            usleep(1000);
+            // usleep(1000);
         }
     }
 

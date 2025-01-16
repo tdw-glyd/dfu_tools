@@ -153,6 +153,10 @@ int main(int argc, char **argv)
 {
     char                    *paramVal = NULL;
     ASYNC_TIMER_STRUCT       keyhitTimer;
+    uint8_t                  imageFlags;
+    uint32_t                 imageAddress;
+    uint32_t                 imageSize;
+    uint8_t                  imageIndex;
 
 
     // TEST %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -164,6 +168,21 @@ int main(int argc, char **argv)
 
     // TEST ONLY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     dfuClientEnvStruct *            dfuClient = dfuClientInit(DFUCLIENT_INTERFACE_ETHERNET,  "\\Device\\NPF_{DADC3966-80F0-48A8-8F57-0188FDB7DB8D}");
+
+
+
+
+    // TEST: Get image status
+    imageIndex = 1;
+    imageAddress = 0x00500000;
+    dfuClientTransaction_CMD_IMAGE_STATUS(dfuClient,
+                                     15000,
+                                     "66:55:44:33:22:11",
+                                     &imageIndex,
+                                     imageAddress,
+                                     &imageFlags,
+                                     &imageSize);
+
 
     macroSequenceInstallImage(
                               dfuClient,

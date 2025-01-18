@@ -1310,7 +1310,7 @@
 	"dfu_messages.h"
 	"dfu_client_config.h"
 
-1736981828 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_proto_api.h
+1737123747 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_proto_api.h
 	<stdint.h>
 	<stdbool.h>
 	"dfu_proto_config.h"
@@ -1327,7 +1327,7 @@
 	"dfu_proto_api.h"
 	"async_timer.h"
 
-1737038684 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_messages.c
+1737041271 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_messages.c
 	<stddef.h>
 	<string.h>
 	"dfu_messages.h"
@@ -1342,7 +1342,7 @@
 	<stdint.h>
 	"dfu_platform_utils.h"
 
-1737041162 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_proto.c
+1737123708 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_proto.c
 	<stdint.h>
 	<stdbool.h>
 	<stddef.h>

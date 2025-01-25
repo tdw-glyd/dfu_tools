@@ -173,6 +173,7 @@ int main(int argc, char **argv)
 
 
     // TEST: Get image status
+#ifdef HGHGHGH
     imageIndex = 1;
     imageAddress = 0x00500000;
     dfuClientTransaction_CMD_IMAGE_STATUS(dfuClient,
@@ -182,7 +183,7 @@ int main(int argc, char **argv)
                                      imageAddress,
                                      &imageFlags,
                                      &imageSize);
-
+#endif // HGHGHGH
 
     macroSequenceInstallImage(
                               dfuClient,

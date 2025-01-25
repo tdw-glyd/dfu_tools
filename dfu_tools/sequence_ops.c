@@ -43,7 +43,7 @@
 #include "dfu_client_crypto.h"
 #include "image_xfer.h"
 
-#define SO_TRANSACTION_TIMEOUT_MS               (5000)
+#define SO_TRANSACTION_TIMEOUT_MS               (1000)
 
 #define IMAGE_INDEX_SESSION_PASSWORD            (127)
 

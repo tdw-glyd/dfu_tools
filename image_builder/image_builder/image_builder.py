@@ -1,3 +1,6 @@
+#! python
+
+
 import os
 import sys
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
@@ -173,7 +176,3 @@ if __name__ == "__main__":
     aes_gcm_encrypt_with_iv_and_tag(firmware_file, aes_key_file, image_index, flash_base_address,
                                     device_type, device_variant, version, core_affinity, image_tag)
 
-    """
-    aes_gcm_encrypt_with_iv_and_tag(firmware_file, aes_key_file, image_index, flash_base_address,
-                                    device_type, device_variant, version, core_affinity, image_tag)
-    """

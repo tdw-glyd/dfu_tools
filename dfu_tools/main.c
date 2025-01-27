@@ -187,12 +187,13 @@ int main(int argc, char **argv)
 
     macroSequenceInstallImage(
                               dfuClient,
-                              0,
+                              1,
                               5,
                               //"FF:FF:FF:FF:FF:FF",
                               "66:55:44:33:22:11",
                               "c://public_key.pem",
-                              "C:/Glydways/bl_tools/image_builder/image_builder/sample_app.img",
+                              //"C:/Glydways/bl_tools/image_builder/image_builder/sample_app.img",
+                              "C:/Glydways/B2/embedded/sample_primary_app/debug_flash/sample_primary_app.img",
                               1,
                               0,
                               false,

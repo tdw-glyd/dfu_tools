@@ -1,5 +1,21 @@
 #! python
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+"""
+    APPLICATION: image_builder.py
+    DESCRIPTION: Creates a final binary image file, formatted per the structure
+                 expected by the bootloader.  This includes:
 
+                 - Image binary
+                 - Image metadata
+                 - AES-GCM Initialization Vector (IV)
+                 - AES-GCM Authentication tag
+
+                 All this is encrypted using AES128-GCM, which includes
+                 both authentication data AND encrypted data.
+"""
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 import os
 import sys
@@ -44,6 +60,19 @@ def display_buffer_as_hex(buffer, bytes_per_line=16):
 
 def create_metadata_binary(image_length, image_index, flash_base_address, device_type,
                            device_variant, version, image_tag, core_affinity):
+    """
+    Builds the image metadata using the input parameters.
+
+    :param image_length:
+    :param image_index:
+    :param flash_base_address:
+    :param device_type:
+    :param device_variant:
+    :param version:
+    :param image_tag:
+    :param core_affinity:
+    :return:
+    """
     # Fixed Header Signature
     header_signature = 0xACEDD00B
 
@@ -77,6 +106,22 @@ def create_metadata_binary(image_length, image_index, flash_base_address, device
     return metadata
 def aes_gcm_encrypt_with_iv_and_tag(input_file, key_file, image_index, flash_base_address,
                                     device_type, device_variant, version, core_affinity, image_tag=None):
+    """
+    Given the AES-128 key and various metadata, this will pre-pend the image binary with
+    the formatted metedata, then encrypts the result using AES128-GCM and outputs a ".img"
+    file that can be transferred to the target via the DFU mode protocols.
+
+    :param input_file:
+    :param key_file:
+    :param image_index:
+    :param flash_base_address:
+    :param device_type:
+    :param device_variant:
+    :param version:
+    :param core_affinity:
+    :param image_tag:
+    :return:
+    """
 
     BLOCK_SIZE = 128
 
@@ -171,6 +216,9 @@ def aes_gcm_encrypt_with_iv_and_tag(input_file, key_file, image_index, flash_bas
 
 # Main function to handle command-line arguments
 if __name__ == "__main__":
+    """
+    Primary program entry point.
+    """
     # Ensure correct usage
     if len(sys.argv) < 9:
         print("Usage: python aes_gcm_encrypt.py <firmware_file> <aes128_key_file> "

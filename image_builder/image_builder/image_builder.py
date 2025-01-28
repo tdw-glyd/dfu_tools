@@ -81,16 +81,24 @@ def aes_gcm_encrypt_with_iv_and_tag(input_file, key_file, image_index, flash_bas
     BLOCK_SIZE = 128
 
     # Read the AES key (128 bits = 16 bytes)
-    with open(key_file, 'rb') as f:
-        key = f.read()
-        assert len(key) == 16, "Key must be 128 bits (16 bytes)"
+    try:
+        with open(key_file, 'rb') as f:
+            key = f.read()
+            assert len(key) == 16, "Key must be 128 bits (16 bytes)"
+    except Exception as error:
+        print(f"Error while opening key file {key_file}: {error}")
+        return
 
     # Generate a random IV (96 bits = 12 bytes)
     iv = token_bytes(12)
 
     # Read the plaintext firmware file
-    with open(input_file, 'rb') as f:
-        firmware_data = f.read()
+    try:
+        with open(input_file, 'rb') as f:
+            firmware_data = f.read()
+    except Exception as error:
+        print(f"Error while opening source firmware file {input_file}: {error}")
+        return
 
     # Pad firmware to 128-byte blocks if needed
     padding_len = (BLOCK_SIZE - len(firmware_data) % BLOCK_SIZE) % BLOCK_SIZE
@@ -102,9 +110,13 @@ def aes_gcm_encrypt_with_iv_and_tag(input_file, key_file, image_index, flash_bas
 
     # TEST ONLY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     unenc_output_file = os.path.splitext(input_file)[0] + ".une"
-    with open(unenc_output_file, 'wb') as handle:
-        handle.write(metadata)
-        handle.write(padded_firmware)
+    try:
+        with open(unenc_output_file, 'wb') as handle:
+            handle.write(metadata)
+            handle.write(padded_firmware)
+    except Exception as error:
+        print(f"Error while opening un-encrypted file {unenc_output_file}: {error}")
+        return
     # ######################################################
 
     # Initialize AES-GCM cipher
@@ -134,12 +146,16 @@ def aes_gcm_encrypt_with_iv_and_tag(input_file, key_file, image_index, flash_bas
     output_file = os.path.splitext(input_file)[0] + ".img"
 
     # Prepend the IV and Authentication Tag to the encrypted data
-    with open(output_file, 'wb') as f:
-        f.write(iv)          # Write the IV
-        f.write(filler)      # Write the padding bytes (to align to 16-bytes)
-        f.write(tag)         # Write the Authentication Tag
-        f.write(encrypted_metadata)
-        f.write(encrypted_firmware)  # Write the ciphertext
+    try:
+        with open(output_file, 'wb') as f:
+            f.write(iv)          # Write the IV
+            f.write(filler)      # Write the padding bytes (to align to 16-bytes)
+            f.write(tag)         # Write the Authentication Tag
+            f.write(encrypted_metadata)
+            f.write(encrypted_firmware)  # Write the ciphertext
+    except Exception as error:
+        print(f"Error while opening output file {output_file}: {error}")
+        return
 
     # Print details
     print(" Encryption complete:")

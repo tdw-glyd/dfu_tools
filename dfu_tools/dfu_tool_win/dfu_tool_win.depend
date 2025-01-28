@@ -1310,7 +1310,7 @@
 	"dfu_messages.h"
 	"dfu_client_config.h"
 
-1738013916 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_proto_api.h
+1738091392 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_proto_api.h
 	<stdint.h>
 	<stdbool.h>
 	"dfu_proto_config.h"

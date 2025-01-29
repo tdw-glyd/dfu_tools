@@ -201,7 +201,6 @@ int main(int argc, char **argv)
                               );
 
     sequenceEndSession(dfuClient, "66:55:44:33:22:11");
-    //sequenceEndSession(dfuClient, "FF:FF:FF:FF:FF:FF");
     return (0);
 
 

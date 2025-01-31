@@ -133,7 +133,7 @@
 
 1731698560 c:\glydways\bl_tools\dfu_tools\include\dfu_lib_config.h
 
-1738014493 source:c:\glydways\bl_tools\dfu_tools\main.c
+1738187738 source:c:\glydways\bl_tools\dfu_tools\main.c
 	<stdint.h>
 	<stdbool.h>
 	<stdio.h>
@@ -1310,7 +1310,7 @@
 	"dfu_messages.h"
 	"dfu_client_config.h"
 
-1738091392 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_proto_api.h
+1738266945 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_proto_api.h
 	<stdint.h>
 	<stdbool.h>
 	"dfu_proto_config.h"
@@ -1342,7 +1342,7 @@
 	<stdint.h>
 	"dfu_platform_utils.h"
 
-1738013316 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_proto.c
+1738269471 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_proto.c
 	<stdint.h>
 	<stdbool.h>
 	<stddef.h>
@@ -1393,7 +1393,7 @@
 	<stdbool.h>
 	"dfu_client.h"
 
-1737730009 source:c:\glydways\bl_tools\dfu_tools\sequence_ops.c
+1738253698 source:c:\glydways\bl_tools\dfu_tools\sequence_ops.c
 	<stdio.h>
 	"dfu_client_config.h"
 	"sequence_ops.h"

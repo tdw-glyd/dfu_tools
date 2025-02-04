@@ -49,7 +49,7 @@
 	"async_timer.h"
 	"dfu_messages.h"
 
-1737040640 source:c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\src\ethernet_sockets.c
+1738704661 source:c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\src\ethernet_sockets.c
 	"ethernet_sockets.h"
 	"dfu_platform_utils.h"
 
@@ -118,7 +118,7 @@
 
 1729798238 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\npcap-sdk-1.13\include\pcap\dlt.h
 
-1736801251 source:c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\src\iface_enet.c
+1738704680 source:c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\src\iface_enet.c
 	<stddef.h>
 	<stdint.h>
 	<stdbool.h>
@@ -133,7 +133,7 @@
 
 1731698560 c:\glydways\bl_tools\dfu_tools\include\dfu_lib_config.h
 
-1738187738 source:c:\glydways\bl_tools\dfu_tools\main.c
+1738699833 source:c:\glydways\bl_tools\dfu_tools\main.c
 	<stdint.h>
 	<stdbool.h>
 	<stdio.h>
@@ -1310,7 +1310,7 @@
 	"dfu_messages.h"
 	"dfu_client_config.h"
 
-1738266945 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_proto_api.h
+1738688283 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_proto_api.h
 	<stdint.h>
 	<stdbool.h>
 	"dfu_proto_config.h"
@@ -1375,7 +1375,7 @@
 	<stdint.h>
 	<stdbool.h>
 
-1736451349 source:c:\glydways\bl_tools\dfu_tools\image_xfer.c
+1738689910 source:c:\glydways\bl_tools\dfu_tools\image_xfer.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -1420,4 +1420,14 @@
 	<unistd.h>
 	<fcntl.h>
 	"dfu_client.h"
+
+1738698722 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_proto_core.c
+	<stdint.h>
+	<stdbool.h>
+	<stddef.h>
+	<string.h>
+	"dfu_proto_api.h"
+	"dfu_proto_private.h"
+	"async_timer.h"
+	"dfu_messages.h"
 

@@ -2,94 +2,9 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug" />
-	<File name="..\platform\include\async_timer.h" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="..\..\..\B2\dfu_protocol\dfu_core\src\dfu_platform_utils.c" open="1" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="960" topLine="8" />
-		</Cursor>
-	</File>
-	<File name="..\server.c" open="1" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="742" topLine="60" />
-		</Cursor>
-	</File>
-	<File name="..\sequence_ops.c" open="1" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="10551" topLine="356" />
-		</Cursor>
-	</File>
-	<File name="..\interfaces\Ethernet\include\ethernet_sockets.h" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="781" topLine="22" />
-		</Cursor>
-	</File>
-	<File name="..\main.c" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="6994" topLine="176" />
-		</Cursor>
-	</File>
-	<File name="..\image_xfer.c" open="1" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1390" topLine="127" />
-		</Cursor>
-	</File>
-	<File name="..\..\..\B2\dfu_protocol\dfu_core\src\dfu_messages.c" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2684" topLine="54" />
-		</Cursor>
-	</File>
-	<File name="..\server.h" open="1" top="0" tabpos="17" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1511" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="..\interfaces\Ethernet\src\iface_enet.c" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="8140" topLine="273" />
-		</Cursor>
-	</File>
-	<File name="..\crypto\src\dfu_client_crypto.c" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2181" topLine="22" />
-		</Cursor>
-	</File>
-	<File name="..\..\..\B2\dfu_protocol\dfu_client\src\dfu_client.c" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="1" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="372" topLine="594" />
-		</Cursor>
-	</File>
-	<File name="..\include\dfu_lib_support.h" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2068" topLine="58" />
-		</Cursor>
-	</File>
-	<File name="..\interfaces\Ethernet\include\iface_enet.h" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="893" topLine="14" />
-		</Cursor>
-	</File>
-	<File name="..\interfaces\Ethernet\src\ethernet_sockets.c" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="8436" topLine="250" />
-		</Cursor>
-	</File>
-	<File name="..\platform\src\async_timer.c" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2916" topLine="96" />
-		</Cursor>
-	</File>
-	<File name="..\include\dfu_lib_config.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1154" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="..\general_utils.c" open="1" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2368" topLine="55" />
-		</Cursor>
-	</File>
-	<File name="..\sequence_ops.h" open="1" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4475" topLine="102" />
+			<Cursor1 position="641" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="..\image_xfer.h" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -97,9 +12,99 @@
 			<Cursor1 position="864" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="..\..\..\B2\dfu_protocol\dfu_core\src\dfu_platform_utils.c" open="1" top="1" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="..\main.c" open="1" top="1" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="641" topLine="0" />
+			<Cursor1 position="6278" topLine="176" />
+		</Cursor>
+	</File>
+	<File name="..\..\..\B2\dfu_protocol\dfu_core\src\dfu_messages.c" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2684" topLine="54" />
+		</Cursor>
+	</File>
+	<File name="..\interfaces\Ethernet\src\iface_enet.c" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="8140" topLine="270" />
+		</Cursor>
+	</File>
+	<File name="..\..\..\B2\dfu_protocol\dfu_client\src\dfu_client.c" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="1" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="372" topLine="594" />
+		</Cursor>
+	</File>
+	<File name="..\interfaces\Ethernet\include\iface_enet.h" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="893" topLine="14" />
+		</Cursor>
+	</File>
+	<File name="..\include\dfu_lib_support.h" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2068" topLine="58" />
+		</Cursor>
+	</File>
+	<File name="..\include\dfu_lib_config.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1154" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="..\image_xfer.c" open="1" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4762" topLine="110" />
+		</Cursor>
+	</File>
+	<File name="..\interfaces\Ethernet\src\ethernet_sockets.c" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="7831" topLine="241" />
+		</Cursor>
+	</File>
+	<File name="..\server.c" open="1" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="742" topLine="60" />
+		</Cursor>
+	</File>
+	<File name="..\sequence_ops.h" open="1" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4475" topLine="102" />
+		</Cursor>
+	</File>
+	<File name="..\crypto\src\dfu_client_crypto.c" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2181" topLine="22" />
+		</Cursor>
+	</File>
+	<File name="..\general_utils.c" open="1" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2368" topLine="55" />
+		</Cursor>
+	</File>
+	<File name="..\sequence_ops.c" open="1" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="7470" topLine="217" />
+		</Cursor>
+	</File>
+	<File name="..\platform\include\async_timer.h" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="960" topLine="8" />
+		</Cursor>
+	</File>
+	<File name="..\interfaces\Ethernet\include\ethernet_sockets.h" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="781" topLine="22" />
+		</Cursor>
+	</File>
+	<File name="..\..\..\B2\dfu_protocol\dfu_core\src\dfu_proto_core.c" open="1" top="0" tabpos="19" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="38364" topLine="1193" />
+		</Cursor>
+	</File>
+	<File name="..\platform\src\async_timer.c" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2916" topLine="96" />
+		</Cursor>
+	</File>
+	<File name="..\server.h" open="1" top="0" tabpos="17" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1511" topLine="0" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

@@ -185,6 +185,11 @@ int main(int argc, char **argv)
                                      &imageSize);
 #endif // HGHGHGH
 
+#define MAX_LOOPS       (1000)
+for (int i = 1; i <= MAX_LOOPS; i++)
+{
+    printf("\r\n\r\n *** INSTALL LOOP: [%5d] ***\r\n", i);
+
     macroSequenceInstallImage(
                               dfuClient,
                               1,
@@ -201,6 +206,7 @@ int main(int argc, char **argv)
                               );
 
     sequenceEndSession(dfuClient, "66:55:44:33:22:11");
+}
     return (0);
 
 

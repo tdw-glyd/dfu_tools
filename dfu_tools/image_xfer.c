@@ -104,6 +104,8 @@ bool xferImage(char *filenameStr,
                     printf("\n\n");
                     fflush(stdout);
 
+                    ret = true;
+
                     /*
                     ** Send all of the image file data
                     **
@@ -120,6 +122,7 @@ bool xferImage(char *filenameStr,
                                                                bytesRead))
                         {
                             printf("\r Client rejected image WRITE operation!          ");
+                            ret = false;
                             break;
                         }
                         else
@@ -139,9 +142,9 @@ bool xferImage(char *filenameStr,
                                                                totalSent))
                     {
                         printf("\r\n Target did not accept RCV_COMPLETE command!");
+                        ret = false;
                     }
 
-                    ret = true;
                     fflush(stdout);
                 }
                 else

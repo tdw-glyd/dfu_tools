@@ -67,7 +67,7 @@
 		<Unit filename="../../../B2/dfu_protocol/dfu_core/src/dfu_platform_utils.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../B2/dfu_protocol/dfu_core/src/dfu_proto.c">
+		<Unit filename="../../../B2/dfu_protocol/dfu_core/src/dfu_proto_core.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../crypto/src/dfu_client_crypto.c">

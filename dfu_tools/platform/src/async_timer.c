@@ -27,14 +27,18 @@
     #include <windows.h>
     #include <sysinfoapi.h>
     #include <stdio.h>
+#else
+    #include <time.h>
+    uint64_t GetTickCount64(void)
+    {
+        struct timespec ts;
+        clock_gettime(CLOCK_MONOTONIC, &ts);
+        return ( (ts.tv_sec * 1000) + (ts.tv_nsec / 1000000) );
+    }
 #endif
 
 static uint64_t mTotalSeconds;
 static uint32_t mTimerModuleInited = 0;
-volatile static uint64_t mTimerTicks = 0;
-
-
-//static uint64_t GetTickCount(void);
 
 #define MS_TICKS_PER_SEC         (1000)
 

@@ -16,7 +16,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <conio.h>
+
+#if defined(_WIN32) || defined (_WIN64)
+    #include <conio.h>
+#else
+    #include <termios.h>
+#endif
 
 #include "image_xfer.h"
 #include "general_utils.h"

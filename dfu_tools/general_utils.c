@@ -7,7 +7,7 @@
 **
 ** DESCRIPTION: Utility functions for the tool.
 **
-** REVISION HISTORY: 
+** REVISION HISTORY:
 **
 */
 //#############################################################################
@@ -16,11 +16,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <stddef.h>
-#include <conio.h>
 #include <ctype.h>
 #include "general_utils.h"
 
-
+#if defined(_WIN32) || defined(_WIN64)
+    #include <conio.h>
+#else
+    #include <termios.h>
+#endif // defined
 
 /*!
 ** FUNCTION: dfuToolStripQuotes

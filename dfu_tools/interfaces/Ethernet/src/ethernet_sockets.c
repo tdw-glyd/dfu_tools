@@ -37,7 +37,7 @@ void print_mac_address(unsigned char *mac)
            mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 }
 
-#if defined(_WIN32) || !defined(_WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 
 static bool pcapDLLLoaded = false;
 

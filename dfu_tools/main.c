@@ -19,7 +19,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef _WIN32
 #include <conio.h>
+#else
+    #include <sys/select.h>
+    #include <termios.h>
+    #define GetStdHandle()
+    #define STD_INPUT_HANDLE
+    #define FlushConsoleInputBuffer(x)      tcflush(STDIN_FILENO, TCIFLUSH)
+
+    int _kbhit(void)
+    {
+        struct timeval tv = {0L, 0L};
+        fd_set fds;
+        FD_ZERO(&fds);
+        FD_SET(0, &fds);
+        return (select(1, &fds, NULL, NULL, &tv));
+    }
+#endif
 
 // Base DFU protocol libraries
 #include "dfu_proto_api.h"
@@ -278,7 +296,7 @@ for (int i = 1; i <= MAX_LOOPS; i++)
                                 printf("\r\n");
 
                                 //
-                                // If there is a destination, ALWAYS try to negotiate the MTU. If a session
+                                // If theGetStdHandlere is a destination, ALWAYS try to negotiate the MTU. If a session
                                 // has been started, this message will be allowed by the target.
                                 //
                                 if (
@@ -364,7 +382,7 @@ static bool cmdlineHandlerXferImage(int argc, char **argv, char *filenameStr, df
     char *                          imageAddressStr = NULL;
     uint32_t                        imageAddress;
     char *                          isEncryptedStr = NULL;
-    bool                            isEncrypted;
+    bool                            isEncrypted = false;
 
     flag_srch(argc, argv, "-dst", 1, &destStr);
     flag_srch(argc, argv, "-i", 1, &imageIndexStr);
@@ -763,7 +781,7 @@ static void _allCommandsHelp(void)
         dfuToolPadStr(helpText, ' ', 20);
         strcat(helpText, ": ");
         strcat(helpText, cmdlineHandlers[index].shortHelp != NULL ? cmdlineHandlers[index].shortHelp : "No Help");
-        printf(helpText);
+        printf("%s", helpText);
         ++index;
     }
     printf("\r\n\r\n");

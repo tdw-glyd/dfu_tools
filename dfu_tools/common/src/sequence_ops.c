@@ -1,39 +1,33 @@
 //#############################################################################
 //#############################################################################
 //#############################################################################
-/*! \file
-**
-** MODULE: sequence_ops.c
-**
-** DESCRIPTION: Contains various transaction sequences that carry out the
-**              different operations needed with remote targets.
-**
-** Example:
-**     - Establishing a session requires the following sequence:
-**
-**          1. Send BEGIN_SESSION
-**              - Receive a challenge password value from the target
-**
-**          2. Encrypt the challenge with the proper key, to a file.
-**
-**          3. Send a BEGIN_RCV, indicating Image ID #127
-**
-**          4. Send RCV_DATA commands to transfer the entire encrypted
-**             challenge to the target.
-**
-**          5. Once the encrypted challenge key has been fully transferred
-**             to the target, send the RCV_COMPLETE
-**                  - Receive ACK
-**
-**          6. Send INSTALL_IMAGE to instruct the target to decrypt the
-**             encrypted challenge we just sent, and them compare it
-**             to what it sent to us.  If they match, a session is
-**             established.
-**
-**
-** REVISION HISTORY:
-**
-*/
+//
+/// @file sequence_ops.c
+/// @brief Contains various transaction sequences that carry out the
+///        different operations needed with remote targets.
+///
+/// Example:
+///    - Establishing a session requires the following sequence:
+///
+///         1. Send BEGIN_SESSION
+///              - Receive a challenge password value from the target
+///
+///         2. Encrypt the challenge with the proper key, to a file.
+///
+///         3. Send a BEGIN_RCV, indicating Image ID #127
+///
+///         4. Send RCV_DATA commands to transfer the entire encrypted
+///            challenge to the target.
+///         5. Once the encrypted challenge key has been fully transferred
+///            to the target, send the RCV_COMPLETE
+///                 - Receive ACK
+///         6. Send INSTALL_IMAGE to instruct the target to decrypt the
+///            encrypted challenge we just sent, and them compare it
+///            to what it sent to us.  If they match, a session is
+///            established.
+/// @copyright 2024 Glydways, Inc
+/// @copyright https://glydways.com
+//
 //#############################################################################
 //#############################################################################
 //#############################################################################

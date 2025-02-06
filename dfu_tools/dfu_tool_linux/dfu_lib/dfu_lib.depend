@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1738783516 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_client/src/dfu_client.c
+1738791749 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_client/src/dfu_client.c
 	"dfu_client.h"
 	"iface_enet.h"
 	<sched.h>
@@ -42,7 +42,7 @@
 
 1732226009 /mnt/c/Glydways/bl_tools/dfu_tools/include/dfu_proto_config.h
 
-1738791447 /mnt/c/Glydways/B2/dfu_protocol/dfu_core/include/dfu_messages.h
+1738869972 /mnt/c/Glydways/B2/dfu_protocol/dfu_core/include/dfu_messages.h
 	<stdint.h>
 	<stdbool.h>
 	"dfu_proto_private.h"
@@ -55,11 +55,11 @@
 1738013008 /mnt/c/Glydways/bl_tools/dfu_tools/platform/include/async_timer.h
 	<stdint.h>
 
-1730129340 /mnt/c/Glydways/bl_tools/dfu_tools/interfaces/Ethernet/include/iface_enet.h
+1738791900 /mnt/c/Glydways/bl_tools/dfu_tools/interfaces/Ethernet/include/iface_enet.h
 	"dfu_proto_api.h"
 	"ethernet_sockets.h"
 
-1738786189 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_core/src/dfu_messages.c
+1738870062 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_core/src/dfu_messages.c
 	<stddef.h>
 	<string.h>
 	"dfu_messages.h"
@@ -68,7 +68,7 @@
 1738791055 /mnt/c/Glydways/B2/dfu_protocol/dfu_core/include/dfu_platform_utils.h
 	<stdint.h>
 
-1738698722 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_core/src/dfu_proto_core.c
+1738791585 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_core/src/dfu_proto_core.c
 	<stdint.h>
 	<stdbool.h>
 	<stddef.h>
@@ -91,7 +91,7 @@
 	<conio.h>
 	<termios.h>
 
-1734731023 /mnt/c/Glydways/bl_tools/dfu_tools/common/include/general_utils.h
+1738791913 /mnt/c/Glydways/bl_tools/dfu_tools/common/include/general_utils.h
 	<stdint.h>
 	<stdbool.h>
 
@@ -109,12 +109,12 @@
 	"ethernet_sockets.h"
 	"async_timer.h"
 
-1734730368 /mnt/c/Glydways/bl_tools/dfu_tools/common/include/image_xfer.h
+1738791918 /mnt/c/Glydways/bl_tools/dfu_tools/common/include/image_xfer.h
 	<stdint.h>
 	<stdbool.h>
 	"dfu_client.h"
 
-1738253698 source:/mnt/c/Glydways/bl_tools/dfu_tools/common/src/sequence_ops.c
+1738870224 source:/mnt/c/Glydways/bl_tools/dfu_tools/common/src/sequence_ops.c
 	<stdio.h>
 	"dfu_client_config.h"
 	"sequence_ops.h"
@@ -165,4 +165,13 @@
 	<string.h>
 	<stdint.h>
 	"dfu_platform_utils.h"
+
+1738883651 source:/mnt/c/Glydways/bl_tools/dfu_tools/common/src/dev_list.c
+	<string.h>
+	"dev_list.h"
+
+1738883961 /mnt/c/Glydways/bl_tools/dfu_tools/common/include/dev_list.h
+	<stdint.h>
+	<stdbool.h>
+	"dfu_proto_api.h"
 

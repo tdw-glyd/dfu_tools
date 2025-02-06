@@ -74,6 +74,9 @@
 		<Unit filename="../../common/include/general_utils.h" />
 		<Unit filename="../../common/include/image_xfer.h" />
 		<Unit filename="../../common/include/sequence_ops.h" />
+		<Unit filename="../../common/src/dev_list.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../common/src/general_utils.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -7,7 +7,7 @@
 **
 ** DESCRIPTION: DFU tool Ethernet interface support header.
 **
-** REVISION HISTORY: 
+** REVISION HISTORY:
 **
 */
 //#############################################################################
@@ -35,11 +35,11 @@ extern "C" {
 **
 ** DESCRIPTION: Initializes the Ethernet aspect of the tool.
 **
-** PARAMETERS: 
+** PARAMETERS:
 **
-** RETURNS: 
+** RETURNS:
 **
-** COMMENTS: 
+** COMMENTS:
 **
 */
 ifaceEthEnvStruct * dfuClientEthernetInit(dfuProtocol **callerDFU, const char *interfaceName, void *userPtr);
@@ -49,11 +49,11 @@ ifaceEthEnvStruct * dfuClientEthernetInit(dfuProtocol **callerDFU, const char *i
 **
 ** DESCRIPTION: Clean up Ethernet-specific items.
 **
-** PARAMETERS: 
+** PARAMETERS:
 **
-** RETURNS: 
+** RETURNS:
 **
-** COMMENTS: 
+** COMMENTS:
 **
 */
 bool dfuClientEthernetUnInit(ifaceEthEnvStruct *env);
@@ -63,11 +63,11 @@ bool dfuClientEthernetUnInit(ifaceEthEnvStruct *env);
 **
 ** DESCRIPTION: Set the destination MAC into the env.
 **
-** PARAMETERS: 
+** PARAMETERS:
 **
-** RETURNS: 
+** RETURNS:
 **
-** COMMENTS: 
+** COMMENTS:
 **
 */
 bool dfuClientEthernetSetDest(ifaceEthEnvStruct * env, char *dest);

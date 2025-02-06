@@ -49,7 +49,7 @@
 	"async_timer.h"
 	"dfu_messages.h"
 
-1738704661 source:c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\src\ethernet_sockets.c
+1738782859 source:c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\src\ethernet_sockets.c
 	"ethernet_sockets.h"
 	"dfu_platform_utils.h"
 
@@ -162,7 +162,7 @@
 	"dfu_messages.h"
 	"dfu_lib_config.h"
 
-1736797666 source:c:\glydways\bl_tools\dfu_tools\platform\src\async_timer.c
+1738786257 source:c:\glydways\bl_tools\dfu_tools\platform\src\async_timer.c
 	<stddef.h>
 	<sys/time.h>
 	<unistd.h>
@@ -170,6 +170,7 @@
 	<windows.h>
 	<sysinfoapi.h>
 	<stdio.h>
+	<time.h>
 
 1729887172 source:c:\glydways\bl_tools\dfu_tools\src\dfu_lib_support.c
 	"dfu_lib_support.h"
@@ -1297,11 +1298,12 @@
 	<limits.h>
 	<errno.h>
 
-1737125319 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client.c
+1738783516 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client.c
 	"dfu_client.h"
 	"iface_enet.h"
+	<sched.h>
 
-1737037463 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client.h
+1738788022 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client.h
 	<stdint.h>
 	<stdbool.h>
 	<stddef.h>
@@ -1327,7 +1329,7 @@
 	"dfu_proto_api.h"
 	"async_timer.h"
 
-1737041271 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_messages.c
+1738786189 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_messages.c
 	<stddef.h>
 	<string.h>
 	"dfu_messages.h"
@@ -1336,7 +1338,7 @@
 1731438852 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_platform_utils.h
 	<stdint.h>
 
-1731606643 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_platform_utils.c
+1738789502 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_platform_utils.c
 	<stddef.h>
 	<string.h>
 	<stdint.h>
@@ -1352,9 +1354,11 @@
 	"async_timer.h"
 	"dfu_messages.h"
 
-1734551499 source:c:\glydways\bl_tools\dfu_tools\crypto\src\dfu_client_crypto.c
+1738784925 source:c:\glydways\bl_tools\dfu_tools\crypto\src\dfu_client_crypto.c
+	<openssl/crypto.h>
 	<openssl/evp.h>
 	<openssl/pem.h>
+	<openssl/ssl.h>
 	<openssl/err.h>
 	"dfu_client_crypto.h"
 
@@ -1430,4 +1434,159 @@
 	"dfu_proto_private.h"
 	"async_timer.h"
 	"dfu_messages.h"
+
+1738784562 source:c:\glydways\bl_tools\dfu_tools\common\src\general_utils.c
+	<stdio.h>
+	<string.h>
+	<stddef.h>
+	<ctype.h>
+	"general_utils.h"
+	<conio.h>
+	<termios.h>
+
+1734731023 c:\glydways\bl_tools\dfu_tools\common\include\general_utils.h
+	<stdint.h>
+	<stdbool.h>
+
+1738784608 source:c:\glydways\bl_tools\dfu_tools\common\src\image_xfer.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<conio.h>
+	<termios.h>
+	"image_xfer.h"
+	"general_utils.h"
+	"dfu_proto_api.h"
+	"dfu_messages.h"
+	"dfu_client.h"
+	"ethernet_sockets.h"
+	"async_timer.h"
+
+1734730368 c:\glydways\bl_tools\dfu_tools\common\include\image_xfer.h
+	<stdint.h>
+	<stdbool.h>
+	"dfu_client.h"
+
+1738253698 source:c:\glydways\bl_tools\dfu_tools\common\src\sequence_ops.c
+	<stdio.h>
+	"dfu_client_config.h"
+	"sequence_ops.h"
+	"dfu_client_crypto.h"
+	"image_xfer.h"
+
+1735841361 c:\glydways\bl_tools\dfu_tools\common\include\sequence_ops.h
+	"dfu_client.h"
+
+1730015521 c:\msys64\mingw64\include\openssl\ssl.h
+	<openssl/macros.h>
+	<openssl/e_os2.h>
+	<openssl/e_ostime.h>
+	<openssl/opensslconf.h>
+	<openssl/comp.h>
+	<openssl/bio.h>
+	<openssl/x509.h>
+	<openssl/crypto.h>
+	<openssl/buffer.h>
+	<openssl/lhash.h>
+	<openssl/pem.h>
+	<openssl/hmac.h>
+	<openssl/async.h>
+	<openssl/safestack.h>
+	<openssl/symhacks.h>
+	<openssl/ct.h>
+	<openssl/sslerr.h>
+	<openssl/prov_ssl.h>
+	<stdio.h>
+	<openssl/ssl2.h>
+	<openssl/ssl3.h>
+	<openssl/tls1.h>
+	<openssl/dtls1.h>
+	<openssl/srtp.h>
+	<openssl/quic.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\e_ostime.h
+	<openssl/macros.h>
+	<openssl/opensslconf.h>
+	<openssl/e_os2.h>
+	<winsock2.h>
+	<sys/time.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\comp.h
+	<openssl/macros.h>
+	<openssl/opensslconf.h>
+	<openssl/crypto.h>
+	<openssl/comperr.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\comperr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\hmac.h
+	<openssl/macros.h>
+	<openssl/opensslconf.h>
+	<openssl/evp.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\async.h
+	<stdlib.h>
+	<openssl/macros.h>
+	<openssl/asyncerr.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\asyncerr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\ct.h
+	<openssl/macros.h>
+	<openssl/opensslconf.h>
+	<openssl/types.h>
+	<openssl/safestack.h>
+	<openssl/x509.h>
+	<openssl/cterr.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\cterr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/cryptoerr_legacy.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\sslerr.h
+	<openssl/opensslconf.h>
+	<openssl/symhacks.h>
+	<openssl/sslerr_legacy.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\sslerr_legacy.h
+	<openssl/macros.h>
+	<openssl/symhacks.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\prov_ssl.h
+
+1730015521 c:\msys64\mingw64\include\openssl\ssl2.h
+	<openssl/macros.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\ssl3.h
+	<openssl/macros.h>
+	<openssl/comp.h>
+	<openssl/buffer.h>
+	<openssl/evp.h>
+	<openssl/ssl.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\tls1.h
+	<openssl/macros.h>
+	<openssl/buffer.h>
+	<openssl/x509.h>
+	<openssl/prov_ssl.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\dtls1.h
+	<openssl/macros.h>
+	<openssl/prov_ssl.h>
+	<openssl/opensslconf.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\srtp.h
+	<openssl/macros.h>
+	<openssl/ssl.h>
+
+1730015521 c:\msys64\mingw64\include\openssl\quic.h
+	<openssl/macros.h>
+	<openssl/ssl.h>
 

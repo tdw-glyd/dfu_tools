@@ -16,15 +16,19 @@
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-fPIC" />
+					<Add option="-Wextra-tokens" />
+					<Add option="-pedantic-errors" />
+					<Add option="-Wall" />
 					<Add option="-g" />
 					<Add directory="/mnt/c/Glydways/bl_tools/dfu_tools/dfu_tool_linux/dfu_lib/" />
 					<Add directory="../../../../B2/dfu_protocol/dfu_client/include" />
 					<Add directory="../../../../B2/dfu_protocol/dfu_core/include" />
 					<Add directory="../../interfaces/Ethernet/include" />
 					<Add directory="../../interfaces/CAN/include" />
-					<Add directory="../../include" />
 					<Add directory="../../crypto/include" />
 					<Add directory="../../platform/include" />
+					<Add directory="../../common/include" />
+					<Add directory="../../config" />
 				</Compiler>
 				<Linker>
 					<Add library="../../../../../../../usr/lib/x86_64-linux-gnu/libcrypto.a" />
@@ -65,6 +69,18 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../../B2/dfu_protocol/dfu_core/src/dfu_proto_core.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../common/include/general_utils.h" />
+		<Unit filename="../../common/include/image_xfer.h" />
+		<Unit filename="../../common/include/sequence_ops.h" />
+		<Unit filename="../../common/src/general_utils.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../common/src/image_xfer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../common/src/sequence_ops.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../crypto/include/dfu_client_crypto.h" />

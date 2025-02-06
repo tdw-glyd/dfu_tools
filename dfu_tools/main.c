@@ -50,7 +50,6 @@
 #include "image_xfer.h"
 #include "general_utils.h"
 #include "sequence_ops.h"
-#include "server.h"
 
 
 // TEST %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

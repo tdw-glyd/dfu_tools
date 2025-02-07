@@ -54,7 +54,13 @@
 			<Add option="-fPIC" />
 		</Compiler>
 		<Unit filename="../../../../B2/dfu_protocol/dfu_client/include/dfu_client.h" />
+		<Unit filename="../../../../B2/dfu_protocol/dfu_client/src/dev_list.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../../../B2/dfu_protocol/dfu_client/src/dfu_client.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../B2/dfu_protocol/dfu_client/src/dfu_client_api.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../../B2/dfu_protocol/dfu_core/include/dfu_messages.h" />
@@ -74,9 +80,6 @@
 		<Unit filename="../../common/include/general_utils.h" />
 		<Unit filename="../../common/include/image_xfer.h" />
 		<Unit filename="../../common/include/sequence_ops.h" />
-		<Unit filename="../../common/src/dev_list.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="../../common/src/general_utils.c">
 			<Option compilerVar="CC" />
 		</Unit>

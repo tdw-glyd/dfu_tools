@@ -60,7 +60,13 @@
 			<Add library="ws2_32" />
 			<Add directory="../../../../msys64/mingw64/lib" />
 		</Linker>
+		<Unit filename="../../../B2/dfu_protocol/dfu_client/src/dev_list.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../../B2/dfu_protocol/dfu_client/src/dfu_client.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../B2/dfu_protocol/dfu_client/src/dfu_client_api.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../B2/dfu_protocol/dfu_core/src/dfu_messages.c">

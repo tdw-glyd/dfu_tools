@@ -22,6 +22,12 @@
 #include "dfu_client_config.h"
 #include "dfu_proto_api.h"
 
+//
+// Only set to 1 if the message receiver needs to
+// match the sending MAC
+//
+#define COMPARE_SRC_MAC                 (0)
+
 static const uint8_t ENET_BROADCAST_MAC[6] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
 
 #define ETH_INTERFACE_SIGNATURE     (0xEDAC0983)
@@ -137,6 +143,7 @@ bool dfuClientEthernetUnInit(ifaceEthEnvStruct *env)
     if (VALID_ETH_ENV(env))
     {
         // Do any clean up here
+        dfuDestroy(env->dfu);
 
         // Free things
         ret = dfuClientEthernetFreeEnv(env);
@@ -289,10 +296,12 @@ uint8_t *dfuClientEnetRxCallback(dfuProtocol * dfu, uint16_t * rxBuffLen, dfuUse
 
         if ( (res) && (rxBuffLen) )
         {
+        #if (COMPARE_SRC_MAC==1)
             uint8_t                     srcMAC[6];
 
             memcpy(srcMAC, env->msgBuff + 6, 6);
             if (memcmp(env->destMAC, srcMAC, 6) == 0)
+        #endif
             {
                 ret = (uint8_t *)&env->msgBuff[14];
             }

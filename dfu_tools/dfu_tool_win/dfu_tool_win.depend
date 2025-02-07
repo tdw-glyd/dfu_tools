@@ -118,7 +118,7 @@
 
 1729798238 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\npcap-sdk-1.13\include\pcap\dlt.h
 
-1738704680 source:c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\src\iface_enet.c
+1738965472 source:c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\src\iface_enet.c
 	<stddef.h>
 	<stdint.h>
 	<stdbool.h>
@@ -133,7 +133,7 @@
 
 1731698560 c:\glydways\bl_tools\dfu_tools\include\dfu_lib_config.h
 
-1738790540 source:c:\glydways\bl_tools\dfu_tools\main.c
+1738962156 source:c:\glydways\bl_tools\dfu_tools\main.c
 	<stdint.h>
 	<stdbool.h>
 	<stdio.h>
@@ -1299,12 +1299,13 @@
 	<limits.h>
 	<errno.h>
 
-1738791749 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client.c
+1738965996 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client.c
 	"dfu_client.h"
 	"iface_enet.h"
+	"dev_list.h"
 	<sched.h>
 
-1738788022 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client.h
+1738965753 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client.h
 	<stdint.h>
 	<stdbool.h>
 	<stddef.h>
@@ -1330,7 +1331,7 @@
 	"dfu_proto_api.h"
 	"async_timer.h"
 
-1738870062 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_messages.c
+1738956608 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_messages.c
 	<stddef.h>
 	<string.h>
 	"dfu_messages.h"
@@ -1426,7 +1427,7 @@
 	<fcntl.h>
 	"dfu_client.h"
 
-1738791585 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_proto_core.c
+1738960427 source:c:\glydways\b2\dfu_protocol\dfu_core\src\dfu_proto_core.c
 	<stdint.h>
 	<stdbool.h>
 	<stddef.h>
@@ -1468,7 +1469,7 @@
 	<stdbool.h>
 	"dfu_client.h"
 
-1738253698 source:c:\glydways\bl_tools\dfu_tools\common\src\sequence_ops.c
+1738959094 source:c:\glydways\bl_tools\dfu_tools\common\src\sequence_ops.c
 	<stdio.h>
 	"dfu_client_config.h"
 	"sequence_ops.h"
@@ -1594,4 +1595,14 @@
 1736456151 c:\glydways\bl_tools\dfu_tools\config\dfu_client_config.h
 
 1732226009 c:\glydways\bl_tools\dfu_tools\config\dfu_proto_config.h
+
+1738949686 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dev_list.c
+	<string.h>
+	"dev_list.h"
+
+1738943096 c:\glydways\b2\dfu_protocol\dfu_client\include\dev_list.h
+	<time.h>
+	<stdint.h>
+	<stdbool.h>
+	"dfu_proto_api.h"
 

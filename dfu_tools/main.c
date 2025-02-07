@@ -202,7 +202,20 @@ int main(int argc, char **argv)
                                      &imageSize);
 #endif // HGHGHGH
 
-#define MAX_LOOPS       (1000)
+#define TEST_DEV_LIST  (1)
+
+#if (TEST_DEV_LIST==1)
+ASYNC_TIMER_STRUCT timer;
+TIMER_Start(&timer);
+printf("\r\n Listening for devices in DFU mode...");
+while (!TIMER_Finished(&timer, 3000))
+{
+    dfuClientDrive(dfuClient);
+}
+// return (0);
+#endif
+
+#define MAX_LOOPS       (10)
 for (int i = 1; i <= MAX_LOOPS; i++)
 {
     printf("\r\n\r\n *** INSTALL LOOP: [%5d] ***\r\n", i);
@@ -224,6 +237,7 @@ for (int i = 1; i <= MAX_LOOPS; i++)
 
     sequenceEndSession(dfuClient, "66:55:44:33:22:11");
 }
+    printf("\r\n\r\n Exiting...");
     return (0);
 
 

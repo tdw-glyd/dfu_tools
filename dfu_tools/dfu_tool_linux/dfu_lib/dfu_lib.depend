@@ -1,10 +1,11 @@
 # depslib dependency file v1.0
-1738791749 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_client/src/dfu_client.c
+1738965996 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_client/src/dfu_client.c
 	"dfu_client.h"
 	"iface_enet.h"
+	"dev_list.h"
 	<sched.h>
 
-1738788022 /mnt/c/Glydways/B2/dfu_protocol/dfu_client/include/dfu_client.h
+1738965753 /mnt/c/Glydways/B2/dfu_protocol/dfu_client/include/dfu_client.h
 	<stdint.h>
 	<stdbool.h>
 	<stddef.h>
@@ -59,7 +60,7 @@
 	"dfu_proto_api.h"
 	"ethernet_sockets.h"
 
-1738870062 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_core/src/dfu_messages.c
+1738956608 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_core/src/dfu_messages.c
 	<stddef.h>
 	<string.h>
 	"dfu_messages.h"
@@ -68,7 +69,7 @@
 1738791055 /mnt/c/Glydways/B2/dfu_protocol/dfu_core/include/dfu_platform_utils.h
 	<stdint.h>
 
-1738791585 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_core/src/dfu_proto_core.c
+1738960427 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_core/src/dfu_proto_core.c
 	<stdint.h>
 	<stdbool.h>
 	<stddef.h>
@@ -166,11 +167,22 @@
 	<stdint.h>
 	"dfu_platform_utils.h"
 
-1738883651 source:/mnt/c/Glydways/bl_tools/dfu_tools/common/src/dev_list.c
+1738942127 source:/mnt/c/Glydways/bl_tools/dfu_tools/common/src/dev_list.c
 	<string.h>
 	"dev_list.h"
 
-1738883961 /mnt/c/Glydways/bl_tools/dfu_tools/common/include/dev_list.h
+1738942229 /mnt/c/Glydways/bl_tools/dfu_tools/common/include/dev_list.h
+	<sys/time.h>
+	<stdint.h>
+	<stdbool.h>
+	"dfu_proto_api.h"
+
+1738949686 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_client/src/dev_list.c
+	<string.h>
+	"dev_list.h"
+
+1738943096 /mnt/c/Glydways/B2/dfu_protocol/dfu_client/include/dev_list.h
+	<time.h>
 	<stdint.h>
 	<stdbool.h>
 	"dfu_proto_api.h"

@@ -282,7 +282,22 @@ static bool dfuClientEthernetInitEnv(ifaceEthEnvStruct *env)
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-
+///
+/// @fn: dfuClientEnetRxCallback
+///
+/// @details Fetch the most recent ethernet message from the interface.
+///          Stash the SRC & DST MAC addresses for use with device
+///          lists, etc.
+///
+/// @param[in]
+/// @param[in]
+/// @param[in]
+/// @param[in]
+///
+/// @returns
+///
+/// @tracereq(@req{xxxxxxx}}
+///
 uint8_t *dfuClientEnetRxCallback(dfuProtocol * dfu, uint16_t * rxBuffLen, dfuUserPtr userPtr)
 {
     uint8_t                 *ret = NULL;
@@ -296,10 +311,14 @@ uint8_t *dfuClientEnetRxCallback(dfuProtocol * dfu, uint16_t * rxBuffLen, dfuUse
 
         if ( (res) && (rxBuffLen) )
         {
-        #if (COMPARE_SRC_MAC==1)
             uint8_t                     srcMAC[6];
 
+            // Save the SRC and DST MAC to the engine
+            dfuSetDstPhysicalID(dfu, env->destMAC, 6);
             memcpy(srcMAC, env->msgBuff + 6, 6);
+            dfuSetSrcPhysicalID(dfu, srcMAC, 6);
+
+        #if (COMPARE_SRC_MAC==1)
             if (memcmp(env->destMAC, srcMAC, 6) == 0)
         #endif
             {
@@ -311,7 +330,20 @@ uint8_t *dfuClientEnetRxCallback(dfuProtocol * dfu, uint16_t * rxBuffLen, dfuUse
     return (ret);
 }
 
-
+///
+/// @fn: dfuClientEnetTxCallback
+///
+/// @details Transmits a raw ethernet frame.
+///
+/// @param[in]
+/// @param[in]
+/// @param[in]
+/// @param[in]
+///
+/// @returns
+///
+/// @tracereq(@req{xxxxxxx}}
+///
 bool dfuClientEnetTxCallback(dfuProtocol * dfu, uint8_t *txBuff, uint16_t txBuffLen, dfuMsgTargetEnum target, dfuUserPtr userPtr)
 {
     bool                    ret = false;
@@ -380,4 +412,34 @@ static bool dfuClientMACStringToBytes(const char *macStr, uint8_t macBytes[6])
     }
 
     return (ret);
+}
+
+///
+/// @fn: dfuClientMACBytesToString
+///
+/// @details Convert a MAC address byte array to an
+//           equivalent string.
+///
+/// @param[in]
+/// @param[in]
+/// @param[in]
+/// @param[in]
+///
+/// @returns
+///
+/// @tracereq(@req{xxxxxxx}}
+///
+void dfuClientMACBytesToString(uint8_t macBytes[6], char macStr[24])
+{
+    snprintf(macStr,
+             24,
+             "%02X:%02X:%02X:%02X:%02X:%02X",
+             macBytes[5],
+             macBytes[4],
+             macBytes[3],
+             macBytes[2],
+             macBytes[1],
+             macBytes[0]);
+
+    return;
 }

@@ -90,13 +90,13 @@
 		<Unit filename="../common/src/sequence_ops.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../config/dfu_client_config.h" />
+		<Unit filename="../config/dfu_proto_config.h" />
 		<Unit filename="../crypto/src/dfu_client_crypto.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../general_utils.h" />
 		<Unit filename="../image_xfer.h" />
-		<Unit filename="../include/dfu_lib_config.h" />
-		<Unit filename="../include/dfu_lib_support.h" />
 		<Unit filename="../interfaces/Ethernet/include/ethernet_sockets.h" />
 		<Unit filename="../interfaces/Ethernet/include/iface_enet.h" />
 		<Unit filename="../interfaces/Ethernet/src/ethernet_sockets.c">

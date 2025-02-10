@@ -72,6 +72,23 @@ bool dfuClientEthernetUnInit(ifaceEthEnvStruct *env);
 */
 bool dfuClientEthernetSetDest(ifaceEthEnvStruct * env, char *dest);
 
+///
+/// @fn: dfuClientMACBytesToString
+///
+/// @details Convert a MAC address byte array to an
+//           equivalent string.
+///
+/// @param[in] 
+/// @param[in] 
+/// @param[in] 
+/// @param[in] 
+///
+/// @returns 
+///
+/// @tracereq(@req{xxxxxxx}}
+///
+void dfuClientMACBytesToString(uint8_t macBytes[6], char macStr[24]);
+
 #if defined(__cplusplus)
 }
 #endif

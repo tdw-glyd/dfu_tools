@@ -7,7 +7,7 @@
 **
 ** DESCRIPTION: Configuration header for the DFU protocol library.
 **
-** REVISION HISTORY: 
+** REVISION HISTORY:
 **
 */
 //#############################################################################
@@ -50,10 +50,10 @@
 #define MAX_MSG_LEN                             (1500)
 
 /*
-** DEFINES HOW MANY PERIODIC COMMANDS CAN BE RUNNING 
+** DEFINES HOW MANY PERIODIC COMMANDS CAN BE RUNNING
 **
 **A caller can install command handlers that will be
-** executed by the library at the rate specified.  
+** executed by the library at the rate specified.
 ** This is useful for things like sending "I'm alive"
 ** or status messages, etc.
 **
@@ -68,6 +68,14 @@
 **
 */
 #define NAK_UNSUPPORTED_COMMANDS                (0)
+
+/*
+** Device-dependent MAC address length.  Size to
+** handle the worst-case of all the interfaces
+** you will support.
+**
+*/
+#define MAX_PHYS_MAC_LEN                        (24)
 
 #if defined(__cplusplus)
 extern "C" {

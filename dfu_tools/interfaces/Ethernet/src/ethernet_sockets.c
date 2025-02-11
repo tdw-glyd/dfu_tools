@@ -460,27 +460,37 @@ void send_ethernet_message(dfu_sock_t * socketHandle,
 */
 uint8_t *receive_ethernet_message(dfu_sock_t *socketHandle, uint8_t *destBuff, uint16_t *destBuffLen, uint8_t *expected_src_mac)
 {
-    unsigned char buffer[ETH_FRAME_LEN];
-    ssize_t numbytes;
+    uint8_t*            ret = NULL;
+    unsigned char       buffer[ETH_FRAME_LEN];
+    ssize_t             numbytes;
+    uint16_t            payloadLen;
 
-    while (1)
+
+    // Receive data
+    numbytes = recvfrom(socketHandle->sockfd, buffer, ETH_FRAME_LEN, 0, NULL, NULL);
+    if (numbytes == -1)
     {
-        // Receive data
-        numbytes = recvfrom(socketHandle->sockfd, buffer, ETH_FRAME_LEN, 0, NULL, NULL);
-        if (numbytes == -1)
-        {
-            perror("recvfrom");
-            exit(EXIT_FAILURE);
-        }
-
-        // Check if the source MAC matches the expected source MAC
-        if (memcmp(buffer + 6, expected_src_mac, 6) == 0)
-        {
-            printf("Received message from ");
-            print_mac_address(buffer + 6);
-            printf("Payload: %s\n", buffer + 14);  // Assuming the payload is a string
-        }
+        perror("recvfrom");
+        exit(EXIT_FAILURE);
     }
+
+    memcpy(&payloadLen, &buffer[12], 2);
+    payloadLen = from_big_endian_16(payloadLen);
+
+    memcpy(destBuff, buffer, payloadLen);
+
+    *destBuffLen = payloadLen;
+    ret = destBuff;
+
+    // Check if the source MAC matches the expected source MAC
+    // if (memcmp(buffer + 6, expected_src_mac, 6) == 0)
+    {
+        printf("Received message from ");
+        print_mac_address(buffer + 6);
+        printf("Payload: %s\n", buffer + 14);  // Assuming the payload is a string
+    }
+
+    return ret;
 }
 
 

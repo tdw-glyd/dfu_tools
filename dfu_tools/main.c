@@ -14,6 +14,7 @@
 //#############################################################################
 //#############################################################################
 
+#include <time.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -50,6 +51,8 @@
 #include "image_xfer.h"
 #include "general_utils.h"
 #include "sequence_ops.h"
+
+#include "dfu_client_api.h"
 
 
 // TEST %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -182,9 +185,13 @@ int main(int argc, char **argv)
 
     printApplicationBanner();
 
+#define TEST_API            (1)
 
     // TEST ONLY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    dfuClientEnvStruct *            dfuClient = dfuClientInit(DFUCLIENT_INTERFACE_ETHERNET,  "\\Device\\NPF_{DADC3966-80F0-48A8-8F57-0188FDB7DB8D}");
+    dfuClientEnvStruct*             dfuClient = NULL;
+#if (TEST_API==0)
+    dfuClient = dfuClientInit(DFUCLIENT_INTERFACE_ETHERNET,  "\\Device\\NPF_{DADC3966-80F0-48A8-8F57-0188FDB7DB8D}");
+#endif
 
 
 
@@ -202,7 +209,52 @@ int main(int argc, char **argv)
                                      &imageSize);
 #endif // HGHGHGH
 
-#define TEST_DEV_LIST  (1)
+
+#define TEST_API            (1)
+dfuClientAPI*       api = dfuClientAPIGet(DFUCLIENT_INTERFACE_ETHERNET,
+                                          "\\Device\\NPF_{DADC3966-80F0-48A8-8F57-0188FDB7DB8D}",
+                                          "FOO");
+if (api)
+{
+    deviceInfoStruct*       devRecord;
+
+    ASYNC_TIMER_STRUCT    timer;
+    TIMER_Start(&timer);
+
+    while (!TIMER_Finished(&timer, 5000))
+    {
+        dfuClientAPI_LL_IdleDrive(api);
+    }
+
+    devRecord = dfuClientAPI_LL_GetFirstDevice(api);
+
+    if (devRecord)
+    {
+        printf("\r\n ::: DEVICE LIST :::\r\n");
+        do
+        {
+            printf("\r\n        Device Type: %02d", devRecord->deviceType);
+            printf("\r\n     Device Variant: %02d", devRecord->deviceVariant);
+            printf("\r\n Device Status Bits: 0x%02X", devRecord->statusBits);
+            printf("\r\n    Core Image Mask: 0x%02X", devRecord->coreImageMask);
+            printf("\r\n         BL Version: %d.%d.%d", devRecord->blVersionMajor, devRecord->blVersionMinor, devRecord->blVersionPatch);
+            printf("\r\n         Time Stamp: %s", ctime(&devRecord->timestamp));
+
+            devRecord = dfuClientAPI_LL_GetNextDevice(api);
+            printf("\r\n\r\n");
+        }while (devRecord != NULL);
+    }
+
+    dfuClientAPIPut(api);
+}
+#if (TEST_API==1)
+
+#endif
+
+
+
+
+#define TEST_DEV_LIST  (0)
 
 #if (TEST_DEV_LIST==1)
 ASYNC_TIMER_STRUCT timer;

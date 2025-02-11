@@ -1,11 +1,11 @@
 # depslib dependency file v1.0
-1738965996 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_client/src/dfu_client.c
+1739283350 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_client/src/dfu_client.c
 	"dfu_client.h"
 	"iface_enet.h"
 	"dev_list.h"
 	<sched.h>
 
-1738965753 /mnt/c/Glydways/B2/dfu_protocol/dfu_client/include/dfu_client.h
+1739283475 /mnt/c/Glydways/B2/dfu_protocol/dfu_client/include/dfu_client.h
 	<stdint.h>
 	<stdbool.h>
 	<stddef.h>
@@ -13,6 +13,7 @@
 	"dfu_proto_api.h"
 	"dfu_messages.h"
 	"dfu_client_config.h"
+	"dev_list.h"
 
 1731939353 /mnt/c/Glydways/bl_tools/dfu_tools/interfaces/Ethernet/include/ethernet_sockets.h
 	<stdio.h>
@@ -36,7 +37,7 @@
 
 1736456151 /mnt/c/Glydways/bl_tools/dfu_tools/include/dfu_client_config.h
 
-1738791108 /mnt/c/Glydways/B2/dfu_protocol/dfu_core/include/dfu_proto_api.h
+1739223830 /mnt/c/Glydways/B2/dfu_protocol/dfu_core/include/dfu_proto_api.h
 	<stdint.h>
 	<stdbool.h>
 	"dfu_proto_config.h"
@@ -49,14 +50,14 @@
 	"dfu_proto_private.h"
 	"dfu_proto_api.h"
 
-1736796871 /mnt/c/Glydways/B2/dfu_protocol/dfu_core/include/dfu_proto_private.h
+1739224676 /mnt/c/Glydways/B2/dfu_protocol/dfu_core/include/dfu_proto_private.h
 	"dfu_proto_api.h"
 	"async_timer.h"
 
 1738013008 /mnt/c/Glydways/bl_tools/dfu_tools/platform/include/async_timer.h
 	<stdint.h>
 
-1738791900 /mnt/c/Glydways/bl_tools/dfu_tools/interfaces/Ethernet/include/iface_enet.h
+1739226027 /mnt/c/Glydways/bl_tools/dfu_tools/interfaces/Ethernet/include/iface_enet.h
 	"dfu_proto_api.h"
 	"ethernet_sockets.h"
 
@@ -69,7 +70,7 @@
 1738791055 /mnt/c/Glydways/B2/dfu_protocol/dfu_core/include/dfu_platform_utils.h
 	<stdint.h>
 
-1738960427 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_core/src/dfu_proto_core.c
+1739224031 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_core/src/dfu_proto_core.c
 	<stdint.h>
 	<stdbool.h>
 	<stddef.h>
@@ -81,7 +82,7 @@
 
 1736456151 /mnt/c/Glydways/bl_tools/dfu_tools/config/dfu_client_config.h
 
-1732226009 /mnt/c/Glydways/bl_tools/dfu_tools/config/dfu_proto_config.h
+1739224788 /mnt/c/Glydways/bl_tools/dfu_tools/config/dfu_proto_config.h
 
 1738784562 source:/mnt/c/Glydways/bl_tools/dfu_tools/common/src/general_utils.c
 	<stdio.h>
@@ -115,7 +116,7 @@
 	<stdbool.h>
 	"dfu_client.h"
 
-1738870224 source:/mnt/c/Glydways/bl_tools/dfu_tools/common/src/sequence_ops.c
+1738959094 source:/mnt/c/Glydways/bl_tools/dfu_tools/common/src/sequence_ops.c
 	<stdio.h>
 	"dfu_client_config.h"
 	"sequence_ops.h"
@@ -138,11 +139,11 @@
 	<openssl/err.h>
 	"dfu_client_crypto.h"
 
-1738782859 source:/mnt/c/Glydways/bl_tools/dfu_tools/interfaces/Ethernet/src/ethernet_sockets.c
+1739308994 source:/mnt/c/Glydways/bl_tools/dfu_tools/interfaces/Ethernet/src/ethernet_sockets.c
 	"ethernet_sockets.h"
 	"dfu_platform_utils.h"
 
-1738704680 source:/mnt/c/Glydways/bl_tools/dfu_tools/interfaces/Ethernet/src/iface_enet.c
+1739226110 source:/mnt/c/Glydways/bl_tools/dfu_tools/interfaces/Ethernet/src/iface_enet.c
 	<stddef.h>
 	<stdint.h>
 	<stdbool.h>
@@ -177,13 +178,24 @@
 	<stdbool.h>
 	"dfu_proto_api.h"
 
-1738949686 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_client/src/dev_list.c
+1739286931 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_client/src/dev_list.c
 	<string.h>
 	"dev_list.h"
 
-1738943096 /mnt/c/Glydways/B2/dfu_protocol/dfu_client/include/dev_list.h
+1739225152 /mnt/c/Glydways/B2/dfu_protocol/dfu_client/include/dev_list.h
 	<time.h>
 	<stdint.h>
 	<stdbool.h>
 	"dfu_proto_api.h"
+	"dfu_proto_config.h"
+
+1739299347 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_client/src/dfu_client_api.c
+	<string.h>
+	"dfu_client_api.h"
+	"dfu_client.h"
+
+1739300045 /mnt/c/Glydways/B2/dfu_protocol/dfu_client/include/dfu_client_api.h
+	<time.h>
+	<stdint.h>
+	<stdbool.h>
 

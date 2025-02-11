@@ -15,6 +15,7 @@
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-g" />
+					<Add option="-DSTATIC_LINKING" />
 					<Add directory="../dfu_tool_win" />
 					<Add directory="../platform/include" />
 					<Add directory="../interfaces/CAN/include" />

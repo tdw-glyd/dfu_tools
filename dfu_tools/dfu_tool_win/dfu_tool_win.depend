@@ -118,7 +118,7 @@
 
 1729798238 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\npcap-sdk-1.13\include\pcap\dlt.h
 
-1739224351 source:c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\src\iface_enet.c
+1739226110 source:c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\src\iface_enet.c
 	<stddef.h>
 	<stdint.h>
 	<stdbool.h>
@@ -133,7 +133,8 @@
 
 1731698560 c:\glydways\bl_tools\dfu_tools\include\dfu_lib_config.h
 
-1738962156 source:c:\glydways\bl_tools\dfu_tools\main.c
+1739287348 source:c:\glydways\bl_tools\dfu_tools\main.c
+	<time.h>
 	<stdint.h>
 	<stdbool.h>
 	<stdio.h>
@@ -150,6 +151,7 @@
 	"image_xfer.h"
 	"general_utils.h"
 	"sequence_ops.h"
+	"dfu_client_api.h"
 	<openssl/evp.h>
 	<openssl/pem.h>
 	<openssl/err.h>
@@ -1299,13 +1301,13 @@
 	<limits.h>
 	<errno.h>
 
-1739225454 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client.c
+1739283350 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client.c
 	"dfu_client.h"
 	"iface_enet.h"
 	"dev_list.h"
 	<sched.h>
 
-1738965753 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client.h
+1739283475 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client.h
 	<stdint.h>
 	<stdbool.h>
 	<stddef.h>
@@ -1313,6 +1315,7 @@
 	"dfu_proto_api.h"
 	"dfu_messages.h"
 	"dfu_client_config.h"
+	"dev_list.h"
 
 1739223830 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_proto_api.h
 	<stdint.h>
@@ -1596,7 +1599,7 @@
 
 1739224788 c:\glydways\bl_tools\dfu_tools\config\dfu_proto_config.h
 
-1739225195 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dev_list.c
+1739286931 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dev_list.c
 	<string.h>
 	"dev_list.h"
 
@@ -1607,11 +1610,12 @@
 	"dfu_proto_api.h"
 	"dfu_proto_config.h"
 
-1738966356 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client_api.c
+1739285334 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client_api.c
 	<string.h>
 	"dfu_client_api.h"
 
-1738966377 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client_api.h
+1739285319 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client_api.h
+	<time.h>
 	<stdint.h>
 	<stdbool.h>
 	"dfu_client.h"

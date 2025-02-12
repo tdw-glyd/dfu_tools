@@ -1,7 +1,8 @@
 # depslib dependency file v1.0
-1739309385 source:/mnt/c/Glydways/bl_tools/dfu_tools/dfu_tool_linux/dfu_tool/main.c
+1739377910 source:/mnt/c/Glydways/bl_tools/dfu_tools/dfu_tool_linux/dfu_tool/main.c
 	<stdio.h>
 	<stdlib.h>
+	<sched.h>
 	"dfu_client_api.h"
 
 1739300045 /mnt/c/Glydways/B2/dfu_protocol/dfu_client/include/dfu_client_api.h

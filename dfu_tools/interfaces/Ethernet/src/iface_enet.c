@@ -303,15 +303,30 @@ uint8_t *dfuClientEnetRxCallback(dfuProtocol * dfu, uint16_t * rxBuffLen, dfuUse
     uint8_t                 *ret = NULL;
     ifaceEthEnvStruct       *env = (ifaceEthEnvStruct *)userPtr;
 
-    if (VALID_ETH_ENV(env))
+    if (
+           (VALID_ETH_ENV(env)) &&
+           (dfu) &&
+           (rxBuffLen)
+       )
     {
         uint8_t *   res = NULL;
+        uint16_t    maxRxLen = sizeof(env->msgBuff);
 
-        res = receive_ethernet_message(&env->socketHandle, env->msgBuff, rxBuffLen, NULL);
+        // Initial response length
+        *rxBuffLen = 0;
 
-        if ( (res) && (rxBuffLen) )
+        //
+        // We send in the max length to receive.  Once the call completes,
+        // "maxRxLen" should contain the length of what we received, including
+        // the Ethernet header (src MAC, dst MAC, length)
+        //
+        res = receive_ethernet_message(&env->socketHandle, env->msgBuff, &maxRxLen, NULL);
+        if ( (res) && (maxRxLen > 0) )
         {
             uint8_t                     srcMAC[6];
+
+            // Save the length of what we just received to the caller.
+            *rxBuffLen = maxRxLen;
 
             // Save the SRC and DST MAC to the engine
             dfuSetDstPhysicalID(dfu, env->destMAC, 6);

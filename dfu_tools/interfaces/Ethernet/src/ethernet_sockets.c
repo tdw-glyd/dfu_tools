@@ -343,39 +343,50 @@ int get_mac_address(const char *interface_name, dfu_sock_t * socketHandle, uint8
 
 dfu_sock_t * create_raw_socket(const char *interface_name, dfu_sock_t * socketHandle)
 {
-    // Create a raw socket
-    socketHandle->sockfd = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
-    if (socketHandle->sockfd == -1)
+    dfu_sock_t*                 ret = NULL;
+
+    if (
+           (interface_name != NULL) &&
+           (strlen(interface_name) > 0) &&
+           (socketHandle != NULL)
+       )
     {
-        perror("socket");
-        exit(EXIT_FAILURE);
+        // Create a raw socket
+        socketHandle->sockfd = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+        if (socketHandle->sockfd == -1)
+        {
+            perror("socket");
+            return NULL;
+        }
+
+        // Bind the socket to the specified interface
+        struct sockaddr_ll addr = {0};
+        addr.sll_family = AF_PACKET;
+        addr.sll_ifindex = if_nametoindex(interface_name);
+        addr.sll_protocol = htons(ETH_P_ALL);
+
+        if (bind(socketHandle->sockfd, (struct sockaddr*)&addr, sizeof(addr)) == -1)
+        {
+            perror("bind");
+            close(socketHandle->sockfd);
+            return NULL;
+        }
+
+        // Enable Ethernet broadcast support
+        int broadcastEnable = 1;
+        if (setsockopt(socketHandle->sockfd, SOL_SOCKET, SO_BROADCAST, &broadcastEnable, sizeof(broadcastEnable)) == -1)
+        {
+            perror("setsockopt");
+            close(socketHandle->sockfd);
+            return NULL;
+        }
+
+        ret = socketHandle;
+
+        printf("Socket successfully bound to interface %s. Index: %d. Socket FD: %d\n", interface_name, addr.sll_ifindex, socketHandle->sockfd);  // Debugging output
     }
 
-    // Bind the socket to the specified interface
-    struct sockaddr_ll addr = {0};
-    addr.sll_family = AF_PACKET;
-    addr.sll_ifindex = if_nametoindex(interface_name);
-    addr.sll_protocol = htons(ETH_P_ALL);
-
-    if (bind(socketHandle->sockfd, (struct sockaddr*)&addr, sizeof(addr)) == -1)
-    {
-        perror("bind");
-        close(socketHandle->sockfd);
-        exit(EXIT_FAILURE);
-    }
-
-    // Enable Ethernet broadcast support
-    int broadcastEnable = 1;
-    if (setsockopt(socketHandle->sockfd, SOL_SOCKET, SO_BROADCAST, &broadcastEnable, sizeof(broadcastEnable)) == -1)
-    {
-        perror("setsockopt");
-        close(socketHandle->sockfd);
-        exit(EXIT_FAILURE);
-    }
-
-    printf("Socket successfully bound to interface %s. Index: %d. Socket FD: %d\n", interface_name, addr.sll_ifindex, socketHandle->sockfd);  // Debugging output
-
-    return socketHandle;
+    return ret;
 }
 
 void send_ethernet_message(dfu_sock_t * socketHandle,
@@ -388,12 +399,10 @@ void send_ethernet_message(dfu_sock_t * socketHandle,
     struct ifreq ifr;
     struct sockaddr_ll addr = {0};
 
-    printf("\r\nSending to Socket FD: %d", socketHandle->sockfd);
-
     if (payload_size > (ETH_FRAME_LEN - 14))
     {
         fprintf(stderr, "Payload size too large.\n");
-        exit(EXIT_FAILURE);
+        return;
     }
 
     // Set the destination MAC address in the frame
@@ -407,8 +416,10 @@ void send_ethernet_message(dfu_sock_t * socketHandle,
     if (ioctl(socketHandle->sockfd, SIOCGIFHWADDR, &ifr) == -1)
     {
         perror("ioctl(SIOCGIFHWADDR)");
-        exit(EXIT_FAILURE);
+        return;
     }
+
+    /*
     printf("Source MAC address: %02X:%02X:%02X:%02X:%02X:%02X\n",
            (unsigned char)ifr.ifr_hwaddr.sa_data[0],
            (unsigned char)ifr.ifr_hwaddr.sa_data[1],
@@ -416,6 +427,7 @@ void send_ethernet_message(dfu_sock_t * socketHandle,
            (unsigned char)ifr.ifr_hwaddr.sa_data[3],
            (unsigned char)ifr.ifr_hwaddr.sa_data[4],
            (unsigned char)ifr.ifr_hwaddr.sa_data[5]);
+    */
 
     memcpy(buffer + 6, ifr.ifr_hwaddr.sa_data, 6); // Source MAC address
 
@@ -433,17 +445,17 @@ void send_ethernet_message(dfu_sock_t * socketHandle,
     addr.sll_halen = ETH_ALEN;
     memcpy(addr.sll_addr, dest_mac, ETH_ALEN);
 
+    /*
     printf("Sending message to MAC: %02X:%02X:%02X:%02X:%02X:%02X\n",
            dest_mac[0], dest_mac[1], dest_mac[2], dest_mac[3], dest_mac[4], dest_mac[5]);
+    */
 
     // Send the packet
     if (sendto(socketHandle->sockfd, buffer, 14 + payload_size, 0, (struct sockaddr*)&addr, sizeof(addr)) == -1)
     {
         perror("sendto");
-        exit(EXIT_FAILURE);
+        return;
     }
-
-    printf("Message sent successfully.\n");
 }
 
 /*!
@@ -461,33 +473,47 @@ void send_ethernet_message(dfu_sock_t * socketHandle,
 uint8_t *receive_ethernet_message(dfu_sock_t *socketHandle, uint8_t *destBuff, uint16_t *destBuffLen, uint8_t *expected_src_mac)
 {
     uint8_t*            ret = NULL;
-    unsigned char       buffer[ETH_FRAME_LEN];
-    ssize_t             numbytes;
-    uint16_t            payloadLen;
 
-
-    // Receive data
-    numbytes = recvfrom(socketHandle->sockfd, buffer, ETH_FRAME_LEN, 0, NULL, NULL);
-    if (numbytes == -1)
+    if (
+           (socketHandle) &&
+           (destBuff) &&
+           (destBuffLen) &&
+           (*destBuffLen > 14)
+       )
     {
-        perror("recvfrom");
-        exit(EXIT_FAILURE);
-    }
+        unsigned char       buffer[ETH_FRAME_LEN];
+        ssize_t             numbytes;
+        uint16_t            payloadLen;
 
-    memcpy(&payloadLen, &buffer[12], 2);
-    payloadLen = from_big_endian_16(payloadLen);
+        // Receive data
+        numbytes = recvfrom(socketHandle->sockfd, buffer, *destBuffLen, 0, NULL, NULL);
+        if (numbytes == -1)
+        {
+            perror("recvfrom");
+            return NULL;
+        }
 
-    memcpy(destBuff, buffer, payloadLen);
+        if (numbytes > 14)
+        {
+            memcpy(&payloadLen, &buffer[12], 2);
+            payloadLen = from_big_endian_16(payloadLen);
 
-    *destBuffLen = payloadLen;
-    ret = destBuff;
+            if (
+                  (numbytes > payloadLen) &&
+                  (numbytes-payloadLen >= 14) &&
+                  ((payloadLen + 14) <= *destBuffLen)
+               )
+            {
+                // Copy the entire frame, including the source/dest/len
+                memcpy(destBuff, buffer, payloadLen + 14);
 
-    // Check if the source MAC matches the expected source MAC
-    // if (memcmp(buffer + 6, expected_src_mac, 6) == 0)
-    {
-        printf("Received message from ");
-        print_mac_address(buffer + 6);
-        printf("Payload: %s\n", buffer + 14);  // Assuming the payload is a string
+                // Return the payload length part
+                *destBuffLen = payloadLen;
+
+                // Return the address of the caller's buffer when success.
+                ret = destBuff;
+            }
+        }
     }
 
     return ret;

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sched.h>
 
 #include "dfu_client_api.h"
 
@@ -16,17 +17,18 @@ int main()
         //ASYNC_TIMER_STRUCT    timer;
         //TIMER_Start(&timer);
 
-        counter = 100000;
+        counter = 15;
         do
         {
             dfuClientAPI_LL_IdleDrive(api);
+            // sched_yield();
         }while (--counter > 0);
 
         devRecord = dfuClientAPI_LL_GetFirstDevice(api);
 
         if (devRecord)
         {
-            printf("\r\n ::: DEVICE LIST :::\r\n");
+            printf("\r\n\r\n     ::: DEVICE LIST :::\r\n");
             do
             {
                 printf("\r\n        Device Type: %02d", devRecord->deviceType);
@@ -38,6 +40,7 @@ int main()
 
                 devRecord = dfuClientAPI_LL_GetNextDevice(api);
                 printf("\r\n\r\n");
+                fflush(stdout);
             }while (devRecord != NULL);
         }
 

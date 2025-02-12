@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1739387053 source:/mnt/c/Glydways/bl_tools/dfu_tools/dfu_tool_linux/dfu_tool/main.c
+1739393208 source:/mnt/c/Glydways/bl_tools/dfu_tools/dfu_tool_linux/dfu_tool/main.c
 	<stdio.h>
 	<stdlib.h>
 	<sched.h>

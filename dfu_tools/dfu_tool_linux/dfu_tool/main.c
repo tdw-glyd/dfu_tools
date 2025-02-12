@@ -14,6 +14,7 @@ int main()
         uint64_t                counter;
         deviceInfoStruct*       devRecord;
 
+
         uint8_t    MAC[6] = {0x66,0x55,0x44,0x33,0x22,0x11};
         for (;;)
         {

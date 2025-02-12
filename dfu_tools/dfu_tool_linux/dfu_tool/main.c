@@ -14,6 +14,12 @@ int main()
         uint64_t                counter;
         deviceInfoStruct*       devRecord;
 
+        uint8_t    MAC[6] = {0x66,0x55,0x44,0x33,0x22,0x11};
+        for (;;)
+        {
+            dfuClientAPI_LL_BeginSession(api, 1, 5, MAC, 6);
+        }
+
         //ASYNC_TIMER_STRUCT    timer;
         //TIMER_Start(&timer);
 
@@ -21,7 +27,6 @@ int main()
         do
         {
             dfuClientAPI_LL_IdleDrive(api);
-            // sched_yield();
         }while (--counter > 0);
 
         devRecord = dfuClientAPI_LL_GetFirstDevice(api);
@@ -36,7 +41,17 @@ int main()
                 printf("\r\n Device Status Bits: 0x%02X", devRecord->statusBits);
                 printf("\r\n    Core Image Mask: 0x%02X", devRecord->coreImageMask);
                 printf("\r\n         BL Version: %d.%d.%d", devRecord->blVersionMajor, devRecord->blVersionMinor, devRecord->blVersionPatch);
+                printf("\r\n         Device MAC: %02X:%02X:%02X:%02X:%02X:%02X",
+                       devRecord->physicalID[0],
+                       devRecord->physicalID[1],
+                       devRecord->physicalID[2],
+                       devRecord->physicalID[3],
+                       devRecord->physicalID[4],
+                       devRecord->physicalID[5]);
                 printf("\r\n         Time Stamp: %s", ctime(&devRecord->timestamp));
+
+
+                dfuClientAPI_LL_BeginSession(api, 1, 5, devRecord->physicalID, 6);
 
                 devRecord = dfuClientAPI_LL_GetNextDevice(api);
                 printf("\r\n\r\n");

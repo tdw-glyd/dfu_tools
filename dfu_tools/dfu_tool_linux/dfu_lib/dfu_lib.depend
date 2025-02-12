@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1739283350 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_client/src/dfu_client.c
+1739377888 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_client/src/dfu_client.c
 	"dfu_client.h"
 	"iface_enet.h"
 	"dev_list.h"
@@ -37,7 +37,7 @@
 
 1736456151 /mnt/c/Glydways/bl_tools/dfu_tools/include/dfu_client_config.h
 
-1739223830 /mnt/c/Glydways/B2/dfu_protocol/dfu_core/include/dfu_proto_api.h
+1739385157 /mnt/c/Glydways/B2/dfu_protocol/dfu_core/include/dfu_proto_api.h
 	<stdint.h>
 	<stdbool.h>
 	"dfu_proto_config.h"
@@ -116,7 +116,7 @@
 	<stdbool.h>
 	"dfu_client.h"
 
-1738959094 source:/mnt/c/Glydways/bl_tools/dfu_tools/common/src/sequence_ops.c
+1739387239 source:/mnt/c/Glydways/bl_tools/dfu_tools/common/src/sequence_ops.c
 	<stdio.h>
 	"dfu_client_config.h"
 	"sequence_ops.h"
@@ -139,7 +139,7 @@
 	<openssl/err.h>
 	"dfu_client_crypto.h"
 
-1739377725 source:/mnt/c/Glydways/bl_tools/dfu_tools/interfaces/Ethernet/src/ethernet_sockets.c
+1739387986 source:/mnt/c/Glydways/bl_tools/dfu_tools/interfaces/Ethernet/src/ethernet_sockets.c
 	"ethernet_sockets.h"
 	"dfu_platform_utils.h"
 
@@ -189,12 +189,13 @@
 	"dfu_proto_api.h"
 	"dfu_proto_config.h"
 
-1739372721 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_client/src/dfu_client_api.c
+1739387478 source:/mnt/c/Glydways/B2/dfu_protocol/dfu_client/src/dfu_client_api.c
 	<string.h>
 	"dfu_client_api.h"
 	"dfu_client.h"
+	"sequence_ops.h"
 
-1739300045 /mnt/c/Glydways/B2/dfu_protocol/dfu_client/include/dfu_client_api.h
+1739385249 /mnt/c/Glydways/B2/dfu_protocol/dfu_client/include/dfu_client_api.h
 	<time.h>
 	<stdint.h>
 	<stdbool.h>

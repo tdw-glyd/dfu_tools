@@ -272,11 +272,33 @@ void send_ethernet_message(dfu_sock_t * socketHandle,
     return;
 }
 
+///
+/// @fn: receive_ethernet_message
+///
+/// @details Uses raw sockets to receive our Ethernet frame.
+///
+/// @param[in] socketHandle : The specific port to get data from
+/// @param[in] destBuff: Where the received data is placed.
+/// @param[in] destBuffLen: [IN]: The max frame length to receive.
+//                          [OUT]: The # of bytes actually received.
+/// @param[in] expected_src_mac: UNUSED
+///
+/// @returns
+///
+/// @tracereq(@req{xxxxxxx}}
+///
 uint8_t *receive_ethernet_message(dfu_sock_t *socketHandle, uint8_t *destBuff, uint16_t *destBuffLen, uint8_t *expected_src_mac)
 {
     uint8_t             *ret = NULL;
 
-    if ( (socketHandle) && (socketHandle->handle) && (destBuffLen) )
+    (void)expected_src_mac;
+
+    if (
+           (socketHandle) &&
+           (socketHandle->handle) &&
+           (destBuffLen) &&
+           (*destBuffLen > 14)
+       )
     {
         struct pcap_pkthdr         *hdr;
         const uint8_t              *pPacket;
@@ -287,37 +309,38 @@ uint8_t *receive_ethernet_message(dfu_sock_t *socketHandle, uint8_t *destBuff, u
         {
             uint16_t            payloadLen;
 
-            memcpy(&payloadLen, pPacket+12, 2);
-            payloadLen = from_big_endian_16(payloadLen);
+            if ((payloadLen + 14) <= *destBuffLen)
+            {
+                memcpy(&payloadLen, pPacket+12, 2);
+                payloadLen = from_big_endian_16(payloadLen);
 
-            memcpy(destBuff, pPacket, hdr->len);
+                memcpy(destBuff, pPacket, hdr->len);
 
-            *destBuffLen = payloadLen;
-            ret = destBuff;
-        }
-        else
-        {
-            // usleep(1000);
+                *destBuffLen = payloadLen;
+                ret = destBuff;
+            }
         }
     }
 
     return (ret);
 }
 
-#else
+#else // Linux versions below
 
-/*!
-** FUNCTION: get_mac_address
-**
-** DESCRIPTION: Get's the MAC address of the named interface.
-**
-** PARAMETERS:
-**
-** RETURNS:
-**
-** COMMENTS:
-**
-*/
+///
+/// @fn: get_mac_address
+///
+/// @details Get's the MAC address of the named interface.
+///
+/// @param[in] interface_name
+/// @param[in] socketHandle
+/// @param[in] mac_address (target for result)
+/// @param[in]
+///
+/// @returns
+///
+/// @tracereq(@req{xxxxxxx}}
+///
 int get_mac_address(const char *interface_name, dfu_sock_t * socketHandle, uint8_t *mac_address)
 {
     struct ifreq ifr;
@@ -340,7 +363,21 @@ int get_mac_address(const char *interface_name, dfu_sock_t * socketHandle, uint8
     return 0;
 }
 
-
+///
+/// @fn: create_raw_socket
+///
+/// @details Linux version of creating new socket
+///
+/// @param[in] interfaceName: Which interface to bind with.
+/// @param[in] socketHandle: The handle to use for this
+/// @param[in]
+/// @param[in]
+///
+/// @returns The address of the socket handle if success. NULL
+///          else.
+///
+/// @tracereq(@req{xxxxxxx}}
+///
 dfu_sock_t * create_raw_socket(const char *interface_name, dfu_sock_t * socketHandle)
 {
     dfu_sock_t*                 ret = NULL;
@@ -389,6 +426,21 @@ dfu_sock_t * create_raw_socket(const char *interface_name, dfu_sock_t * socketHa
     return ret;
 }
 
+///
+/// @fn: send_ethernet_message
+///
+/// @details Linux version of sending a raw ethernet message.
+///
+/// @param[in] socketHandle
+/// @param[in] interface_name
+/// @param[in] dest_mac
+/// @param[in] payload
+/// @param[in] payload_size
+///
+/// @returns
+///
+/// @tracereq(@req{xxxxxxx}}
+///
 void send_ethernet_message(dfu_sock_t * socketHandle,
                            const char *interface_name,
                            uint8_t *dest_mac,
@@ -398,6 +450,7 @@ void send_ethernet_message(dfu_sock_t * socketHandle,
     unsigned char buffer[ETH_FRAME_LEN];
     struct ifreq ifr;
     struct sockaddr_ll addr = {0};
+    ssize_t bytesSent;
 
     if (payload_size > (ETH_FRAME_LEN - 14))
     {
@@ -451,25 +504,29 @@ void send_ethernet_message(dfu_sock_t * socketHandle,
     */
 
     // Send the packet
-    if (sendto(socketHandle->sockfd, buffer, 14 + payload_size, 0, (struct sockaddr*)&addr, sizeof(addr)) == -1)
+    bytesSent = sendto(socketHandle->sockfd, buffer, 14 + payload_size, 0, (struct sockaddr*)&addr, sizeof(addr));
+    if (bytesSent == -1)
     {
         perror("sendto");
         return;
     }
 }
 
-/*!
-** FUNCTION: receive_ethernet_message
-**
-** DESCRIPTION: Gets raw ehernet messages from the interface.
-**
-** PARAMETERS:
-**
-** RETURNS:
-**
-** COMMENTS:
-**
-*/
+///
+/// @fn: receive_ethernet_message
+///
+/// @details Uses raw sockets to receive our Ethernet frame.
+///
+/// @param[in] socketHandle : The specific port to get data from
+/// @param[in] destBuff: Where the received data is placed.
+/// @param[in][out] destBuffLen: [IN]: The max frame length to receive.
+//                               [OUT]: The # of bytes actually received.
+/// @param[in] expected_src_mac: UNUSED
+///
+/// @returns
+///
+/// @tracereq(@req{xxxxxxx}}
+///
 uint8_t *receive_ethernet_message(dfu_sock_t *socketHandle, uint8_t *destBuff, uint16_t *destBuffLen, uint8_t *expected_src_mac)
 {
     uint8_t*            ret = NULL;
@@ -518,30 +575,5 @@ uint8_t *receive_ethernet_message(dfu_sock_t *socketHandle, uint8_t *destBuff, u
 
     return ret;
 }
-
-
-#ifdef HGHGHGHG
-int main() {
-    const char *interface_name = "eth0";  // Change to the appropriate interface
-    unsigned char dest_mac[6] = {0x00, 0x1A, 0x2B, 0x3C, 0x4D, 0x5E};  // Destination MAC address
-    unsigned char src_mac[6] = {0x00, 0x1A, 0x2B, 0x3C, 0x4D, 0x5E};   // Expected source MAC for receiving
-    unsigned char payload[] = "Hello, Ethernet!";
-
-    // Create a raw socket
-    int sockfd = create_raw_socket(interface_name);
-
-    // Send raw Ethernet message
-    send_ethernet_message(sockfd, interface_name, dest_mac, payload, sizeof(payload));
-
-    // Receive raw Ethernet message
-    receive_ethernet_message(sockfd, src_mac);
-
-    // Close the socket
-    close(sockfd);
-
-    return 0;
-}
-#endif
-
 
 #endif // _WIN32 && _WIN64

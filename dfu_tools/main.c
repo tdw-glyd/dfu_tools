@@ -194,10 +194,11 @@ int main(int argc, char **argv)
 #endif
 
 
-
-
+#ifdef FHFHFHFH
+dfuClient = dfuClientInit(DFUCLIENT_INTERFACE_ETHERNET,
+                          "Ethernet 4");
     // TEST: Get image status
-#ifdef HGHGHGH
+
     imageIndex = 1;
     imageAddress = 0x00500000;
     dfuClientTransaction_CMD_IMAGE_STATUS(dfuClient,
@@ -207,21 +208,35 @@ int main(int argc, char **argv)
                                      imageAddress,
                                      &imageFlags,
                                      &imageSize);
-#endif // HGHGHGH
 
+#endif // FHFHFHFH
 
 #define TEST_API            (1)
+/*
 dfuClientAPI*       api = dfuClientAPIGet(DFUCLIENT_INTERFACE_ETHERNET,
                                           "\\Device\\NPF_{DADC3966-80F0-48A8-8F57-0188FDB7DB8D}",
+                                          "FOO");
+*/
+
+
+dfuClientAPI*       api = dfuClientAPIGet(DFUCLIENT_INTERFACE_ETHERNET,
+                                          "Ethernet 4",
                                           "FOO");
 if (api)
 {
     deviceInfoStruct*       devRecord;
 
+uint8_t    MAC[6] = {0x66,0x55,0x44,0x33,0x22,0x11};
+//uint8_t    MAC[6] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
+for (;;)
+{
+    dfuClientAPI_LL_BeginSession(api, 1, 5, MAC, 6);
+}
+
     ASYNC_TIMER_STRUCT    timer;
     TIMER_Start(&timer);
 
-    while (!TIMER_Finished(&timer, 5000))
+    while (!TIMER_Finished(&timer, 80000))
     {
         dfuClientAPI_LL_IdleDrive(api);
     }

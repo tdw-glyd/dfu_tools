@@ -400,21 +400,28 @@ dfu_sock_t * create_raw_socket(const char *interface_name, dfu_sock_t * socketHa
         if (setsockopt(socketHandle->sockfd, SOL_PACKET, PACKET_LOOPBACK, &loopback_opt, sizeof(loopback_opt)) < 0)
         {
             perror("setsockopt PACKET_LOOPBACK");
+            // return NULL;
         }
 
         int sock_opt = 1;
         if (setsockopt(socketHandle->sockfd, SOL_SOCKET, SO_DONTROUTE, &sock_opt, sizeof(sock_opt)) < 0)
         {
             perror("setsockopt SO_DONTROUTE");
+            return NULL;
         }
 
         if (setsockopt(socketHandle->sockfd, SOL_SOCKET, SO_NO_CHECK, &sock_opt, sizeof(sock_opt)) < 0)
         {
             perror("setsockopt SO_NO_CHECK");
+            return NULL;
         }
 
         // Bind to the interface given by "interface_name"
-        setsockopt(socketHandle->sockfd, SOL_SOCKET, SO_BINDTODEVICE, interface_name, strlen(interface_name));
+        if (setsockopt(socketHandle->sockfd, SOL_SOCKET, SO_BINDTODEVICE, interface_name, strlen(interface_name)) < 0)
+        {
+            perror("setsockupt SO_BINDTODEVICE");
+            return NULL;
+        }
 
         // Bind the socket to the specified interface
         struct sockaddr_ll addr = {0};

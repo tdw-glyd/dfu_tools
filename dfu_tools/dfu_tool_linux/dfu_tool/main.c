@@ -7,7 +7,7 @@
 int main()
 {
     dfuClientAPI*       api = dfuClientAPIGet(INTERFACE_TYPE_ETHERNET,
-                                              "eth0",
+                                              "enxc8a3621a2c16",
                                               "FOO");
     if (api)
     {

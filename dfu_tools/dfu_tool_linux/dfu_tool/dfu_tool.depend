@@ -10,3 +10,14 @@
 	<stdint.h>
 	<stdbool.h>
 
+1739731925 source:/mnt/windowsshare/Glydways/bl_tools/dfu_tools/dfu_tool_linux/dfu_tool/main.c
+	<stdio.h>
+	<stdlib.h>
+	<sched.h>
+	"dfu_client_api.h"
+
+1739590045 /mnt/windowsshare/Glydways/B2/dfu_protocol/dfu_client/include/dfu_client_api.h
+	<time.h>
+	<stdint.h>
+	<stdbool.h>
+

@@ -20,7 +20,6 @@
 					<Add option="-pedantic-errors" />
 					<Add option="-Wall" />
 					<Add option="-g" />
-					<Add directory="/mnt/c/Glydways/bl_tools/dfu_tools/dfu_tool_linux/dfu_lib/" />
 					<Add directory="../../../../B2/dfu_protocol/dfu_client/include" />
 					<Add directory="../../../../B2/dfu_protocol/dfu_core/include" />
 					<Add directory="../../interfaces/Ethernet/include" />
@@ -29,6 +28,7 @@
 					<Add directory="../../platform/include" />
 					<Add directory="../../common/include" />
 					<Add directory="../../config" />
+					<Add directory="../dfu_lib" />
 				</Compiler>
 				<Linker>
 					<Add library="../../../../../../../usr/lib/x86_64-linux-gnu/libcrypto.a" />

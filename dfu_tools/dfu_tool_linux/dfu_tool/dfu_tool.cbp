@@ -16,7 +16,7 @@
 					<Add directory="../../../../B2/dfu_protocol/dfu_client/include" />
 				</Compiler>
 				<Linker>
-					<Add library="../dfu_lib/bin/Debug/libdfu_lib.so" />
+					<Add library="/mnt/windowsshare/Glydways/bl_tools/dfu_tools/dfu_tool_linux/dfu_lib/bin/Debug/libdfu_lib.so" />
 					<Add directory="../dfu_lib/bin/Debug" />
 				</Linker>
 			</Target>

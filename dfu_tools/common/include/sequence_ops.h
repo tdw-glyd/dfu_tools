@@ -61,7 +61,8 @@ bool sequenceBeginSession(dfuClientEnvStruct * dfuClient,
                           uint8_t devType,
                           uint8_t devVariant,
                           char * dest,
-                          char * challengePubKeyFilename);
+                          char * challengePubKeyFilename,
+                          uint16_t* linkMTU);
 
 /*!
 ** FUNCTION: sequenceEndSession
@@ -110,7 +111,9 @@ bool sequenceTransferAndInstallImage(dfuClientEnvStruct * dfuClient,
 ** COMMENTS:
 **
 */
-bool sequenceNegotiateMTU(dfuClientEnvStruct * dfuClient, char * dest);
+bool sequenceNegotiateMTU(dfuClientEnvStruct* dfuClient, 
+                          uint16_t* linkMTU, 
+                          char* dest);
 
 /*!
 ** FUNCTION: sequenceRebootTarget
@@ -151,12 +154,12 @@ bool macroSequenceInstallImage(dfuClientEnvStruct * dfuClient,
                                uint8_t devVariant,
                                char * dest,
                                char * challengePubKeyFilename,
+                               uint16_t* linkMTU,
                                char *imageFilename,
                                uint8_t imageIndex,
                                uint32_t imageAddress,
                                bool shouldReboot,
-                               uint16_t rebootDelayMS
-                              );
+                               uint16_t rebootDelayMS);
 
 #if defined(__cplusplus)
 }

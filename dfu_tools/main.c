@@ -218,10 +218,11 @@ dfuClientAPI*       api = dfuClientAPIGet(DFUCLIENT_INTERFACE_ETHERNET,
                                           "FOO");
 */
 
-
+uint16_t mtu = 1024;
 dfuClientAPI*       api = dfuClientAPIGet(DFUCLIENT_INTERFACE_ETHERNET,
                                           "Ethernet 4",
-                                          "FOO");
+                                          "./public_key.pem",
+                                          mtu);
 if (api)
 {
     deviceInfoStruct*       devRecord;
@@ -295,6 +296,7 @@ for (int i = 1; i <= MAX_LOOPS; i++)
                               "66:55:44:33:22:11",
                               "c://public_key.pem",
                               //"C:/Glydways/bl_tools/image_builder/image_builder/sample_app.img",
+                              &mtu,
                               "C:/Glydways/B2/embedded/sample_primary_app/debug_flash/sample_primary_app.img",
                               1,
                               0,

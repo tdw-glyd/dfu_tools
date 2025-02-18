@@ -87,11 +87,12 @@ bool sequenceBeginSession(dfuClientEnvStruct * dfuClient,
                           uint8_t devType,
                           uint8_t devVariant,
                           char * dest,
-                          char * challengePubKeyFilename)
+                          char * challengePubKeyFilename,
+                          uint16_t* linkMTU)
 {
     bool                    ret = false;
 
-    if ( (dfuClient) && (dest) )
+    if ( (dfuClient) && (dest) && (linkMTU != NULL) && (*linkMTU > 0) )
     {
         uint32_t                    challengePW;
 
@@ -113,7 +114,7 @@ bool sequenceBeginSession(dfuClientEnvStruct * dfuClient,
             ** we can now determine the MTU to use.
             **
             */
-            sequenceNegotiateMTU(dfuClient, dest);
+            *linkMTU = sequenceNegotiateMTU(dfuClient, linkMTU, dest);
 
             /*
             ** Now that we have the challenge password from the target,
@@ -247,34 +248,32 @@ bool sequenceTransferAndInstallImage(dfuClientEnvStruct * dfuClient,
 ** DESCRIPTION: Negotiate the MTU that we will use for image transfer
 **              operations.
 **
-** PARAMETERS:
+** PARAMETERS: linkMTU must contain the desired MTU when this is called
+**             We SET the value on return so the caller can use it.
 **
 ** RETURNS:
 **
 ** COMMENTS:
 **
 */
-bool sequenceNegotiateMTU(dfuClientEnvStruct * dfuClient, char * dest)
+bool sequenceNegotiateMTU(dfuClientEnvStruct* dfuClient,
+                          uint16_t* linkMTU,
+                          char* dest)
 {
     bool                        ret = false;
 
-    if ( (dfuClient) && (dest) )
+    if ( (dfuClient) && (dest) && (linkMTU) && (*linkMTU > 0) )
     {
-        uint16_t                retMTU = 0;
-
         dfuClientSetDestination(dfuClient, dest);
 
-        retMTU = dfuClientTransaction_CMD_NEGOTIATE_MTU(dfuClient,
-                                                        SO_TRANSACTION_TIMEOUT_MS,
-                                                        dest,
-                                                        MAX_ETHERNET_MSG_LEN);
-        if (retMTU > 0)
+        *linkMTU = dfuClientTransaction_CMD_NEGOTIATE_MTU(dfuClient,
+                                                          SO_TRANSACTION_TIMEOUT_MS,
+                                                          dest,
+                                                          *linkMTU);
+        if (*linkMTU > 0)
         {
-            // Adjust our MTU if the client's is larger than ours
-            retMTU = (retMTU > MAX_ETHERNET_MSG_LEN) ? MAX_ETHERNET_MSG_LEN : retMTU;
-
             // Set the internal MTU
-            dfuClientSetInternalMTU(dfuClient, retMTU);
+            dfuClientSetInternalMTU(dfuClient, *linkMTU);
 
             ret = true;
         }
@@ -342,12 +341,12 @@ bool macroSequenceInstallImage(dfuClientEnvStruct * dfuClient,
                                uint8_t devVariant,
                                char * dest,
                                char * challengePubKeyFilename,
+                               uint16_t* linkMTU,
                                char *imageFilename,
                                uint8_t imageIndex,
                                uint32_t imageAddress,
                                bool shouldReboot,
-                               uint16_t rebootDelayMS
-                              )
+                               uint16_t rebootDelayMS)
 {
     bool                        ret = false;
 
@@ -360,7 +359,8 @@ bool macroSequenceInstallImage(dfuClientEnvStruct * dfuClient,
                              devType,
                              devVariant,
                              dest,
-                             challengePubKeyFilename))
+                             challengePubKeyFilename,
+                             linkMTU))
     {
         //
         // Send the requested image file

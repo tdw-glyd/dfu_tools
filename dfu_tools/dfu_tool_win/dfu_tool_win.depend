@@ -49,11 +49,11 @@
 	"async_timer.h"
 	"dfu_messages.h"
 
-1739496440 source:c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\src\ethernet_sockets.c
+1739826103 source:c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\src\ethernet_sockets.c
 	"ethernet_sockets.h"
 	"dfu_platform_utils.h"
 
-1739459018 c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\include\ethernet_sockets.h
+1739801251 c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\include\ethernet_sockets.h
 	<stdio.h>
 	<stdlib.h>
 	<stdint.h>
@@ -68,12 +68,11 @@
 	<linux/if_packet.h>
 	<linux/if_ether.h>
 	<linux/if_arp.h>
+	<net/ethernet.h>
 	<pcap.h>
 	<winsock2.h>
-	<windows.h>
 	<iphlpapi.h>
 	<tchar.h>
-	<ws2tcpip.h>
 
 1729798238 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\npcap-sdk-1.13\include\pcap.h
 	<pcap/pcap.h>
@@ -1319,7 +1318,7 @@
 	"dfu_client_config.h"
 	"dev_list.h"
 
-1739563739 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_proto_api.h
+1739590120 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_proto_api.h
 	<stdint.h>
 	<stdbool.h>
 	"dfu_proto_config.h"
@@ -1474,14 +1473,14 @@
 	<stdbool.h>
 	"dfu_client.h"
 
-1739387239 source:c:\glydways\bl_tools\dfu_tools\common\src\sequence_ops.c
+1739825730 source:c:\glydways\bl_tools\dfu_tools\common\src\sequence_ops.c
 	<stdio.h>
 	"dfu_client_config.h"
 	"sequence_ops.h"
 	"dfu_client_crypto.h"
 	"image_xfer.h"
 
-1735841361 c:\glydways\bl_tools\dfu_tools\common\include\sequence_ops.h
+1739825779 c:\glydways\bl_tools\dfu_tools\common\include\sequence_ops.h
 	"dfu_client.h"
 
 1730015521 c:\msys64\mingw64\include\openssl\ssl.h
@@ -1612,13 +1611,13 @@
 	"dfu_proto_api.h"
 	"dfu_proto_config.h"
 
-1739387478 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client_api.c
+1739825701 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client_api.c
 	<string.h>
 	"dfu_client_api.h"
 	"dfu_client.h"
 	"sequence_ops.h"
 
-1739563755 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client_api.h
+1739825488 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client_api.h
 	<time.h>
 	<stdint.h>
 	<stdbool.h>

@@ -32,6 +32,7 @@
     #include <linux/if_packet.h>
     #include <linux/if_ether.h>
     #include <linux/if_arp.h>
+    #include <net/ethernet.h>
 #else
     #include <pcap.h>
     #include <winsock2.h>

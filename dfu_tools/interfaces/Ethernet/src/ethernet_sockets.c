@@ -330,7 +330,7 @@ uint8_t *receive_ethernet_message(dfu_sock_t *socketHandle, uint8_t *destBuff, u
 ///
 /// @fn: get_mac_address
 ///
-/// @details Get's the MAC address of the named interface.
+/// @details Get's the MAC address of (socketHandle->sockfd, SOL_PACKET,the named interface.
 ///
 /// @param[in] interface_name
 /// @param[in] socketHandle
@@ -363,7 +363,7 @@ int get_mac_address(const char *interface_name, dfu_sock_t * socketHandle, uint8
     return 0;
 }
 
-///
+///(socketHandle->sockfd, SOL_PACKET,
 /// @fn: create_raw_socket
 ///
 /// @details Linux version of creating new socket

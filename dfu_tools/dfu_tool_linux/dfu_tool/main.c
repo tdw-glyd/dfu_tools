@@ -8,23 +8,26 @@ int main()
 {
     dfuClientAPI*       api = dfuClientAPIGet(INTERFACE_TYPE_ETHERNET,
                                               "enxc8a3621a2c16",
-                                              "FOO");
+                                              "./public_key.pem");
     if (api)
     {
         uint64_t                counter;
         deviceInfoStruct*       devRecord;
 
 
+#ifdef HGHGHG
         uint8_t    MAC[6] = {0x66,0x55,0x44,0x33,0x22,0x11};
         for (;;)
         {
+
             dfuClientAPI_LL_BeginSession(api, 1, 5, MAC, 6);
         }
 
         //ASYNC_TIMER_STRUCT    timer;
         //TIMER_Start(&timer);
+#endif // HGHGHG
 
-        counter = 15;
+        counter = 150;
         do
         {
             dfuClientAPI_LL_IdleDrive(api);

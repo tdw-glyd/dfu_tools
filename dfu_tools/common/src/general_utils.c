@@ -58,6 +58,40 @@ char * dfuToolStripQuotes(char *str)
 }
 
 /*!
+** FUNCTION: dfuToolStricmp
+**
+** DESCRIPTION: Compares two strings, ignores case and length.
+**
+** ARGUMENTS:
+**
+** NOTES:
+*/
+int dfuToolStricmp (const char *s1, const char *s2)
+{
+    char    c1, c2;
+    int     result = 0;
+
+    if ( (s1) && (s2) )
+    {
+        while (result == 0)
+        {
+            c1 = *s1++;
+            c2 = *s2++;
+            if ((c1 >= 'a') && (c1 <= 'z'))
+                c1 = (char)(c1 - ' ');
+            if ((c2 >= 'a') && (c2 <= 'z'))
+                c2 = (char)(c2 - ' ');
+            if ((result = (c1 - c2)) != 0)
+                break;
+            if ((c1 == 0) || (c2 == 0))
+                break;
+        }
+    }
+
+    return result;
+}
+
+/*!
 ** FUNCTION: dfuToolStrnicmp
 **
 ** DESCRIPTION: Case-insensitive string comparison
@@ -197,4 +231,74 @@ char *dfuToolPadStr(char *pStr, char padChar, int padLength)
     }
 
     return (NULL);
+}
+
+/*!
+** FUNCTION: dfuToolLtrim
+**
+** DESCRIPTION: Trim non-printables from LEADING side of string
+**
+** ARGUMENTS:
+**
+** NOTES:
+*/
+char *dfuToolLtrim(char *s)
+{
+    char* newstart = s;
+
+    if (s)
+    {
+        while (isspace( (int)*newstart))
+        {
+            ++newstart;
+        }
+
+        // newstart points to first non-whitespace char (which might be '\0')
+        memmove( s, newstart, strlen( newstart) + 1); // don't forget to move the '\0' terminator
+    }
+
+    return (s);
+}
+
+/*!
+** FUNCTION: dfuToolRtrim
+**
+** DESCRIPTION: Trim non-printables from the TRAILING edge of the string.
+**
+** ARGUMENTS:
+**
+** NOTES:
+*/
+char *dfuToolRtrim(char *s)
+{
+    char *end = s + strlen(s);
+
+    // find the last non-whitespace character
+    while ((end != s) && isspace( (int)*(end-1)))
+    {
+        --end;
+    }
+
+    // at this point either (end == s) and s is either empty or all whitespace
+    //      so it needs to be made empty, or
+    //      end points just past the last non-whitespace character (it might point
+    //      at the '\0' terminator, in which case there's no problem writing
+    //      another there).
+    *end = '\0';
+
+    return (s);
+}
+
+/*!
+** FUNCTION: UTIL_trim
+**
+** DESCRIPTION: Trims both leading and trailing sides of string.
+**
+** ARGUMENTS:
+**
+** NOTES:
+*/
+char *dfuToolTrim(char *s)
+{
+    return ( dfuToolRtrim(dfuToolRtrim(s)) );
 }

@@ -79,13 +79,21 @@
 		<Unit filename="../../../B2/dfu_protocol/dfu_core/src/dfu_proto_core.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../common/include/file_kvp.h" />
 		<Unit filename="../common/include/general_utils.h" />
 		<Unit filename="../common/include/image_xfer.h" />
+		<Unit filename="../common/include/kvparse.h" />
 		<Unit filename="../common/include/sequence_ops.h" />
+		<Unit filename="../common/src/file_kvp.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../common/src/general_utils.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../common/src/image_xfer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../common/src/kvparse.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../common/src/sequence_ops.c">
@@ -96,8 +104,6 @@
 		<Unit filename="../crypto/src/dfu_client_crypto.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../general_utils.h" />
-		<Unit filename="../image_xfer.h" />
 		<Unit filename="../interfaces/Ethernet/include/ethernet_sockets.h" />
 		<Unit filename="../interfaces/Ethernet/include/iface_enet.h" />
 		<Unit filename="../interfaces/Ethernet/src/ethernet_sockets.c">
@@ -113,7 +119,6 @@
 		<Unit filename="../platform/src/async_timer.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../sequence_ops.h" />
 		<Unit filename="../server.h" />
 		<Extensions>
 			<lib_finder disable_auto="1" />

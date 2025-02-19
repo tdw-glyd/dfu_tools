@@ -41,6 +41,206 @@ void print_mac_address(unsigned char *mac)
 
 static bool pcapDLLLoaded = false;
 
+/*
+** Max length of a PCAP interface path name
+**
+*/
+#define MAX_DEVICE_PATH 256
+
+//
+// Structure to hold MAC address
+//
+typedef struct
+{
+    BYTE        address[8];    // Most MAC addresses are 6 bytes, but allow for 8
+    ULONG       length;        // Actual length of the MAC address
+    int         found;         // Flag to indicate if MAC was found
+} MAC_ADDRESS;
+
+//
+// Structure to hold device path
+//
+typedef struct
+{
+    char        path[MAX_DEVICE_PATH];   // PCAP-compatible device path
+    int         found;                   // Flag to indicate if path was found
+} DEVICE_PATH;
+
+
+///
+/// @fn: PrintMACAddress
+///
+/// @details Console output of the MAC address of the interface.
+///
+/// @param[in]
+/// @param[in]
+/// @param[in]
+/// @param[in]
+///
+/// @returns
+///
+/// @tracereq(@req{xxxxxxx}}
+///
+void PrintMACAddress(BYTE* address, ULONG length)
+{
+    for (ULONG i = 0; i < length; i++)
+    {
+        printf("%02X", address[i]);
+        if (i < length - 1) printf(":");
+    }
+    printf("\n");
+}
+
+///
+/// @fn: GetMACByFriendlyName
+///
+/// @details Given an interface "friendly name", this will return a MAC
+///          structure with the MAC address of that interface.
+///
+/// @param[in]
+/// @param[in]
+/// @param[in]
+/// @param[in]
+///
+/// @returns
+///
+/// @tracereq(@req{xxxxxxx}}
+///
+MAC_ADDRESS GetMACByFriendlyName(const char* friendlyName)
+{
+    MAC_ADDRESS             result = {0};
+    ULONG                   outBufLen = 0;
+    IP_ADAPTER_ADDRESSES*   pAddresses = NULL;
+    DWORD                   ret = 0;
+    char                    currentName[128];
+
+    // Get required size
+    ret = GetAdaptersAddresses(AF_UNSPEC, 0, NULL, NULL, &outBufLen);
+    if (ret != ERROR_BUFFER_OVERFLOW)
+    {
+        printf("GetAdaptersAddresses failed for size query\n");
+        return result;
+    }
+
+    // Allocate memory
+    pAddresses = (IP_ADAPTER_ADDRESSES*)malloc(outBufLen);
+    if (pAddresses == NULL)
+    {
+        printf("Memory allocation failed\n");
+        return result;
+    }
+
+    // Get adapter info
+    ret = GetAdaptersAddresses(AF_UNSPEC, 0, NULL, pAddresses, &outBufLen);
+    if (ret != ERROR_SUCCESS)
+    {
+        printf("GetAdaptersAddresses failed with error: %lu\n", ret);
+        free(pAddresses);
+        return result;
+    }
+
+    // Search for the adapter
+    IP_ADAPTER_ADDRESSES* pCurrent = pAddresses;
+    while (pCurrent)
+    {
+        WideCharToMultiByte(CP_ACP, 0, pCurrent->FriendlyName, -1,
+                           currentName, sizeof(currentName), NULL, NULL);
+
+        if (strcmp(currentName, friendlyName) == 0)
+        {
+            if (pCurrent->PhysicalAddressLength != 0)
+            {
+                memcpy(result.address, pCurrent->PhysicalAddress,
+                      pCurrent->PhysicalAddressLength);
+                result.length = pCurrent->PhysicalAddressLength;
+                result.found = 1;
+                break;
+            }
+        }
+        pCurrent = pCurrent->Next;
+    }
+
+    free(pAddresses);
+    return result;
+}
+
+///
+/// @fn: GetPCAPDevicePathByFriendlyName
+///
+/// @details Returns the full "device path" that PCAP needs
+///          in order to create a raw socket. Allows a caller
+///          to refer to the "friendly" name of the interface
+///          as opposed to the canonical device path name used
+///          by PCAP
+///
+/// @param[in]
+/// @param[in]
+/// @param[in]
+/// @param[in]
+///
+/// @returns
+///
+/// @tracereq(@req{xxxxxxx}}
+///
+DEVICE_PATH GetPCAPDevicePathByFriendlyName(const char* friendlyName)
+{
+    DEVICE_PATH             result = {0};
+    ULONG                   outBufLen = 0;
+    IP_ADAPTER_ADDRESSES*   pAddresses = NULL;
+    DWORD                   ret = 0;
+    char                    currentName[128];
+
+    // Get required size
+    ret = GetAdaptersAddresses(AF_UNSPEC, 0, NULL, NULL, &outBufLen);
+    if (ret != ERROR_BUFFER_OVERFLOW)
+    {
+        printf("GetAdaptersAddresses failed for size query\n");
+        return result;
+    }
+
+    // Allocate memory
+    pAddresses = (IP_ADAPTER_ADDRESSES*)malloc(outBufLen);
+    if (pAddresses == NULL)
+    {
+        printf("Memory allocation failed\n");
+        return result;
+    }
+
+    // Get adapter info
+    ret = GetAdaptersAddresses(AF_UNSPEC, 0, NULL, pAddresses, &outBufLen);
+    if (ret != ERROR_SUCCESS)
+    {
+        printf("GetAdaptersAddresses failed with error: %lu\n", ret);
+        free(pAddresses);
+        return result;
+    }
+
+    // Search for the adapter
+    IP_ADAPTER_ADDRESSES* pCurrent = pAddresses;
+    while (pCurrent)
+    {
+        WideCharToMultiByte(CP_ACP, 0, pCurrent->FriendlyName, -1,
+                           currentName, sizeof(currentName), NULL, NULL);
+
+        if (strcmp(currentName, friendlyName) == 0)
+        {
+            // Format the path as PCAP expects it
+            snprintf(result.path, MAX_DEVICE_PATH, "\\Device\\NPF_%s",
+                    pCurrent->AdapterName);
+            result.found = 1;
+
+            printf("\r\nFound PCAP name for [%s]: %s", friendlyName, result.path);
+            fflush(stdout);
+
+            break;
+        }
+        pCurrent = pCurrent->Next;
+    }
+
+    free(pAddresses);
+    return result;
+}
+
 /*!
 ** FUNCTION: LoadNpcapDlls
 **
@@ -140,58 +340,83 @@ dfu_sock_t *create_raw_socket(const char *interface_name, dfu_sock_t *socketHand
 
     if (socketHandle)
     {
-        char errbuf[PCAP_ERRBUF_SIZE] = {0};
+        char                errbuf[PCAP_ERRBUF_SIZE] = {0};
+        DEVICE_PATH         pcapPath;
 
         LoadNpcapDlls();
 
-        // Create the pcap handle
-        socketHandle->handle = pcap_create(interface_name, errbuf);
-        if (socketHandle->handle != NULL)
+        pcapPath = GetPCAPDevicePathByFriendlyName(interface_name);
+        if (pcapPath.found)
         {
-            // Set parameters before activation
-            if (pcap_set_snaplen(socketHandle->handle, 262144) == 0 &&
-                pcap_set_promisc(socketHandle->handle, 1) == 0 &&
-                pcap_set_timeout(socketHandle->handle, 10) == 0 &&
-                pcap_set_immediate_mode(socketHandle->handle, 1) == 0)
+            // Create the pcap handle
+            socketHandle->handle = pcap_create(pcapPath.path, errbuf);
+            if (socketHandle->handle != NULL)
             {
-                // Activate the pcap handle
-                if (pcap_activate(socketHandle->handle) == 0)
+                // Set parameters before activation
+                if (pcap_set_snaplen(socketHandle->handle, 262144) == 0 &&
+                    pcap_set_promisc(socketHandle->handle, 1) == 0 &&
+                    pcap_set_timeout(socketHandle->handle, 10) == 0 &&
+                    pcap_set_immediate_mode(socketHandle->handle, 1) == 0)
                 {
-                    // Set non-blocking mode
-                    if (pcap_setnonblock(socketHandle->handle, 1, errbuf) != -1)
+                    // Activate the pcap handle
+                    if (pcap_activate(socketHandle->handle) == 0)
                     {
-                        // Get MAC address
-                        if (get_mac_address(interface_name, socketHandle, socketHandle->myMAC) == 6)
+                        if (pcap_set_datalink(socketHandle->handle, DLT_EN10MB) != 0) 
                         {
-                            ret = socketHandle; // Successfully initialized
+                            fprintf(stderr, "Failed to set datalink type: %s\n", pcap_geterr(socketHandle->handle));
+                        }
+
+                        // After pcap_activate():
+                        int dlt = pcap_datalink(socketHandle->handle);
+                        printf("\n\nData link type: %d (%s)\n", dlt, pcap_datalink_val_to_name(dlt));
+
+                        // Also check if interface is in monitor mode
+                        int monitor_mode = pcap_can_set_rfmon(socketHandle->handle);
+                        printf("Monitor mode supported: %d\n", monitor_mode);
+
+                        // And get the pcap lib version
+                        printf("PCAP version: %s\n", pcap_lib_version());
+
+                        // Set non-blocking mode
+                        if (pcap_setnonblock(socketHandle->handle, 1, errbuf) != -1)
+                        {
+                            MAC_ADDRESS             macAddress;
+
+                            // Get the MAC of the interface. If found, save to handle.
+                            macAddress = GetMACByFriendlyName(interface_name);
+                            if ( (macAddress.found) && (macAddress.length ==6) )
+                            {
+                                memcpy(socketHandle->myMAC, macAddress.address, 6);
+                                ret = socketHandle; // Successfully initialized
+                            }
+                            else
+                            {
+                                fprintf(stderr, "Failed to get MAC address\n");
+                                pcap_close(socketHandle->handle);
+                            }
                         }
                         else
                         {
-                            fprintf(stderr, "Failed to get MAC address\n");
+                            fprintf(stderr, "Failed to set non-blocking mode: %s\n", errbuf);
                             pcap_close(socketHandle->handle);
                         }
                     }
                     else
                     {
-                        fprintf(stderr, "Failed to set non-blocking mode: %s\n", errbuf);
+                        fprintf(stderr, "Failed to activate pcap handle: %s\n", pcap_geterr(socketHandle->handle));
                         pcap_close(socketHandle->handle);
                     }
                 }
                 else
                 {
-                    fprintf(stderr, "Failed to activate pcap handle: %s\n", pcap_geterr(socketHandle->handle));
+                    fprintf(stderr, "Failed to configure pcap parameters\n");
                     pcap_close(socketHandle->handle);
                 }
             }
             else
             {
-                fprintf(stderr, "Failed to configure pcap parameters\n");
-                pcap_close(socketHandle->handle);
+                fprintf(stderr, "Failed to create pcap handle: %s\n", errbuf);
             }
-        }
-        else
-        {
-            fprintf(stderr, "Failed to create pcap handle: %s\n", errbuf);
         }
     }
 
@@ -309,11 +534,11 @@ uint8_t *receive_ethernet_message(dfu_sock_t *socketHandle, uint8_t *destBuff, u
         {
             uint16_t            payloadLen;
 
+            memcpy(&payloadLen, pPacket+12, 2);
+            payloadLen = from_big_endian_16(payloadLen);
+
             if ((payloadLen + 14) <= *destBuffLen)
             {
-                memcpy(&payloadLen, pPacket+12, 2);
-                payloadLen = from_big_endian_16(payloadLen);
-
                 memcpy(destBuff, pPacket, hdr->len);
 
                 *destBuffLen = payloadLen;

@@ -49,7 +49,7 @@
 	"async_timer.h"
 	"dfu_messages.h"
 
-1739826103 source:c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\src\ethernet_sockets.c
+1739994855 source:c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\src\ethernet_sockets.c
 	"ethernet_sockets.h"
 	"dfu_platform_utils.h"
 
@@ -134,7 +134,7 @@
 
 1731698560 c:\glydways\bl_tools\dfu_tools\include\dfu_lib_config.h
 
-1739496015 source:c:\glydways\bl_tools\dfu_tools\main.c
+1740005726 source:c:\glydways\bl_tools\dfu_tools\main.c
 	<time.h>
 	<stdint.h>
 	<stdbool.h>
@@ -153,6 +153,7 @@
 	"general_utils.h"
 	"sequence_ops.h"
 	"dfu_client_api.h"
+	"file_kvp.h"
 	<openssl/evp.h>
 	<openssl/pem.h>
 	<openssl/err.h>
@@ -1318,7 +1319,7 @@
 	"dfu_client_config.h"
 	"dev_list.h"
 
-1739590120 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_proto_api.h
+1739900312 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_proto_api.h
 	<stdint.h>
 	<stdbool.h>
 	"dfu_proto_config.h"
@@ -1441,7 +1442,7 @@
 	"async_timer.h"
 	"dfu_messages.h"
 
-1738784562 source:c:\glydways\bl_tools\dfu_tools\common\src\general_utils.c
+1739990600 source:c:\glydways\bl_tools\dfu_tools\common\src\general_utils.c
 	<stdio.h>
 	<string.h>
 	<stddef.h>
@@ -1450,7 +1451,7 @@
 	<conio.h>
 	<termios.h>
 
-1738791913 c:\glydways\bl_tools\dfu_tools\common\include\general_utils.h
+1739990745 c:\glydways\bl_tools\dfu_tools\common\include\general_utils.h
 	<stdint.h>
 	<stdbool.h>
 
@@ -1611,14 +1612,35 @@
 	"dfu_proto_api.h"
 	"dfu_proto_config.h"
 
-1739825701 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client_api.c
+1739887681 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client_api.c
 	<string.h>
 	"dfu_client_api.h"
 	"dfu_client.h"
 	"sequence_ops.h"
 
-1739825488 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client_api.h
+1739900280 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client_api.h
 	<time.h>
 	<stdint.h>
 	<stdbool.h>
+
+1739990421 source:c:\glydways\bl_tools\dfu_tools\common\src\kvparse.c
+	"kvparse.h"
+	"general_utils.h"
+
+1739928837 c:\glydways\bl_tools\dfu_tools\common\include\kvparse.h
+	<string.h>
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+	<stdint.h>
+
+1740005999 source:c:\glydways\bl_tools\dfu_tools\common\src\file_kvp.c
+	<string.h>
+	"file_kvp.h"
+	"general_utils.h"
+
+1740004981 c:\glydways\bl_tools\dfu_tools\common\include\file_kvp.h
+	<stdio.h>
+	<stdbool.h>
+	"kvparse.h"
 

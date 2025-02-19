@@ -53,6 +53,7 @@
 #include "sequence_ops.h"
 
 #include "dfu_client_api.h"
+#include "file_kvp.h"
 
 
 // TEST %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -185,12 +186,29 @@ int main(int argc, char **argv)
 
     printApplicationBanner();
 
-#define TEST_API            (1)
+
+    fkvpStruct         fkvp;
+    if (fkvpBegin("c:/Glydways/B2/dfu_protocol/dfu_client/release_manifest.kvp", &fkvp) != NULL)
+    {
+        char*           val = fkvpFind(&fkvp, "target_0_manifest", true);
+
+        if (val)
+        {
+            printf("\r\nFound key [target_0_manifest].  Value: %s", val);
+        }
+        fkvpEnd(&fkvp);
+    }
+
+
+
+
+#define TEST_API            (0)
 
     // TEST ONLY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     dfuClientEnvStruct*             dfuClient = NULL;
 #if (TEST_API==0)
-    dfuClient = dfuClientInit(DFUCLIENT_INTERFACE_ETHERNET,  "\\Device\\NPF_{DADC3966-80F0-48A8-8F57-0188FDB7DB8D}");
+    // dfuClient = dfuClientInit(DFUCLIENT_INTERFACE_ETHERNET,  "\\Device\\NPF_{DADC3966-80F0-48A8-8F57-0188FDB7DB8D}");
+    dfuClient = dfuClientInit(DFUCLIENT_INTERFACE_ETHERNET,  "Ethernet 4");
 #endif
 
 
@@ -211,7 +229,8 @@ dfuClient = dfuClientInit(DFUCLIENT_INTERFACE_ETHERNET,
 
 #endif // FHFHFHFH
 
-#define TEST_API            (1)
+#if (TEST_API==1)
+
 /*
 dfuClientAPI*       api = dfuClientAPIGet(DFUCLIENT_INTERFACE_ETHERNET,
                                           "\\Device\\NPF_{DADC3966-80F0-48A8-8F57-0188FDB7DB8D}",
@@ -263,7 +282,6 @@ for (;;)
 
     dfuClientAPIPut(api);
 }
-#if (TEST_API==1)
 
 #endif
 
@@ -276,14 +294,15 @@ for (;;)
 ASYNC_TIMER_STRUCT timer;
 TIMER_Start(&timer);
 printf("\r\n Listening for devices in DFU mode...");
-while (!TIMER_Finished(&timer, 3000))
+while (!TIMER_Finished(&timer, 30000))
 {
     dfuClientDrive(dfuClient);
 }
 // return (0);
 #endif
 
-#define MAX_LOOPS       (10)
+#define MAX_LOOPS       (1)
+uint16_t mtu = 387;
 for (int i = 1; i <= MAX_LOOPS; i++)
 {
     printf("\r\n\r\n *** INSTALL LOOP: [%5d] ***\r\n", i);

@@ -3,7 +3,7 @@
 //#############################################################################
 //
 /// @file kvparse.c
-/// @brief 
+/// @brief
 ///
 /// @details
 ///
@@ -14,6 +14,7 @@
 //#############################################################################
 //#############################################################################
 #include "kvparse.h"
+#include "general_utils.h"
 
 
 /*
@@ -21,8 +22,6 @@
 **
 */
 static KVP *_KVPARSE_findKey(const char *key, PARSED_KVP *kvp);
-static int UTIL_stricmp (const char *s1, const char *s2);
-static int UTIL_strnicmp(const char *s1, const char *s2, size_t n);
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -67,10 +66,10 @@ PARSED_KVP *MKVPARSE_parseKVP(char *pBuffer, uint16_t bufLen, PARSED_KVP *pKVP, 
           (bufLen > 0) &&
           (bufLen < MAX_KVP_STRING_LEN)
        )
-    {            
+    {
         if (pKeyCount != NULL)
             *pKeyCount = 0;
-            
+
         memset(pKVP, 0x00, sizeof(PARSED_KVP));
 
         // Reset the indices of the located '=' and SPACE chars
@@ -84,8 +83,8 @@ PARSED_KVP *MKVPARSE_parseKVP(char *pBuffer, uint16_t bufLen, PARSED_KVP *pKVP, 
 
         pKVP->f_KVPCount = 0;
 
-        pKVP->f_Base = pBuffer; 
-        pKVP->allocated = false; 
+        pKVP->f_Base = pBuffer;
+        pKVP->allocated = false;
 
     #if (USE_ALLOCATION==1)
         if (shouldAlloc)
@@ -98,7 +97,7 @@ PARSED_KVP *MKVPARSE_parseKVP(char *pBuffer, uint16_t bufLen, PARSED_KVP *pKVP, 
             }
         }
         else
-    #endif        
+    #endif
         {
             if ( (callerBuf != NULL) && (callerBufSize > 0) )
             {
@@ -112,14 +111,14 @@ PARSED_KVP *MKVPARSE_parseKVP(char *pBuffer, uint16_t bufLen, PARSED_KVP *pKVP, 
         pBuf = pKVP->f_Base;
         end = pBuf;
         end += bufLen;
-        
+
         pCurrent = pBuf;
         Index = 0;
 
         while (Index < MAX_PARSED_KEYS)
         {
             //***
-            // Find equal sign. 
+            // Find equal sign.
             // Make sure we don't run past end of buffer.
             //***
             while ( (*pCurrent != 0x00) && (pCurrent <= (pBuf+bufLen) ) && (*pCurrent != '=') )
@@ -214,14 +213,14 @@ PARSED_KVP *MKVPARSE_parseKVP(char *pBuffer, uint16_t bufLen, PARSED_KVP *pKVP, 
                 **
                 */
                 if ((
-                       (UTIL_stricmp(pKVP->f_KVP[Index].pKey, PAYLOAD_LEN_KEY) == 0) ||
-                       (UTIL_stricmp(pKVP->f_KVP[Index].pKey, PAYLOAD_LEN_KEY_2) == 0)
+                       (dfuToolStricmp(pKVP->f_KVP[Index].pKey, PAYLOAD_LEN_KEY) == 0) ||
+                       (dfuToolStricmp(pKVP->f_KVP[Index].pKey, PAYLOAD_LEN_KEY_2) == 0)
                     ) &&
                     (
                        (pKVP->f_KVP[Index].pValue != NULL)
                     ))
                 {
-                
+
                     payloadLen = (uint16_t)strtoul(pKVP->f_KVP[Index].pValue, NULL, 10);
                 }
                 else
@@ -229,7 +228,7 @@ PARSED_KVP *MKVPARSE_parseKVP(char *pBuffer, uint16_t bufLen, PARSED_KVP *pKVP, 
                 // (whose value we saved), then move the "pCurrent" past it.  This
                 // allows there to be other KVP data following payload data.
                 if (
-                       (UTIL_stricmp(pKVP->f_KVP[Index].pKey, PAYLOAD_DATA_KEY) == 0) &&
+                       (dfuToolStricmp(pKVP->f_KVP[Index].pKey, PAYLOAD_DATA_KEY) == 0) &&
                        (payloadLen > 0)
                    )
                 {
@@ -238,7 +237,7 @@ PARSED_KVP *MKVPARSE_parseKVP(char *pBuffer, uint16_t bufLen, PARSED_KVP *pKVP, 
 
                     // Skip to end of the DATA portion
                     pCurrent += payloadLen;
-                    
+
                     // Clear for next set of text KVP...
                     payloadLen = 0;
                 }
@@ -248,7 +247,7 @@ PARSED_KVP *MKVPARSE_parseKVP(char *pBuffer, uint16_t bufLen, PARSED_KVP *pKVP, 
                 // number of KVP items found in this string
                 //***
                 ++pKVP->f_KVPCount;
-                
+
                 if (pKeyCount != NULL)
                     *pKeyCount = pKVP->f_KVPCount;
 
@@ -275,16 +274,16 @@ PARSED_KVP *MKVPARSE_parseKVP(char *pBuffer, uint16_t bufLen, PARSED_KVP *pKVP, 
 }
 
 /*!
-** FUNCTION: KVPARSE_unparseKVP 
+** FUNCTION: KVPARSE_unparseKVP
 **
 ** DESCRIPTION: Use the saved indices of '=' and SPACE chars
 **              to restore the original string.
 **
-** PARAMETERS: 
+** PARAMETERS:
 **
-** RETURNS: 
+** RETURNS:
 **
-** COMMENTS: 
+** COMMENTS:
 **
 */
 int KVPARSE_unparseKVP(PARSED_KVP *pKVP)
@@ -308,7 +307,7 @@ int KVPARSE_unparseKVP(PARSED_KVP *pKVP)
 
                 if (pKVP->f_SpaceIndices[index] >= 0)
                 {
-                    current = pKVP->f_Base + pKVP->f_SpaceIndices[index];    
+                    current = pKVP->f_Base + pKVP->f_SpaceIndices[index];
                     *current = 0x20;
                 }
             }
@@ -357,17 +356,17 @@ char *KVPARSE_getValueForKey(const char *pKey, PARSED_KVP *pKVP)
 }
 
 /*!
-** FUNCTION: KVPARSE_findKey 
+** FUNCTION: KVPARSE_findKey
 **
 ** DESCRIPTION: Searches for the named key and returns the address of
 **              the entire KVP record associated with it.
 **
 ** PARAMETERS:
 **
-** RETURNS: 
+** RETURNS:
 **
 ** COMMENTS:
-** 
+**
 */
 KVP *KVPARSE_findKey(const char *pKey, PARSED_KVP *kvp)
 {
@@ -375,22 +374,22 @@ KVP *KVPARSE_findKey(const char *pKey, PARSED_KVP *kvp)
 }
 
 /*!
-** FUNCTION: KVPARSE_getKVPByIndex 
+** FUNCTION: KVPARSE_getKVPByIndex
 **
 ** DESCRIPTION: Returns a pointer to the element given by
 **              "index", if it's in range.
 **
 ** PARAMETERS:
 **
-** RETURNS: 
+** RETURNS:
 **
 ** COMMENTS:
-** 
+**
 */
 KVP *KVPARSE_getKVPByIndex(PARSED_KVP *kvp, uint32_t index)
 {
     KVP             *returnVal = NULL;
-    
+
     if (
           (kvp) &&
           (index < kvp->f_KVPCount)
@@ -398,22 +397,22 @@ KVP *KVPARSE_getKVPByIndex(PARSED_KVP *kvp, uint32_t index)
     {
         returnVal = &kvp->f_KVP[index];
     }
-    
+
     return (returnVal);
 }
 
 /*!
-** FUNCTION: KVPARSE_firstKVP 
+** FUNCTION: KVPARSE_firstKVP
 **
 ** DESCRIPTION: Returns the address of the first parsed KVP
 **              item.
 **
 ** PARAMETERS:
 **
-** RETURNS: 
+** RETURNS:
 **
 ** COMMENTS:
-** 
+**
 */
 KVP *KVPARSE_firstKVP(PARSED_KVP *kvp)
 {
@@ -424,21 +423,21 @@ KVP *KVPARSE_firstKVP(PARSED_KVP *kvp)
     {
         return (&kvp->f_KVP[0]);
     }
-    
+
     return (NULL);
 }
 
 /*!
-** FUNCTION: KVPARSE_nextKVP 
+** FUNCTION: KVPARSE_nextKVP
 **
 ** DESCRIPTION: Returns the next parsed KVP item
 **
 ** PARAMETERS:
 **
-** RETURNS: 
+** RETURNS:
 **
 ** COMMENTS:
-** 
+**
 */
 KVP *KVPARSE_nextKVP(PARSED_KVP *kvp, KVP *item)
 {
@@ -450,20 +449,20 @@ KVP *KVPARSE_nextKVP(PARSED_KVP *kvp, KVP *item)
     {
         uint8_t                 *bytePtr = (uint8_t *)item;
         uint8_t                 *last;
-        
+
         // Compute the address of the last parsed record
         last = (uint8_t *)&kvp->f_KVP[0];
         last += (kvp->f_KVPCount * sizeof(KVP));
-        
+
         // Move the "item" pointer forward by one
         bytePtr += sizeof(KVP);
-        
+
         // If the new address falls into range of what was parsed,
         // set the return up.
         if (bytePtr <= last)
             retVal = (KVP *)bytePtr;
     }
-    
+
     return (retVal);
 }
 
@@ -498,27 +497,27 @@ uint16_t KVPARSE_getPayloadLen(PARSED_KVP *pKVP)
 }
 
 /*!
-** FUNCTION: KVPARSE_dumpKVP  
+** FUNCTION: KVPARSE_dumpKVP
 **
 ** DESCRIPTION: Displays the contents of a parsed KVP structure
 **
 ** PARAMETERS:
 **
-** RETURNS: 
+** RETURNS:
 **
 ** COMMENTS:
-** 
+**
 */
 void KVPARSE_dumpKVP(PARSED_KVP *pKVP)
 {
     int             index;
-    
+
     if (pKVP)
     {
         printf("\r\n>>> KVP DUMP <<<\r\n");
         printf("\r\n   [%d] Keys found.\r\n", pKVP->f_KVPCount);
         fflush(stdout);
-        
+
         for (index = 0; index < MAX_PARSED_KEYS; index++)
         {
             if (pKVP->f_KVP[index].pKey != NULL)
@@ -537,7 +536,7 @@ void KVPARSE_dumpKVP(PARSED_KVP *pKVP)
                             pKVP->f_KVP[index].pKey);
                 }
             }
-            
+
             fflush(stdout);
         }
     }
@@ -577,7 +576,7 @@ static KVP *_KVPARSE_findKey(const char *key, PARSED_KVP *kvp)
             //***
             // Case-sensitive comparison here!!!
             //***
-            if (UTIL_stricmp(key, kvp->f_KVP[Index].pKey) == 0)
+            if (dfuToolStricmp(key, kvp->f_KVP[Index].pKey) == 0)
             {
                 //***
                 // Return a pointer to the "value"
@@ -591,71 +590,6 @@ static KVP *_KVPARSE_findKey(const char *key, PARSED_KVP *kvp)
     }
 
     return (NULL);
-}
-
-/*!
-** FUNCTION: UTIL_strnicmp
-**
-** DESCRIPTION: Compares two strings, ignoring case
-**
-** ARGUMENTS:
-**
-** NOTES:
-*/
-static int UTIL_strnicmp(const char *s1, const char *s2, size_t n)
-{
-  unsigned char c1;
-  unsigned char c2;
-
-  if ( (s1) && (s2) )
-  {
-      while (n-- != 0 && (*s1 || *s2)) {
-        c1 = *(const unsigned char *)s1++;
-        if ('a' <= c1 && c1 <= 'z')
-          c1 += ('A' - 'a');
-        c2 = *(const unsigned char *)s2++;
-        if ('a' <= c2 && c2 <= 'z')
-          c2 += ('A' - 'a');
-        if (c1 != c2)
-          return c1 - c2;
-      } /* while */
-  }
-
-  return 0;
-}
-
-/*!
-** FUNCTION: UTIL_stricmp
-**
-** DESCRIPTION: Compares two strings, ignores case and length.
-**
-** ARGUMENTS:
-**
-** NOTES:
-*/
-static int UTIL_stricmp (const char *s1, const char *s2)
-{
-    char    c1, c2;
-    int     result = 0;
-
-    if ( (s1) && (s2) )
-    {
-        while (result == 0)
-        {
-            c1 = *s1++;
-            c2 = *s2++;
-            if ((c1 >= 'a') && (c1 <= 'z'))
-                c1 = (char)(c1 - ' ');
-            if ((c2 >= 'a') && (c2 <= 'z'))
-                c2 = (char)(c2 - ' ');
-            if ((result = (c1 - c2)) != 0)
-                break;
-            if ((c1 == 0) || (c2 == 0))
-                break;
-        }
-    }
-
-    return result;
 }
 
 

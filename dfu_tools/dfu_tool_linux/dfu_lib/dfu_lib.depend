@@ -200,3 +200,191 @@
 	<stdint.h>
 	<stdbool.h>
 
+1739286931 source:/mnt/windowsshare/Glydways/B2/dfu_protocol/dfu_client/src/dev_list.c
+	<string.h>
+	"dev_list.h"
+
+1739225152 /mnt/windowsshare/Glydways/B2/dfu_protocol/dfu_client/include/dev_list.h
+	<time.h>
+	<stdint.h>
+	<stdbool.h>
+	"dfu_proto_api.h"
+	"dfu_proto_config.h"
+
+1739590120 /mnt/windowsshare/Glydways/B2/dfu_protocol/dfu_core/include/dfu_proto_api.h
+	<stdint.h>
+	<stdbool.h>
+	"dfu_proto_config.h"
+
+1739224788 /mnt/windowsshare/Glydways/bl_tools/dfu_tools/config/dfu_proto_config.h
+
+1739564475 source:/mnt/windowsshare/Glydways/B2/dfu_protocol/dfu_client/src/dfu_client.c
+	"dfu_client.h"
+	"iface_enet.h"
+	"dev_list.h"
+	<sched.h>
+
+1739564460 /mnt/windowsshare/Glydways/B2/dfu_protocol/dfu_client/include/dfu_client.h
+	<stdint.h>
+	<stdbool.h>
+	<stddef.h>
+	"ethernet_sockets.h"
+	"dfu_proto_api.h"
+	"dfu_messages.h"
+	"dfu_client_config.h"
+	"dev_list.h"
+
+1739801251 /mnt/windowsshare/Glydways/bl_tools/dfu_tools/interfaces/Ethernet/include/ethernet_sockets.h
+	<stdio.h>
+	<stdlib.h>
+	<stdint.h>
+	<stdbool.h>
+	<string.h>
+	<unistd.h>
+	"dfu_client_config.h"
+	<arpa/inet.h>
+	<net/if.h>
+	<sys/ioctl.h>
+	<sys/socket.h>
+	<linux/if_packet.h>
+	<linux/if_ether.h>
+	<linux/if_arp.h>
+	<net/ethernet.h>
+	<pcap.h>
+	<winsock2.h>
+	<iphlpapi.h>
+	<tchar.h>
+
+1736456151 /mnt/windowsshare/Glydways/bl_tools/dfu_tools/config/dfu_client_config.h
+
+1738869972 /mnt/windowsshare/Glydways/B2/dfu_protocol/dfu_core/include/dfu_messages.h
+	<stdint.h>
+	<stdbool.h>
+	"dfu_proto_private.h"
+	"dfu_proto_api.h"
+
+1739224676 /mnt/windowsshare/Glydways/B2/dfu_protocol/dfu_core/include/dfu_proto_private.h
+	"dfu_proto_api.h"
+	"async_timer.h"
+
+1738013008 /mnt/windowsshare/Glydways/bl_tools/dfu_tools/platform/include/async_timer.h
+	<stdint.h>
+
+1739226027 /mnt/windowsshare/Glydways/bl_tools/dfu_tools/interfaces/Ethernet/include/iface_enet.h
+	"dfu_proto_api.h"
+	"ethernet_sockets.h"
+
+1738956608 source:/mnt/windowsshare/Glydways/B2/dfu_protocol/dfu_core/src/dfu_messages.c
+	<stddef.h>
+	<string.h>
+	"dfu_messages.h"
+	"dfu_platform_utils.h"
+
+1738791055 /mnt/windowsshare/Glydways/B2/dfu_protocol/dfu_core/include/dfu_platform_utils.h
+	<stdint.h>
+
+1738791074 source:/mnt/windowsshare/Glydways/B2/dfu_protocol/dfu_core/src/dfu_platform_utils.c
+	<stddef.h>
+	<string.h>
+	<stdint.h>
+	"dfu_platform_utils.h"
+
+1739376746 source:/mnt/windowsshare/Glydways/B2/dfu_protocol/dfu_core/src/dfu_proto_core.c
+	<stdint.h>
+	<stdbool.h>
+	<stddef.h>
+	<string.h>
+	"dfu_proto_api.h"
+	"dfu_proto_private.h"
+	"async_timer.h"
+	"dfu_messages.h"
+
+1738784562 source:/mnt/windowsshare/Glydways/bl_tools/dfu_tools/common/src/general_utils.c
+	<stdio.h>
+	<string.h>
+	<stddef.h>
+	<ctype.h>
+	"general_utils.h"
+	<conio.h>
+	<termios.h>
+
+1738791913 /mnt/windowsshare/Glydways/bl_tools/dfu_tools/common/include/general_utils.h
+	<stdint.h>
+	<stdbool.h>
+
+1738784608 source:/mnt/windowsshare/Glydways/bl_tools/dfu_tools/common/src/image_xfer.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<conio.h>
+	<termios.h>
+	"image_xfer.h"
+	"general_utils.h"
+	"dfu_proto_api.h"
+	"dfu_messages.h"
+	"dfu_client.h"
+	"ethernet_sockets.h"
+	"async_timer.h"
+
+1738791918 /mnt/windowsshare/Glydways/bl_tools/dfu_tools/common/include/image_xfer.h
+	<stdint.h>
+	<stdbool.h>
+	"dfu_client.h"
+
+1739825730 source:/mnt/windowsshare/Glydways/bl_tools/dfu_tools/common/src/sequence_ops.c
+	<stdio.h>
+	"dfu_client_config.h"
+	"sequence_ops.h"
+	"dfu_client_crypto.h"
+	"image_xfer.h"
+
+1739825779 /mnt/windowsshare/Glydways/bl_tools/dfu_tools/common/include/sequence_ops.h
+	"dfu_client.h"
+
+1735658820 /mnt/windowsshare/Glydways/bl_tools/dfu_tools/crypto/include/dfu_client_crypto.h
+	<stdio.h>
+	<stdint.h>
+	<stdbool.h>
+
+1738784925 source:/mnt/windowsshare/Glydways/bl_tools/dfu_tools/crypto/src/dfu_client_crypto.c
+	<openssl/crypto.h>
+	<openssl/evp.h>
+	<openssl/pem.h>
+	<openssl/ssl.h>
+	<openssl/err.h>
+	"dfu_client_crypto.h"
+
+1739826103 source:/mnt/windowsshare/Glydways/bl_tools/dfu_tools/interfaces/Ethernet/src/ethernet_sockets.c
+	"ethernet_sockets.h"
+	"dfu_platform_utils.h"
+
+1739377718 source:/mnt/windowsshare/Glydways/bl_tools/dfu_tools/interfaces/Ethernet/src/iface_enet.c
+	<stddef.h>
+	<stdint.h>
+	<stdbool.h>
+	<stdio.h>
+	"iface_enet.h"
+	"dfu_client_config.h"
+	"dfu_proto_api.h"
+
+1738786257 source:/mnt/windowsshare/Glydways/bl_tools/dfu_tools/platform/src/async_timer.c
+	<stddef.h>
+	<sys/time.h>
+	<unistd.h>
+	"async_timer.h"
+	<windows.h>
+	<sysinfoapi.h>
+	<stdio.h>
+	<time.h>
+
+1739884653 source:/mnt/windowsshare/Glydways/B2/dfu_protocol/dfu_client/src/dfu_client_api.c
+	<string.h>
+	"dfu_client_api.h"
+	"dfu_client.h"
+	"sequence_ops.h"
+
+1739884702 /mnt/windowsshare/Glydways/B2/dfu_protocol/dfu_client/include/dfu_client_api.h
+	<time.h>
+	<stdint.h>
+	<stdbool.h>
+

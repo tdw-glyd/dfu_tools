@@ -6,26 +6,30 @@
 
 int main()
 {
+    uint16_t mtu = 387;
     dfuClientAPI*       api = dfuClientAPIGet(INTERFACE_TYPE_ETHERNET,
                                               "enxc8a3621a2c16",
-                                              "./public_key.pem");
+                                              "./public_key.pem",
+                                              mtu);
     if (api)
     {
         uint64_t                counter;
         deviceInfoStruct*       devRecord;
 
 
-#ifdef HGHGHG
+//#ifdef HGHGHG
         uint8_t    MAC[6] = {0x66,0x55,0x44,0x33,0x22,0x11};
         for (;;)
         {
 
             dfuClientAPI_LL_BeginSession(api, 1, 5, MAC, 6);
+
+            dfuClientAPI_LL_NegotiateMTU(api, 387);
         }
 
         //ASYNC_TIMER_STRUCT    timer;
         //TIMER_Start(&timer);
-#endif // HGHGHG
+//#endif // HGHGHG
 
         counter = 150;
         do

@@ -6,7 +6,10 @@
 /// @brief Parses a KVP file and passes the parsed KVP back to the caller
 ///        for each line it processes.
 ///
-/// @details
+/// @details Callers can walk through each line of a KVP file, parsing
+///          each and then use the parsed data. They can also do a higher-level
+///          "search" operation that can walk the entire file to find a value
+///          associated with a specified key.
 ///
 /// @copyright 2024 Glydways, Inc
 /// @copyright https://glydways.com
@@ -19,12 +22,8 @@
 #include "general_utils.h"
 
 
-//#define VALID_FKVP(kvp)  ( (kvp) && (((fkvpStruct*)kvp)->signature == FKVP_SIGNATURE) )
-
-static bool VALID_FKVP(fkvpStruct* kvp)
-{
-    return ( (kvp) && (kvp->signature == FKVP_SIGNATURE) );
-}
+// Simple macro to validate the fkvpStruct pointer
+#define VALID_FKVP(kvp)  ( (kvp) && (((fkvpStruct*)kvp)->signature == FKVP_SIGNATURE) )
 
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -144,6 +143,8 @@ PARSED_KVP* fkvpNext(fkvpStruct* kvp)
             */
             do
             {
+                memset(kvp->lineBuffer, 0x00, sizeof(kvp->lineBuffer));
+
                 // Read a line of text from the file
                 if (fgets(kvp->lineBuffer, MAX_KVP_LINE_LEN, kvp->handle) != NULL)
                 {
@@ -203,11 +204,16 @@ char* fkvpFind(fkvpStruct* kvp, char* keyName, bool fromStart)
         {
             PARSED_KVP*         foundKVP;
 
+            // Rewind the file pointer?
             if (fromStart)
             {
                 fkvpRewind(kvp);
             }
 
+            /*
+            ** Walk the file, searching for a matching key.
+            **
+            */
             while (1)
             {
                 foundKVP = fkvpNext(kvp);

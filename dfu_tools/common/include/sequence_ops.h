@@ -111,9 +111,9 @@ bool sequenceTransferAndInstallImage(dfuClientEnvStruct * dfuClient,
 ** COMMENTS:
 **
 */
-bool sequenceNegotiateMTU(dfuClientEnvStruct* dfuClient, 
-                          uint16_t* linkMTU, 
-                          char* dest);
+uint16_t sequenceNegotiateMTU(dfuClientEnvStruct* dfuClient,
+                              uint16_t* linkMTU,
+                              char* dest);
 
 /*!
 ** FUNCTION: sequenceRebootTarget

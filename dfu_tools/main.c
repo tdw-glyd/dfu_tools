@@ -301,7 +301,7 @@ while (!TIMER_Finished(&timer, 30000))
 // return (0);
 #endif
 
-#define MAX_LOOPS       (1)
+#define MAX_LOOPS       (100)
 uint16_t mtu = 387;
 for (int i = 1; i <= MAX_LOOPS; i++)
 {

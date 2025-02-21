@@ -132,7 +132,7 @@ bool fkvpRewind(fkvpStruct* kvp);
 ** API MACROS
 **
 */
-#define fkvpGetValue(kvp, keyName)     KVPARSE_getValueForKey((const char *)keyName, &((fkvpStruct *)kvp)->parsedKVP)
+#define fkvpGetValue(kvp, keyName)     KVPARSE_getValueForKey((const char *)keyName, (PARSED_KVP*)kvp)
 #define fkvpKeyCount(kvp)              KVP_KEYCOUNT(&((fkvpStruct *)kvp)->parsedKVP) 
 
 

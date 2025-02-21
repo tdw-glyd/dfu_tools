@@ -256,11 +256,11 @@ bool sequenceTransferAndInstallImage(dfuClientEnvStruct * dfuClient,
 ** COMMENTS:
 **
 */
-bool sequenceNegotiateMTU(dfuClientEnvStruct* dfuClient,
-                          uint16_t* linkMTU,
-                          char* dest)
+uint16_t sequenceNegotiateMTU(dfuClientEnvStruct* dfuClient,
+                              uint16_t* linkMTU,
+                              char* dest)
 {
-    bool                        ret = false;
+    uint16_t                        ret = 0;
 
     if ( (dfuClient) && (dest) && (linkMTU) && (*linkMTU > 0) )
     {
@@ -275,7 +275,7 @@ bool sequenceNegotiateMTU(dfuClientEnvStruct* dfuClient,
             // Set the internal MTU
             dfuClientSetInternalMTU(dfuClient, *linkMTU);
 
-            ret = true;
+            ret = *linkMTU;
         }
     }
 

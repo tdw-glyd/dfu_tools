@@ -14,7 +14,6 @@
 				<Option parameters='-x C:\Glydways\bl_demo\sample_app\generate\src\Clock_Ip_Cfg.c -iface &quot;\Device\NPF_{DADC3966-80F0-48A8-8F57-0188FDB7DB8D}&quot; -dst 66:55:44:33:22:11 --type ethernet -i 1 -a 0x00600000 -e 1 -devtype 0 -variant 5' />
 				<Compiler>
 					<Add option="-Wall" />
-					<Add option="-Og" />
 					<Add option="-g" />
 					<Add option="-DSTATIC_LINKING" />
 					<Add directory="../dfu_tool_win" />
@@ -50,7 +49,7 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
-			<Add option="-Og" />
+			<Add option="-m64" />
 			<Add option="-g" />
 			<Add directory="../crypto/include" />
 			<Add directory="../../../B2/dfu_protocol/dfu_client/include" />
@@ -60,6 +59,7 @@
 			<Add directory="../../../../msys64/mingw64/include" />
 		</Compiler>
 		<Linker>
+			<Add option="-m64" />
 			<Add option="-lssl -lcrypto" />
 			<Add library="ssl" />
 			<Add library="crypto" />
@@ -92,6 +92,9 @@
 		<Unit filename="../common/include/kvparse.h" />
 		<Unit filename="../common/include/sequence_ops.h" />
 		<Unit filename="../common/src/file_kvp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../common/src/fw_update_process.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../common/src/general_utils.c">

@@ -38,7 +38,6 @@
 
 #define XFER_TRANSACTION_TIMEOUT_MS             (5000)
 
-
 /*!
 ** FUNCTION: xferImage
 **
@@ -81,8 +80,6 @@ bool xferImage(char *filenameStr,
             printf("\r\n FLASH Address : 0x%08X", imageAddress);
             printf("\r\n Encrypted     : %s", isEncrypted ? "yes" : "no");
             fflush(stdout);
-
-            // TIMER_Start(&startTimer);
 
             // Open the file
             handle = fopen(filenameStr, "rb");
@@ -181,3 +178,4 @@ bool xferImage(char *filenameStr,
 
     return (ret);
 }
+

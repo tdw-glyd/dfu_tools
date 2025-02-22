@@ -336,91 +336,106 @@ int get_mac_address(const char *interface_name, dfu_sock_t * socketHandle, uint8
 */
 dfu_sock_t *create_raw_socket(const char *interface_name, dfu_sock_t *socketHandle)
 {
-    dfu_sock_t *ret = NULL;
+   dfu_sock_t *ret = NULL;
+   if (socketHandle)
+   {
+       char                errbuf[PCAP_ERRBUF_SIZE] = {0};
+       DEVICE_PATH         pcapPath;
+       LoadNpcapDlls();
+       pcapPath = GetPCAPDevicePathByFriendlyName(interface_name);
+       if (pcapPath.found)
+       {
+           // Create the pcap handle
+           socketHandle->handle = pcap_create(pcapPath.path, errbuf);
+           if (socketHandle->handle != NULL)
+           {
+               // Set parameters before activation
+               // Reduced snaplen to 2048 - sufficient for standard Ethernet frames
+               if (pcap_set_snaplen(socketHandle->handle, 2048) == 0 &&
+                   // Keep promiscuous mode on to receive broadcasts
+                   pcap_set_promisc(socketHandle->handle, 1) == 0 &&
+                   // Reduced timeout for better responsiveness
+                   pcap_set_timeout(socketHandle->handle, 2) == 0 &&
+                   pcap_set_immediate_mode(socketHandle->handle, 1) == 0) 
+               {
+                   // Activate the pcap handle
+                   if (pcap_activate(socketHandle->handle) == 0)
+                   {
+                       // Verify/set correct datalink type
+                       if (pcap_datalink(socketHandle->handle) != DLT_EN10MB) 
+                       {
+                           if (pcap_set_datalink(socketHandle->handle, DLT_EN10MB) != 0) 
+                           {
+                               fprintf(stderr, "Failed to set datalink type: %s\n", pcap_geterr(socketHandle->handle));
+                               pcap_close(socketHandle->handle);
+                               return NULL;
+                           }
+                       }
 
-    if (socketHandle)
-    {
-        char                errbuf[PCAP_ERRBUF_SIZE] = {0};
-        DEVICE_PATH         pcapPath;
+                       // Get the MAC address first since we need it for the filter
+                       MAC_ADDRESS macAddress = GetMACByFriendlyName(interface_name);
+                       if ((macAddress.found) && (macAddress.length == 6))
+                       {
+                           memcpy(socketHandle->myMAC, macAddress.address, 6);
 
-        LoadNpcapDlls();
+                           // Set up packet filter for broadcast and direct frames
+                           struct bpf_program fp;
+                           char filter_exp[] = "ether broadcast or ether dst host %02x:%02x:%02x:%02x:%02x:%02x";
+                           char actual_filter[100];
 
-        pcapPath = GetPCAPDevicePathByFriendlyName(interface_name);
-        if (pcapPath.found)
-        {
-            // Create the pcap handle
-            socketHandle->handle = pcap_create(pcapPath.path, errbuf);
-            if (socketHandle->handle != NULL)
-            {
-                // Set parameters before activation
-                if (pcap_set_snaplen(socketHandle->handle, 262144) == 0 &&
-                    pcap_set_promisc(socketHandle->handle, 1) == 0 &&
-                    pcap_set_timeout(socketHandle->handle, 10) == 0 &&
-                    pcap_set_immediate_mode(socketHandle->handle, 1) == 0)
-                {
-                    // Activate the pcap handle
-                    if (pcap_activate(socketHandle->handle) == 0)
-                    {
-                        if (pcap_set_datalink(socketHandle->handle, DLT_EN10MB) != 0) 
-                        {
-                            fprintf(stderr, "Failed to set datalink type: %s\n", pcap_geterr(socketHandle->handle));
-                        }
+                           snprintf(actual_filter, sizeof(actual_filter), filter_exp,
+                                    socketHandle->myMAC[0], socketHandle->myMAC[1], socketHandle->myMAC[2],
+                                    socketHandle->myMAC[3], socketHandle->myMAC[4], socketHandle->myMAC[5]);
 
-                        // After pcap_activate():
-                        int dlt = pcap_datalink(socketHandle->handle);
-                        printf("\n\nData link type: %d (%s)\n", dlt, pcap_datalink_val_to_name(dlt));
+                           if (pcap_compile(socketHandle->handle, &fp, actual_filter, 0, PCAP_NETMASK_UNKNOWN) == 0) 
+                           {
+                               if (pcap_setfilter(socketHandle->handle, &fp) != 0) 
+                               {
+                                   fprintf(stderr, "Failed to set filter: %s\n", pcap_geterr(socketHandle->handle));
+                               }
+                               pcap_freecode(&fp);
+                           }
+                           else 
+                           {
+                               fprintf(stderr, "Failed to compile filter: %s\n", pcap_geterr(socketHandle->handle));
+                           }
 
-                        // Also check if interface is in monitor mode
-                        int monitor_mode = pcap_can_set_rfmon(socketHandle->handle);
-                        printf("Monitor mode supported: %d\n", monitor_mode);
-
-                        // And get the pcap lib version
-                        printf("PCAP version: %s\n", pcap_lib_version());
-
-                        // Set non-blocking mode
-                        if (pcap_setnonblock(socketHandle->handle, 1, errbuf) != -1)
-                        {
-                            MAC_ADDRESS             macAddress;
-
-                            // Get the MAC of the interface. If found, save to handle.
-                            macAddress = GetMACByFriendlyName(interface_name);
-                            if ( (macAddress.found) && (macAddress.length ==6) )
-                            {
-                                memcpy(socketHandle->myMAC, macAddress.address, 6);
-                                ret = socketHandle; // Successfully initialized
-                            }
-                            else
-                            {
-                                fprintf(stderr, "Failed to get MAC address\n");
-                                pcap_close(socketHandle->handle);
-                            }
-                        }
-                        else
-                        {
-                            fprintf(stderr, "Failed to set non-blocking mode: %s\n", errbuf);
-                            pcap_close(socketHandle->handle);
-                        }
-                    }
-                    else
-                    {
-                        fprintf(stderr, "Failed to activate pcap handle: %s\n", pcap_geterr(socketHandle->handle));
-                        pcap_close(socketHandle->handle);
-                    }
-                }
-                else
-                {
-                    fprintf(stderr, "Failed to configure pcap parameters\n");
-                    pcap_close(socketHandle->handle);
-                }
-            }
-            else
-            {
-                fprintf(stderr, "Failed to create pcap handle: %s\n", errbuf);
-            }
-        }
-    }
-
-    return ret;
+                           // Set non-blocking mode
+                           if (pcap_setnonblock(socketHandle->handle, 1, errbuf) != -1)
+                           {
+                               ret = socketHandle; // Successfully initialized
+                           }
+                           else
+                           {
+                               fprintf(stderr, "Failed to set non-blocking mode: %s\n", errbuf);
+                               pcap_close(socketHandle->handle);
+                           }
+                       }
+                       else
+                       {
+                           fprintf(stderr, "Failed to get MAC address\n");
+                           pcap_close(socketHandle->handle);
+                       }
+                   }
+                   else
+                   {
+                       fprintf(stderr, "Failed to activate pcap handle: %s\n", pcap_geterr(socketHandle->handle));
+                       pcap_close(socketHandle->handle);
+                   }
+               }
+               else
+               {
+                   fprintf(stderr, "Failed to configure pcap parameters\n");
+                   pcap_close(socketHandle->handle);
+               }
+           }
+           else
+           {
+               fprintf(stderr, "Failed to create pcap handle: %s\n", errbuf);
+           }
+       }
+   }
+   return ret;
 }
 
 /*!

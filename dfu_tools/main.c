@@ -301,8 +301,8 @@ while (!TIMER_Finished(&timer, 30000))
 // return (0);
 #endif
 
-#define MAX_LOOPS       (100)
-uint16_t mtu = 387;
+#define MAX_LOOPS       (5)
+uint16_t mtu = MAX_ETHERNET_MSG_LEN;
 for (int i = 1; i <= MAX_LOOPS; i++)
 {
     printf("\r\n\r\n *** INSTALL LOOP: [%5d] ***\r\n", i);

@@ -119,7 +119,7 @@
 
 1729798238 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\npcap-sdk-1.13\include\pcap\dlt.h
 
-1739377718 source:c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\src\iface_enet.c
+1740413218 source:c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\src\iface_enet.c
 	<stddef.h>
 	<stdint.h>
 	<stdbool.h>
@@ -128,13 +128,13 @@
 	"dfu_client_config.h"
 	"dfu_proto_api.h"
 
-1739226027 c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\include\iface_enet.h
+1740412868 c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\include\iface_enet.h
 	"dfu_proto_api.h"
 	"ethernet_sockets.h"
 
 1731698560 c:\glydways\bl_tools\dfu_tools\include\dfu_lib_config.h
 
-1740161806 source:c:\glydways\bl_tools\dfu_tools\main.c
+1740403550 source:c:\glydways\bl_tools\dfu_tools\main.c
 	<time.h>
 	<stdint.h>
 	<stdbool.h>
@@ -1303,13 +1303,13 @@
 	<limits.h>
 	<errno.h>
 
-1740162505 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client.c
+1740438466 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client.c
 	"dfu_client.h"
 	"iface_enet.h"
 	"dev_list.h"
 	<sched.h>
 
-1739564460 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client.h
+1740439945 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client.h
 	<stdint.h>
 	<stdbool.h>
 	<stddef.h>
@@ -1318,6 +1318,7 @@
 	"dfu_messages.h"
 	"dfu_client_config.h"
 	"dev_list.h"
+	"dfu_client_api.h"
 
 1740070427 c:\glydways\b2\dfu_protocol\dfu_core\include\dfu_proto_api.h
 	<stdint.h>
@@ -1474,14 +1475,14 @@
 	<stdbool.h>
 	"dfu_client.h"
 
-1740070982 source:c:\glydways\bl_tools\dfu_tools\common\src\sequence_ops.c
+1740439649 source:c:\glydways\bl_tools\dfu_tools\common\src\sequence_ops.c
 	<stdio.h>
 	"dfu_client_config.h"
 	"sequence_ops.h"
 	"dfu_client_crypto.h"
 	"image_xfer.h"
 
-1740069560 c:\glydways\bl_tools\dfu_tools\common\include\sequence_ops.h
+1740403323 c:\glydways\bl_tools\dfu_tools\common\include\sequence_ops.h
 	"dfu_client.h"
 
 1730015521 c:\msys64\mingw64\include\openssl\ssl.h
@@ -1601,18 +1602,18 @@
 
 1739224788 c:\glydways\bl_tools\dfu_tools\config\dfu_proto_config.h
 
-1739286931 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dev_list.c
+1740418864 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dev_list.c
 	<string.h>
 	"dev_list.h"
 
-1739225152 c:\glydways\b2\dfu_protocol\dfu_client\include\dev_list.h
+1740418958 c:\glydways\b2\dfu_protocol\dfu_client\include\dev_list.h
 	<time.h>
 	<stdint.h>
 	<stdbool.h>
 	"dfu_proto_api.h"
 	"dfu_proto_config.h"
 
-1740093617 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client_api.c
+1740403526 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client_api.c
 	<winsock2.h>
 	<windows.h>
 	<pthread.h>
@@ -1621,7 +1622,7 @@
 	"dfu_client.h"
 	"sequence_ops.h"
 
-1739900280 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client_api.h
+1740439646 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client_api.h
 	<time.h>
 	<stdint.h>
 	<stdbool.h>
@@ -3392,4 +3393,14 @@
 	<openssl/cryptoerr_legacy.h>
 	<limits.h>
 	<errno.h>
+
+1740430805 source:c:\glydways\bl_tools\dfu_tools\common\src\fw_update_process.c
+	"fw_update_process.h"
+	"file_kvp.h"
+	"dfu_client_api.h"
+	"async_timer.h"
+	"sequence_ops.h"
+	"dfu_client.h"
+
+1740177497 c:\glydways\bl_tools\dfu_tools\common\include\fw_update_process.h
 

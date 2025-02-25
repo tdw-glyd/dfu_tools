@@ -60,7 +60,6 @@ static bool dfuClientEthernetFreeEnv(ifaceEthEnvStruct * env);
 uint8_t *dfuClientEnetRxCallback(dfuProtocol * dfu, uint16_t * rxBuffLen, dfuUserPtr userPtr);
 bool dfuClientEnetTxCallback(dfuProtocol * dfu, uint8_t *txBuff, uint16_t txBuffLen, dfuMsgTargetEnum target, dfuUserPtr userPtr);
 void dfuClientEnetErrCallback(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, dfuErrorCodeEnum error, dfuUserPtr userPtr);
-static bool dfuClientMACStringToBytes(const char *macStr, uint8_t mac_bytes[6]);
 
 #define VALID_ETH_ENV(env)   ( (env != NULL) && (env->signature == ETH_INTERFACE_SIGNATURE) )
 
@@ -172,8 +171,7 @@ bool dfuClientEthernetSetDest(ifaceEthEnvStruct * env, char *dest)
 
     if ( (VALID_ETH_ENV(env)) && (dest) )
     {
-        ret = dfuClientMACStringToBytes(dest, env->destMAC);
-        ret = true;
+        ret = (ifaceEthernetMACStringToBytes(dest, env->destMAC, sizeof(env->destMAC)) != NULL) ? true : false;
     }
 
     return (ret);
@@ -391,49 +389,14 @@ void dfuClientEnetErrCallback(dfuProtocol * dfu, uint8_t *msg, uint16_t msgLen, 
     return;
 }
 
-
-/*!
-** FUNCTION: dfuClientMACStringToBytes
-**
-** DESCRIPTION: Converts a MAC address string formatted as XX:XX:XX:XX:XX:XX
-**              into a byte array.
-**
-** PARAMETERS:
-**
-** RETURNS:
-**
-** COMMENTS:
-**
-*/
-static bool dfuClientMACStringToBytes(const char *macStr, uint8_t macBytes[6])
-{
-    bool                    ret = false;
-    unsigned int            temp[6];
-
-    if (sscanf(macStr,
-              "%x:%x:%x:%x:%x:%x",
-               &temp[0],
-               &temp[1],
-               &temp[2],
-               &temp[3],
-               &temp[4],
-               &temp[5]) == 6)
-    {
-        for (int i = 0; i < 6; i++)
-        {
-            macBytes[i] = (uint8_t)temp[i];
-        }
-        ret = true; // Success
-    }
-
-    return (ret);
-}
-
 ///
-/// @fn: dfuClientMACBytesToString
+/// @fn: ifaceEthernetMACBytesToString
 ///
-/// @details Convert a MAC address byte array to an
-//           equivalent string.
+/// @details Converts an array of MAC address bytes to a C
+///          STRING, provided by the caller.
+///          This is one of the REQUIRED MAC conversion
+///          functions that each interface type (ETHERNET,
+///          CAN, UART, ETC) must provided.
 ///
 /// @param[in]
 /// @param[in]
@@ -444,17 +407,88 @@ static bool dfuClientMACStringToBytes(const char *macStr, uint8_t macBytes[6])
 ///
 /// @tracereq(@req{xxxxxxx}}
 ///
-void dfuClientMACBytesToString(uint8_t macBytes[6], char macStr[24])
+char* ifaceEthernetMACBytesToString(uint8_t* mac, uint8_t macLen, char* destStr, uint8_t destStrLen)
 {
-    snprintf(macStr,
-             24,
-             "%02X:%02X:%02X:%02X:%02X:%02X",
-             macBytes[5],
-             macBytes[4],
-             macBytes[3],
-             macBytes[2],
-             macBytes[1],
-             macBytes[0]);
+    char*                   ret = NULL;
 
-    return;
+    if (
+           (mac) &&
+           (macLen == 6) &&
+           (destStr) &&
+           (destStrLen >= 18)
+       )
+    {
+        snprintf(destStr,
+                 destStrLen,
+                 "%02X:%02X:%02X:%02X:%02X:%02X",
+                 mac[0],
+                 mac[1],
+                 mac[2],
+                 mac[3],
+                 mac[4],
+                 mac[5]);
+
+        ret = destStr;
+    }
+
+    return ret;
 }
+
+///
+/// @fn: ifaceEthernetMACStringToBytes
+///
+/// @details Function to convert from an Ethernet MAC STRING, to
+///          an array of bytes, provided by the caller.
+///          This is one of the REQUIRED MAC conversion functions that
+///          each interface type (ETHERNET, CAN, UART, ETC) must
+///          provide.
+///
+/// @param[in]
+/// @param[in]
+/// @param[in]
+/// @param[in]
+///
+/// @returns
+///
+/// @tracereq(@req{xxxxxxx}}
+///
+uint8_t* ifaceEthernetMACStringToBytes(char* macStr, uint8_t* mac, uint8_t macLen)
+{
+    uint8_t*                ret = NULL;
+
+    if (
+           (macStr) &&
+           (strlen(macStr) >= 17) &&
+           (mac) &&
+           (macLen >= 6)
+       )
+    {
+        uint32_t                 temp[6];
+
+        if (sscanf(macStr,
+                   "%x:%x:%x:%x:%x:%x",
+                   &temp[0],
+                   &temp[1],
+                   &temp[2],
+                   &temp[3],
+                   &temp[4],
+                   &temp[5]) == 6)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                if (temp[i] > 255)
+                {
+                    return NULL;
+                }
+                mac[i] = (uint8_t)temp[i];
+            }
+
+            ret = mac;
+        }
+    }
+
+    return (ret);
+}
+
+
+

@@ -73,10 +73,13 @@ bool dfuClientEthernetUnInit(ifaceEthEnvStruct *env);
 bool dfuClientEthernetSetDest(ifaceEthEnvStruct * env, char *dest);
 
 ///
-/// @fn: dfuClientMACBytesToString
+/// @fn: ifaceEthernetMACBytesToString
 ///
-/// @details Convert a MAC address byte array to an
-//           equivalent string.
+/// @details Converts an array of MAC address bytes to a C
+///          STRING, provided by the caller.
+///          This is one of the REQUIRED MAC conversion
+///          functions that each interface type (ETHERNET,
+///          CAN, UART, ETC) must provided.
 ///
 /// @param[in] 
 /// @param[in] 
@@ -87,7 +90,27 @@ bool dfuClientEthernetSetDest(ifaceEthEnvStruct * env, char *dest);
 ///
 /// @tracereq(@req{xxxxxxx}}
 ///
-void dfuClientMACBytesToString(uint8_t macBytes[6], char macStr[24]);
+char* ifaceEthernetMACBytesToString(uint8_t* mac, uint8_t macLen, char* destStr, uint8_t destStrLen);
+
+///
+/// @fn: ifaceEthernetMACStringToBytes
+///
+/// @details Function to convert from an Ethernet MAC STRING, to
+///          an array of bytes, provided by the caller.
+///          This is one of the REQUIRED MAC conversion functions that
+///          each interface type (ETHERNET, CAN, UART, ETC) must 
+///          provide.
+///
+/// @param[in] 
+/// @param[in] 
+/// @param[in] 
+/// @param[in] 
+///
+/// @returns 
+///
+/// @tracereq(@req{xxxxxxx}}
+///
+uint8_t* ifaceEthernetMACStringToBytes(char* macStr, uint8_t* mac, uint8_t macLen);
 
 #if defined(__cplusplus)
 }

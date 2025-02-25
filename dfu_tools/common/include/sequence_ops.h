@@ -61,8 +61,7 @@ bool sequenceBeginSession(dfuClientEnvStruct * dfuClient,
                           uint8_t devType,
                           uint8_t devVariant,
                           char * dest,
-                          char * challengePubKeyFilename,
-                          uint16_t* linkMTU);
+                          char * challengePubKeyFilename);
 
 /*!
 ** FUNCTION: sequenceEndSession
@@ -112,7 +111,7 @@ bool sequenceTransferAndInstallImage(dfuClientEnvStruct * dfuClient,
 **
 */
 uint16_t sequenceNegotiateMTU(dfuClientEnvStruct* dfuClient,
-                              uint16_t* linkMTU,
+                              uint16_t linkMTU,
                               char* dest);
 
 /*!
@@ -154,7 +153,6 @@ bool macroSequenceInstallImage(dfuClientEnvStruct * dfuClient,
                                uint8_t devVariant,
                                char * dest,
                                char * challengePubKeyFilename,
-                               uint16_t* linkMTU,
                                char *imageFilename,
                                uint8_t imageIndex,
                                uint32_t imageAddress,

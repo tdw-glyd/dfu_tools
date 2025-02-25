@@ -302,7 +302,6 @@ while (!TIMER_Finished(&timer, 30000))
 #endif
 
 #define MAX_LOOPS       (5)
-uint16_t mtu = MAX_ETHERNET_MSG_LEN;
 for (int i = 1; i <= MAX_LOOPS; i++)
 {
     printf("\r\n\r\n *** INSTALL LOOP: [%5d] ***\r\n", i);
@@ -315,7 +314,6 @@ for (int i = 1; i <= MAX_LOOPS; i++)
                               "66:55:44:33:22:11",
                               "c://public_key.pem",
                               //"C:/Glydways/bl_tools/image_builder/image_builder/sample_app.img",
-                              &mtu,
                               "C:/Glydways/B2/embedded/sample_primary_app/debug_flash/sample_primary_app.img",
                               1,
                               0,

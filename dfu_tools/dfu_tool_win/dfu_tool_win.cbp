@@ -94,6 +94,9 @@
 		<Unit filename="../common/src/file_kvp.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../common/src/fw_manifest.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../common/src/fw_update_process.c">
 			<Option compilerVar="CC" />
 		</Unit>

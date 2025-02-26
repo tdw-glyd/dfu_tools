@@ -197,6 +197,45 @@ uint32_t dfuToolGetFileSize(char *filename)
     return (ret);
 }
 
+///
+/// @fn: dfuToolExtractPath
+///
+/// @details Does an in-place extraction of the path to a file.
+///
+/// @param[in]
+/// @param[in]
+/// @param[in]
+/// @param[in]
+///
+/// @returns
+///
+/// @tracereq(@req{xxxxxxx}}
+///
+char* dfuToolExtractPath(char* buffer)
+{
+    // Find the last backslash or forward slash
+    char* last_slash = strrchr(buffer, '\\');
+    char* last_fwd_slash = strrchr(buffer, '/');
+
+    // Get the rightmost slash (Windows supports both)
+    char* last_separator = (last_slash > last_fwd_slash) ? last_slash : last_fwd_slash;
+
+    // If there's no slash, set buffer to current directory
+    if (last_separator == NULL)
+    {
+        buffer[0] = '.';
+        buffer[1] = '\0';
+    }
+    else
+    {
+        // Terminate the string at the last separator (keeping the separator)
+        ++last_separator;
+        *last_separator = 0x00;
+    }
+
+    return buffer;
+}
+
 /*!
 ** FUNCTION: dfuToolPadStr
 **
@@ -290,7 +329,7 @@ char *dfuToolRtrim(char *s)
 }
 
 /*!
-** FUNCTION: UTIL_trim
+** FUNCTION: dfuToolTrim
 **
 ** DESCRIPTION: Trims both leading and trailing sides of string.
 **

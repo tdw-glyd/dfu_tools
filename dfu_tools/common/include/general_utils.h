@@ -92,6 +92,22 @@ char * dfuToolStristr(const char *haystack, const char *needle);
 */
 uint32_t dfuToolGetFileSize(char *filename);
 
+///
+/// @fn: dfuToolExtractPath
+///
+/// @details Does an in-place extraction of the path to a file.
+///
+/// @param[in] 
+/// @param[in] 
+/// @param[in] 
+/// @param[in] 
+///
+/// @returns 
+///
+/// @tracereq(@req{xxxxxxx}}
+///
+char* dfuToolExtractPath(char* buffer);
+
 /*!
 ** FUNCTION: dfuToolPadStr
 **

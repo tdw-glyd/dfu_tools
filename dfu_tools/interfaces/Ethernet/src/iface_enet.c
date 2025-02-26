@@ -413,7 +413,7 @@ char* ifaceEthernetMACBytesToString(uint8_t* mac, uint8_t macLen, char* destStr,
 
     if (
            (mac) &&
-           (macLen == 6) &&
+           (macLen >= 6) &&
            (destStr) &&
            (destStrLen >= 18)
        )

@@ -202,7 +202,7 @@ int main(int argc, char **argv)
 
 
 
-#define TEST_API            (0)
+#define TEST_API            (1)
 
     // TEST ONLY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     dfuClientEnvStruct*             dfuClient = NULL;
@@ -231,19 +231,33 @@ dfuClient = dfuClientInit(DFUCLIENT_INTERFACE_ETHERNET,
 
 #if (TEST_API==1)
 
-/*
-dfuClientAPI*       api = dfuClientAPIGet(DFUCLIENT_INTERFACE_ETHERNET,
-                                          "\\Device\\NPF_{DADC3966-80F0-48A8-8F57-0188FDB7DB8D}",
-                                          "FOO");
-*/
 
-uint16_t mtu = 1024;
+
+void startOp(dfuClientAPI* api, apiOpcodeEnum opCode, void* userPtr)
+{
+    printf("\r\n'START' CALLBACK: %d", (int)opCode);
+}
+
+void endOp(dfuClientAPI* api, apiOpcodeEnum opCode, apiErrorCodeEnum result, void* userPtr)
+{
+    printf("\r\n'END' CALLBACK: %d", (int)opCode);
+}
+
 dfuClientAPI*       api = dfuClientAPIGet(DFUCLIENT_INTERFACE_ETHERNET,
                                           "Ethernet 4",
-                                          "./public_key.pem",
-                                          mtu);
+                                          "c:/glydways/b2/example_releases/firmware/public_key.pem");
 if (api)
 {
+
+    dfuClientAPIRegisterOpStartCallback(api, startOp, NULL);
+    dfuClientAPIRegisterOpEndCallback(api, endOp, NULL);
+
+    dfuClientAPI_HL_UpdateBoardFW(api, "c:/glydways/b2/example_releases/firmware/atp/atp_manifest.kvp", 5000);
+    dfuClientAPIPut(api);
+    return 0;
+
+
+
     deviceInfoStruct*       devRecord;
 
 uint8_t    MAC[6] = {0x66,0x55,0x44,0x33,0x22,0x11};

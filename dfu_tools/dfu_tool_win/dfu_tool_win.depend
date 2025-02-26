@@ -119,7 +119,7 @@
 
 1729798238 c:\glydways\bl_tools\dfu_tools\dfu_tool_win\npcap-sdk-1.13\include\pcap\dlt.h
 
-1740413218 source:c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\src\iface_enet.c
+1740512010 source:c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\src\iface_enet.c
 	<stddef.h>
 	<stdint.h>
 	<stdbool.h>
@@ -134,7 +134,7 @@
 
 1731698560 c:\glydways\bl_tools\dfu_tools\include\dfu_lib_config.h
 
-1740403550 source:c:\glydways\bl_tools\dfu_tools\main.c
+1740520522 source:c:\glydways\bl_tools\dfu_tools\main.c
 	<time.h>
 	<stdint.h>
 	<stdbool.h>
@@ -1303,13 +1303,13 @@
 	<limits.h>
 	<errno.h>
 
-1740438466 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client.c
+1740519402 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client.c
 	"dfu_client.h"
 	"iface_enet.h"
 	"dev_list.h"
 	<sched.h>
 
-1740439945 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client.h
+1740495898 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client.h
 	<stdint.h>
 	<stdbool.h>
 	<stddef.h>
@@ -1443,7 +1443,7 @@
 	"async_timer.h"
 	"dfu_messages.h"
 
-1739990600 source:c:\glydways\bl_tools\dfu_tools\common\src\general_utils.c
+1740518627 source:c:\glydways\bl_tools\dfu_tools\common\src\general_utils.c
 	<stdio.h>
 	<string.h>
 	<stddef.h>
@@ -1452,7 +1452,7 @@
 	<conio.h>
 	<termios.h>
 
-1739990745 c:\glydways\bl_tools\dfu_tools\common\include\general_utils.h
+1740517576 c:\glydways\bl_tools\dfu_tools\common\include\general_utils.h
 	<stdint.h>
 	<stdbool.h>
 
@@ -1475,7 +1475,7 @@
 	<stdbool.h>
 	"dfu_client.h"
 
-1740439649 source:c:\glydways\bl_tools\dfu_tools\common\src\sequence_ops.c
+1740494201 source:c:\glydways\bl_tools\dfu_tools\common\src\sequence_ops.c
 	<stdio.h>
 	"dfu_client_config.h"
 	"sequence_ops.h"
@@ -1613,7 +1613,7 @@
 	"dfu_proto_api.h"
 	"dfu_proto_config.h"
 
-1740403526 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client_api.c
+1740522633 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client_api.c
 	<winsock2.h>
 	<windows.h>
 	<pthread.h>
@@ -1621,8 +1621,10 @@
 	"dfu_client_api.h"
 	"dfu_client.h"
 	"sequence_ops.h"
+	"fw_update_process.h"
+	"fw_manifest.h"
 
-1740439646 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client_api.h
+1740510979 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client_api.h
 	<time.h>
 	<stdint.h>
 	<stdbool.h>
@@ -3394,13 +3396,25 @@
 	<limits.h>
 	<errno.h>
 
-1740430805 source:c:\glydways\bl_tools\dfu_tools\common\src\fw_update_process.c
+1740523007 source:c:\glydways\bl_tools\dfu_tools\common\src\fw_update_process.c
 	"fw_update_process.h"
-	"file_kvp.h"
-	"dfu_client_api.h"
 	"async_timer.h"
 	"sequence_ops.h"
-	"dfu_client.h"
+	"fw_manifest.h"
+	"dfu_client_api.h"
 
-1740177497 c:\glydways\bl_tools\dfu_tools\common\include\fw_update_process.h
+1740522430 c:\glydways\bl_tools\dfu_tools\common\include\fw_update_process.h
+	<stdint.h>
+	<stdbool.h>
+	"dfu_client.h"
+	"dfu_client_api.h"
+
+1740516596 source:c:\glydways\bl_tools\dfu_tools\common\src\fw_manifest.c
+	"fw_manifest.h"
+
+1740515835 c:\glydways\bl_tools\dfu_tools\common\include\fw_manifest.h
+	<stdint.h>
+	<stdbool.h>
+	"file_kvp.h"
+	"general_utils.h"
 

@@ -7,11 +7,11 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/dfu_tool_win" prefix_auto="1" extension_auto="1" />
+				<Option output="/utils/dfu_tool" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters='-x C:\Glydways\bl_demo\sample_app\generate\src\Clock_Ip_Cfg.c -iface &quot;\Device\NPF_{DADC3966-80F0-48A8-8F57-0188FDB7DB8D}&quot; -dst 66:55:44:33:22:11 --type ethernet -i 1 -a 0x00600000 -e 1 -devtype 0 -variant 5' />
+				<Option parameters="-i Sample_Primary_App.img" />
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-g" />
@@ -24,6 +24,9 @@
 					<Add directory="npcap-sdk-1.13/Include" />
 					<Add directory="../common/include" />
 					<Add directory="../config" />
+					<Add directory="../../../B2/common/include" />
+					<Add directory="../ini/include" />
+					<Add directory="../ini/minIni/dev" />
 				</Compiler>
 				<Linker>
 					<Add option="npcap-sdk-1.13\Lib\x64\wpcap.lib" />
@@ -109,6 +112,9 @@
 		<Unit filename="../common/src/kvparse.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../common/src/path_utils.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../common/src/sequence_ops.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -117,15 +123,18 @@
 		<Unit filename="../crypto/src/dfu_client_crypto.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../dfu_tool.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ini/minIni/dev/minIni.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../interfaces/Ethernet/include/ethernet_sockets.h" />
 		<Unit filename="../interfaces/Ethernet/include/iface_enet.h" />
 		<Unit filename="../interfaces/Ethernet/src/ethernet_sockets.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../interfaces/Ethernet/src/iface_enet.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../main.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../platform/include/async_timer.h" />

@@ -21,7 +21,7 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include "dfu_client_crypto.h"
-#include "image_utils.h"
+#include "image_metadata.h"
 
 /* Platform-specific includes and definitions */
 #ifdef _WIN32
@@ -41,24 +41,42 @@
 #define HEADER_SIZE (IV_SIZE + PADDING_SIZE + TAG_SIZE) /* Total header size: 32 bytes */
 #define MAX_DECRYPT_SIZE 128
 
-
-void handleOpenSSLError(void)
+///
+/// @fn: handleOpenSSLError
+///
+/// @details Called for errors in OpenSSL
+///
+/// @param[in] 
+/// @param[in] 
+/// @param[in] 
+/// @param[in] 
+///
+/// @returns 
+///
+/// @tracereq(@req{xxxxxxx}}
+///
+static void handleOpenSSLError(void)
 {
     ERR_print_errors_fp(stderr);
 }
 
-int hex_to_binary(const char *hex, unsigned char *bin, int bin_size) {
-    int i;
-    for (i = 0; i < bin_size && hex[i*2] && hex[i*2+1]; i++) {
-        if (sscanf(&hex[i*2], "%2hhx", &bin[i]) != 1) {
-            return 0; /* Error parsing hex */
-        }
-    }
-    return i; /* Return number of bytes converted */
-}
 
-/* Platform-independent file open function */
-FILE* open_binary_file(const char* filename, const char* mode) {
+///
+/// @fn: openBinaryFile
+///
+/// @details Platform-independent file open
+///
+/// @param[in] 
+/// @param[in] 
+/// @param[in] 
+/// @param[in] 
+///
+/// @returns 
+///
+/// @tracereq(@req{xxxxxxx}}
+///
+static FILE* openBinaryFile(const char* filename, const char* mode) 
+{
 #ifdef _WIN32
     FILE* fp = NULL;
     fopen_s(&fp, filename, mode);
@@ -68,112 +86,134 @@ FILE* open_binary_file(const char* filename, const char* mode) {
 #endif
 }
 
+///
+/// @fn: decryptFileAES_GCM
+///
+/// @details Decrypts the header portion of a core image file.
+///
+/// @param[in] 
+/// @param[in] 
+/// @param[in] 
+/// @param[in] 
+///
+/// @returns 
+///
+/// @tracereq(@req{xxxxxxx}}
+///
+static int decryptFileAES_GCM(const char *input_file, 
+                              const unsigned char *key,
+                              int key_len, 
+                              unsigned char *output_buffer, 
+                              int *output_len) 
+{
+    FILE*               fp;
+    unsigned char       iv[IV_SIZE];
+    unsigned char       padding[PADDING_SIZE];
+    unsigned char       tag[TAG_SIZE];
+    unsigned char       ciphertext[MAX_DECRYPT_SIZE];
 
-int decryptFileAES_GCM(const char *input_file, const unsigned char *key,
-                       int key_len, unsigned char *output_buffer, int *output_len) {
-    FILE *fp;
-    unsigned char iv[IV_SIZE];
-    unsigned char padding[PADDING_SIZE];
-    unsigned char tag[TAG_SIZE];
-    unsigned char ciphertext[MAX_DECRYPT_SIZE];
+    EVP_CIPHER_CTX*     ctx;
+    int                 len = 0;
+    int                 ret = 0;
 
-    EVP_CIPHER_CTX *ctx;
-    int len = 0;
-    int ret = 0;
-
-    /* Validate parameters */
-    if (!input_file || !key || key_len != 16 || !output_buffer || !output_len) {
-        fprintf(stderr, "Invalid parameters\n");
+    // Validate parameters 
+    if (!input_file || !key || key_len != 16 || !output_buffer || !output_len) 
+    {
         return 0;
     }
 
-    /* Initialize OpenSSL */
+    // Initialize OpenSSL
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
     /* Legacy OpenSSL initialization (< 1.1.0) */
     OpenSSL_add_all_algorithms();
     ERR_load_crypto_strings();
 #else
-    /* Modern OpenSSL initialization (>= 1.1.0) */
+    // Modern OpenSSL initialization (>= 1.1.0) 
     OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CRYPTO_STRINGS |
                         OPENSSL_INIT_ADD_ALL_CIPHERS,
                         NULL);
 #endif
 
-    /* Open the encrypted file */
-    fp = open_binary_file(input_file, "rb");
-    if (!fp) {
-        fprintf(stderr, "Error opening file: %s\n", input_file);
+    // Open the encrypted file 
+    fp = openBinaryFile(input_file, "rb");
+    if (!fp) 
+    {
         return 0;
     }
 
-    /* Read the IV from the beginning of the file */
-    if (fread(iv, 1, IV_SIZE, fp) != IV_SIZE) {
-        fprintf(stderr, "Error reading IV from file\n");
+    // Read the IV from the beginning of the file 
+    if (fread(iv, 1, IV_SIZE, fp) != IV_SIZE) 
+    {
         fclose(fp);
         return 0;
     }
 
-    /* Read the padding (4 bytes) */
-    if (fread(padding, 1, PADDING_SIZE, fp) != PADDING_SIZE) {
-        fprintf(stderr, "Error reading padding from file\n");
+    // Read the padding (4 bytes) 
+    if (fread(padding, 1, PADDING_SIZE, fp) != PADDING_SIZE) 
+    {
         fclose(fp);
         return 0;
     }
 
-    /* Verify padding has expected values */
-    if (padding[0] != 0xA5 || padding[1] != 0x5A || padding[2] != 0xAA || padding[3] != 0x55) {
-        fprintf(stderr, "Warning: Padding bytes don't match expected values\n");
+    // Verify padding has expected values
+    if (padding[0] != 0xA5 || padding[1] != 0x5A || padding[2] != 0xAA || padding[3] != 0x55) 
+    {
         /* Continue anyway, as this is just a warning */
     }
 
-    /* Read authentication tag */
-    if (fread(tag, 1, TAG_SIZE, fp) != TAG_SIZE) {
-        fprintf(stderr, "Error reading authentication tag from file\n");
+    // Read authentication tag 
+    if (fread(tag, 1, TAG_SIZE, fp) != TAG_SIZE) 
+    {
         fclose(fp);
         return 0;
     }
 
-    /* Read up to 128 bytes of ciphertext (which starts after the header) */
+    // Read up to 128 bytes of ciphertext (which starts after the header) 
     int bytes_read = fread(ciphertext, 1, MAX_DECRYPT_SIZE, fp);
-    if (bytes_read <= 0) {
-        fprintf(stderr, "Error reading ciphertext from file\n");
+    if (bytes_read <= 0) 
+    {
         fclose(fp);
         return 0;
     }
 
-    /* Create and initialize the context */
-    if (!(ctx = EVP_CIPHER_CTX_new())) {
+    // Create and initialize the context
+    if (!(ctx = EVP_CIPHER_CTX_new())) 
+    {
         handleOpenSSLError();
         fclose(fp);
         return 0;
     }
 
-    /* Initialize decryption operation */
-    if (!EVP_DecryptInit_ex(ctx, EVP_aes_128_gcm(), NULL, NULL, NULL)) {
-        handleOpenSSLError();
-        EVP_CIPHER_CTX_free(ctx);
-        fclose(fp);
-        return 0;
-    }
-
-    /* Set IV length */
-    if (!EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_IVLEN, IV_SIZE, NULL)) {
+    // Initialize decryption operation 
+    if (!EVP_DecryptInit_ex(ctx, EVP_aes_128_gcm(), NULL, NULL, NULL)) 
+    {
         handleOpenSSLError();
         EVP_CIPHER_CTX_free(ctx);
         fclose(fp);
         return 0;
     }
 
-    /* Initialize key and IV */
-    if (!EVP_DecryptInit_ex(ctx, NULL, NULL, key, iv)) {
+    // Set IV length 
+    if (!EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_IVLEN, IV_SIZE, NULL)) 
+    {
         handleOpenSSLError();
         EVP_CIPHER_CTX_free(ctx);
         fclose(fp);
         return 0;
     }
 
-    /* Decrypt ciphertext */
-    if (!EVP_DecryptUpdate(ctx, output_buffer, &len, ciphertext, bytes_read)) {
+    // Initialize key and IV 
+    if (!EVP_DecryptInit_ex(ctx, NULL, NULL, key, iv)) 
+    {
+        handleOpenSSLError();
+        EVP_CIPHER_CTX_free(ctx);
+        fclose(fp);
+        return 0;
+    }
+
+    // Decrypt ciphertext 
+    if (!EVP_DecryptUpdate(ctx, output_buffer, &len, ciphertext, bytes_read)) 
+    {
         handleOpenSSLError();
         EVP_CIPHER_CTX_free(ctx);
         fclose(fp);
@@ -181,33 +221,37 @@ int decryptFileAES_GCM(const char *input_file, const unsigned char *key,
     }
     *output_len = len;
 
-    /* Set expected tag value */
-    if (!EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG, TAG_SIZE, tag)) {
-        handleOpenSSLError();
-        EVP_CIPHER_CTX_free(ctx);
-        fclose(fp);
-        return 0;
-    }
-
-    /* Finalize the decryption. A positive return value indicates success,
-     * anything else is a failure (i.e. bad tag) */
-    ret = EVP_DecryptFinal_ex(ctx, output_buffer + len, &len);
-
-    /* Add bytes from the final call to the total */
-    *output_len += len;
-
-    /* Clean up */
+    // Clean up
     EVP_CIPHER_CTX_free(ctx);
     fclose(fp);
 
-    /* ret > 0 indicates success, 0 or negative means verify failed */
-    return (ret > 0);
+    ret = (*output_len > 0);
+
+    /// ret > 0 indicates success, 0 or negative means verify failed
+    return ret;
 }
 
-
-AppImageHeaderStruct* getDecryptedImageHeader(char* imageFilename, char* keyFilename, uint8_t* headerBuf, uint32_t headerLen)
+///
+/// @fn: getDecryptedImageHeader
+///
+/// @details Decryptes the metadata of an image file into the 
+///          caller's buffer.
+///
+/// @param[in]
+/// @param[in]
+/// @param[in]
+/// @param[in]
+///
+/// @returns
+///
+/// @tracereq(@req{xxxxxxx}}
+///
+AppImageHeaderStruct* getDecryptedImageHeader(char* imageFilename,
+                                              char* keyFilename,
+                                              uint8_t* headerBuf,
+                                              uint32_t headerLen)
 {
-    uint8_t*                ret = NULL;
+    AppImageHeaderStruct*                ret = NULL;
 
     if (keyFilename)
     {
@@ -222,7 +266,16 @@ AppImageHeaderStruct* getDecryptedImageHeader(char* imageFilename, char* keyFile
 
                 if (decryptFileAES_GCM(imageFilename, keyBuf, 16, headerBuf, &outputLen))
                 {
+                    ret = (AppImageHeaderStruct*)headerBuf;
 
+                    // Now make sure it looks ok
+                    if (
+                           (ret->headSignature != APP_IMAGE_HEAD_SIGNATURE) ||
+                           (ret->tailSignature != APP_IMAGE_TAIL_SIGNATURE)     
+                       )
+                    {
+                        ret = NULL;
+                    }
                 }
             }
 
@@ -232,7 +285,6 @@ AppImageHeaderStruct* getDecryptedImageHeader(char* imageFilename, char* keyFile
 
     return ret;
 }
-
 
 /*!
 ** FUNCTION: encryptWithPublicKey

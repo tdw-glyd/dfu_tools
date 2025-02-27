@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include "image_metadata.h"
 
 
 #define DEFAULT_ENCRYPTED_CHALLENGE_FILENAME            ("./encrypted_chal.bin")
@@ -25,6 +26,26 @@
 #if defined(__cplusplus)
 extern "C" {
 #endif
+
+///
+/// @fn: getDecryptedImageHeader
+///
+/// @details Decryptes the metadata of an image file into the 
+///          caller's buffer.
+///
+/// @param[in]
+/// @param[in]
+/// @param[in]
+/// @param[in]
+///
+/// @returns
+///
+/// @tracereq(@req{xxxxxxx}}
+///
+AppImageHeaderStruct* getDecryptedImageHeader(char* imageFilename,
+                                              char* keyFilename,
+                                              uint8_t* headerBuf,
+                                              uint32_t headerLen);
 
 /*!
 ** FUNCTION: encryptWithPublicKey

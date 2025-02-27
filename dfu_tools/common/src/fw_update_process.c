@@ -66,6 +66,7 @@ apiErrorCodeEnum fwupdProcessFWManifestForDevice(dfuClientEnvStruct* dfuClient,
             uint8_t             imageCount = FWMAN_IMAGE_COUNT(&fkvp);
             char                textBuf[MAX_PATH_LEN];
 
+            // Build the path to the challenge key file
             snprintf(textBuf, sizeof(textBuf), "%s", manifestPath);
             dfuToolExtractPath(textBuf);
             strcat(textBuf, FWMAN_KEY_PATH(&fkvp));
@@ -94,20 +95,18 @@ apiErrorCodeEnum fwupdProcessFWManifestForDevice(dfuClientEnvStruct* dfuClient,
                     // Transfer each image to the target,
                     // using the MAC address provided.
                     //
-                    // ALL IMAGE ID'S AND INDICES START
-                    // AT 1.
+                    // !!! ALL IMAGE ID'S AND INDICES START AT 1 !!!
                     //
                     for (int index = 1; index <= imageCount; index++)
                     {
                         uint32_t        imageAddress = FWMAN_IMAGE_ADDRESS(&fkvp, index);
                         uint8_t         imageIndex = FWMAN_IMAGE_INDEX(&fkvp, index);
 
-
+                        // Build the path to the manifest
                         snprintf(textBuf,
                                  sizeof(textBuf),
                                  "%s",
                                  manifestPath);
-
                         dfuToolExtractPath(textBuf);
                         strcat(textBuf, FWMAN_IMAGE_FILENAME(&fkvp, index));
 
@@ -153,12 +152,31 @@ apiErrorCodeEnum fwupdProcessFWManifestForDevice(dfuClientEnvStruct* dfuClient,
     return ret;
 }
 
-
+///
+/// @fn: fwupdInstallCoreImageFile
+///
+/// @details Given a device MAC, the core image file, decryption key
+///          and challenge key, this will transfer the image file
+///          to the target.
+///
+/// @param[in]
+/// @param[in]
+/// @param[in]
+/// @param[in]
+///
+/// @returns
+///
+/// @tracereq(@req{xxxxxxx}}
+///
 apiErrorCodeEnum fwupdInstallCoreImageFile(dfuClientEnvStruct* dfuClient,
+                                           dfuDeviceTypeEnum deviceType,
+                                           uint8_t deviceVariant,
+                                           uint8_t imageIndex,
+                                           uint32_t flashBaseAddress,
                                            uint8_t* mac,
-                                           uint8_t macLen, 
+                                           uint8_t macLen,
                                            char* imageFilename,
-                                           char* decryptionKeyFilename)
+                                           char* challengeKeyFilename)
 {
     apiErrorCodeEnum                ret = API_ERR_UNKNOWN;
 
@@ -167,18 +185,69 @@ apiErrorCodeEnum fwupdInstallCoreImageFile(dfuClientEnvStruct* dfuClient,
            (mac) &&
            (macLen > 0) &&
            (imageFilename) &&
-           (decryptionKeyFilename)
+           (challengeKeyFilename)
        )
     {
+        // Verify the files exist
         if (
                (dfuToolGetFileSize(imageFilename) > 0) &&
-               (dfuToolGetFileSize(decryptionKeyFilename) > 0)
+               (dfuToolGetFileSize(challengeKeyFilename) > 0)
            )
         {
+            char                            dest[24];
 
+            // Convert the MAC
+            dfuClientMacBytesToString(dfuClient,
+                                      mac,
+                                      macLen,
+                                      dest,
+                                      24);
+            //
+            // Now we know the device TYPE and VARIANT, due
+            // to having the metadata for its image file.
+            //
+            // Establish a Session. If that succeeds,
+            // begin updating the firmware.
+            //
+            if (sequenceBeginSession(dfuClient,
+                                     (dfuDeviceTypeEnum)deviceType,
+                                     (uint8_t)deviceVariant,
+                                     dest,
+                                     challengeKeyFilename))
+            {
+
+                if (sequenceTransferAndInstallImage(dfuClient,
+                                                    imageFilename,
+                                                    imageIndex,
+                                                    flashBaseAddress,
+                                                    dest))
+                {
+                    // Result is GOOD!
+                    ret = API_ERR_NONE;
+                }
+                else
+                {
+                    ret = API_ERR_IMAGE_INSTALLATION_FAILED;
+                }
+
+                // Now close the Session
+                sequenceEndSession(dfuClient, dest);
+            }
+            else
+            {
+                ret = API_ERR_SESSION_START_REJECTED;
+            }
         }
+        else
+        {
+            ret = API_ERR_MISSING_FILE;
+        }
+    }
+    else
+    {
+        ret = API_ERR_INVALID_PARAMS;
     }
 
     return ret;
-}                                           
+}
 

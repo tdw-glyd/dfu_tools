@@ -54,6 +54,7 @@
 
 #include "dfu_client_api.h"
 #include "file_kvp.h"
+#include "dfu_client_crypto.h"
 
 
 // TEST %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -187,6 +188,15 @@ int main(int argc, char **argv)
     printApplicationBanner();
 
 
+    AppImageHeaderStruct            hdr;
+
+    getDecryptedImageHeader("C:/Glydways/B2/embedded/Sample_Primary_App/Debug_FLASH/Sample_Primary_App.img",
+                            "C:/Glydways/B2/embedded/Sample_Primary_App/Debug_FLASH/Aes-128.key",
+                            (uint8_t*)&hdr,
+                            sizeof(hdr));
+
+
+
     fkvpStruct         fkvp;
     if (fkvpBegin("c:/Glydways/B2/dfu_protocol/dfu_client/release_manifest.kvp", &fkvp) != NULL)
     {
@@ -245,14 +255,15 @@ void endOp(dfuClientAPI* api, apiOpcodeEnum opCode, apiErrorCodeEnum result, voi
 
 dfuClientAPI*       api = dfuClientAPIGet(DFUCLIENT_INTERFACE_ETHERNET,
                                           "Ethernet 4",
-                                          "c:/glydways/b2/example_releases/firmware/public_key.pem");
+                                          "c:/glydways/b2/example_releases/firmware/public_key.pem",
+                                          NULL);
 if (api)
 {
 
     dfuClientAPIRegisterOpStartCallback(api, startOp, NULL);
     dfuClientAPIRegisterOpEndCallback(api, endOp, NULL);
 
-    dfuClientAPI_HL_UpdateBoardFW(api, "c:/glydways/b2/example_releases/firmware/atp/atp_manifest.kvp", 5000);
+    dfuClientAPI_HL_UpdateBoardFWFromManifest(api, "c:/glydways/b2/example_releases/firmware/atp/atp_manifest.kvp", 5000);
     dfuClientAPIPut(api);
     return 0;
 

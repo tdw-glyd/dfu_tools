@@ -46,7 +46,31 @@ apiErrorCodeEnum fwupdProcessFWManifestForDevice(dfuClientEnvStruct* dfuClient,
                                                  uint8_t deviceMACLen,
                                                  char* manifestPath);
 
-
+///
+/// @fn: fwupdInstallCoreImageFile
+///
+/// @details Given a device MAC, the core image file, decryption key
+///          and challenge key, this will transfer the image file
+///          to the target.
+///
+/// @param[in] 
+/// @param[in] 
+/// @param[in] 
+/// @param[in] 
+///
+/// @returns 
+///
+/// @tracereq(@req{xxxxxxx}}
+///
+apiErrorCodeEnum fwupdInstallCoreImageFile(dfuClientEnvStruct* dfuClient,
+                                           dfuDeviceTypeEnum deviceType,
+                                           uint8_t deviceVariant,
+                                           uint8_t imageIndex,
+                                           uint32_t flashBaseAddress, 
+                                           uint8_t* mac,
+                                           uint8_t macLen,
+                                           char* imageFilename,
+                                           char* challengeKeyFilename);
 
 #if defined(__cplusplus)
 }

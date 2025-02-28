@@ -117,6 +117,12 @@ static void installImageHelpHandler(char *arg);
 static bool cmdlineHandlerManifestInstall(int argc, char **argv, char *paramVal, dfuClientAPI* apiHandle);
 static void installFromManifestHelpHandler(char *arg);
 
+static bool cmdlineHandlerListDevices(int argc, char **argv, char *paramVal, dfuClientAPI* apiHandle);
+static void listDevicesHelpHandler(char *arg);
+
+static bool cmdlineHandlerInstallVehicle(int argc, char **argv, char *paramVal, dfuClientAPI* apiHandle);
+static void installVehicleHelpHandler(char *arg);
+
 /*
 ** The main command-line dispatch table
 **
@@ -131,8 +137,8 @@ static cmdlineDispatchStruct cmdlineHandlers [] =
 {
     {"-i", "--image", "Install a specified core-image file.", installImageHelpHandler, cmdlineHandlerInstallImage},
     {"-m", "--manifest", "Transfer images specified in the manifest to target.", installFromManifestHelpHandler, cmdlineHandlerManifestInstall},
-    {"-v", "--vehicle", "Install firmware on all vehicle boards.", NULL, NULL},
-    {"-d", "--devices", "Display list of devices in DFU mode", NULL, NULL},
+    {"-v", "--vehicle", "Install firmware on all vehicle boards.", installVehicleHelpHandler, cmdlineHandlerInstallVehicle},
+    {"-d", "--devices", "Display list of devices in DFU mode", listDevicesHelpHandler, cmdlineHandlerListDevices},
     {NULL, NULL, NULL, NULL, NULL}
 };
 
@@ -323,8 +329,6 @@ static bool cmdlineHandlerInstallImage(int argc, char **argv, char *paramVal, df
             snprintf(scratch1, sizeof(scratch1), "%s", paramVal);
         }
 
-        printf("\r\n INSTALL FILE PATH: %s", scratch1);
-
         // Call the library function to install the image
         err = dfuClientAPI_HL_InstallCoreImage(apiHandle,
                                                scratch1,
@@ -365,7 +369,122 @@ static void installFromManifestHelpHandler(char *arg)
 }
 
 
+///
+/// @fn: cmdlineHandlerListDevices
+///
+/// @details Listens for some period of time, displaying
+///          device records that it hears being broadcast
+///          on the interface.
+///
+/// @param[in]
+/// @param[in]
+/// @param[in]
+/// @param[in]
+///
+/// @returns
+///
+/// @tracereq(@req{xxxxxxx}}
+///
+static bool cmdlineHandlerListDevices(int argc, char **argv, char *paramVal, dfuClientAPI* apiHandle)
+{
+    bool                    ret = true;
 
+    if (
+           (argc > 0) &&
+           (argv) &&
+           (apiHandle)
+       )
+    {
+        char                timeoutStr[24];
+        uint32_t            timeoutMS = DEFAULT_DEVICE_LISTEN_TIMEOUT_MS*2;
+        apiErrorCodeEnum    err;
+
+        // See if there was a timeout value
+        if (getDesiredArgumentValue(argc,
+                                    argv,
+                                    "-t",
+                                    "DEVICE_LIST",
+                                    "listen_timeout_ms",
+                                    timeoutStr,
+                                    sizeof(timeoutStr),
+                                    true))
+        {
+            timeoutMS = strtoul(timeoutStr, NULL, 10);
+        }
+
+        if (timeoutMS > 0)
+        {
+            ASYNC_TIMER_STRUCT          timer;
+            deviceInfoStruct*           deviceRecord;
+            bool                        first = true;
+            uint32_t                    index = 1;
+
+            //printf("\r\n <<< DEVICES IN DFU MODE >>>\r\n");
+
+            TIMER_Start(&timer);
+            do
+            {
+                if (first)
+                {
+                    deviceRecord = dfuClientAPI_LL_GetFirstDevice(apiHandle);
+                    if (deviceRecord)
+                    {
+                        first = false;
+                    }
+                }
+                else
+                {
+                    deviceRecord = dfuClientAPI_LL_GetNextDevice(apiHandle);
+                }
+
+                if (deviceRecord)
+                {
+                    char                devAddrStr[64];
+
+                    dfuClientAPIMacBytesToString(apiHandle,
+                                                 deviceRecord->physicalID,
+                                                 MAX_INTERFACE_MAC_LEN,
+                                                 devAddrStr,
+                                                 sizeof(devAddrStr));
+
+                    printf("\r\n    ::: DEVICE (%2d) DESCRIPTION :::\r\n", index++);
+                    printf("\r\n         Device MAC: %s", devAddrStr);
+                    printf("\r\n        Device TYPE: %d", (int)deviceRecord->deviceType);
+                    printf("\r\n     Device VARIANT: %d", (int)deviceRecord->deviceVariant);
+                    printf("\r\n        Status Bits: 0x%02X", deviceRecord->statusBits);
+                    printf("\r\n    Core Image Mask: 0x%02X", deviceRecord->coreImageMask);
+                    printf("\r\n Bootloader Version: %d.%d.%d",
+                           deviceRecord->blVersionMajor,
+                           deviceRecord->blVersionMinor,
+                           deviceRecord->blVersionPatch);
+                    printf("\r\n       Last Update: %s", ctime(&deviceRecord->timestamp));
+                    printf("\r\n");
+                }
+            } while (!TIMER_Finished(&timer, timeoutMS));
+
+        }
+    }
+
+    return ret;
+}
+
+static void listDevicesHelpHandler(char *arg)
+{
+    return;
+}
+
+
+static bool cmdlineHandlerInstallVehicle(int argc, char **argv, char *paramVal, dfuClientAPI* apiHandle)
+{
+    bool                ret = true;
+
+    return ret;
+}
+
+static void installVehicleHelpHandler(char *arg)
+{
+    return;
+}
 
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$

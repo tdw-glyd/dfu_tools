@@ -49,7 +49,7 @@
 	"async_timer.h"
 	"dfu_messages.h"
 
-1740165941 source:c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\src\ethernet_sockets.c
+1740691332 source:c:\glydways\bl_tools\dfu_tools\interfaces\ethernet\src\ethernet_sockets.c
 	"ethernet_sockets.h"
 	"dfu_platform_utils.h"
 
@@ -1304,7 +1304,7 @@
 	<limits.h>
 	<errno.h>
 
-1740519402 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client.c
+1740687085 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client.c
 	"dfu_client.h"
 	"iface_enet.h"
 	"dev_list.h"
@@ -1363,7 +1363,7 @@
 	"async_timer.h"
 	"dfu_messages.h"
 
-1740580137 source:c:\glydways\bl_tools\dfu_tools\crypto\src\dfu_client_crypto.c
+1740691348 source:c:\glydways\bl_tools\dfu_tools\crypto\src\dfu_client_crypto.c
 	<string.h>
 	<stdlib.h>
 	<openssl/crypto.h>
@@ -1463,7 +1463,7 @@
 	<stdint.h>
 	<stdbool.h>
 
-1740166173 source:c:\glydways\bl_tools\dfu_tools\common\src\image_xfer.c
+1740693543 source:c:\glydways\bl_tools\dfu_tools\common\src\image_xfer.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -1482,7 +1482,7 @@
 	<stdbool.h>
 	"dfu_client.h"
 
-1740494201 source:c:\glydways\bl_tools\dfu_tools\common\src\sequence_ops.c
+1740690812 source:c:\glydways\bl_tools\dfu_tools\common\src\sequence_ops.c
 	<stdio.h>
 	"dfu_client_config.h"
 	"sequence_ops.h"
@@ -1609,7 +1609,7 @@
 
 1739224788 c:\glydways\bl_tools\dfu_tools\config\dfu_proto_config.h
 
-1740418864 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dev_list.c
+1740689039 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dev_list.c
 	<string.h>
 	"dev_list.h"
 
@@ -1620,7 +1620,7 @@
 	"dfu_proto_api.h"
 	"dfu_proto_config.h"
 
-1740679889 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client_api.c
+1740704946 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client_api.c
 	<winsock2.h>
 	<windows.h>
 	<pthread.h>
@@ -1633,7 +1633,7 @@
 	"image_metadata.h"
 	"dfu_client_crypto.h"
 
-1740679263 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client_api.h
+1740696387 c:\glydways\b2\dfu_protocol\dfu_client\include\dfu_client_api.h
 	<time.h>
 	<stdint.h>
 	<stdbool.h>
@@ -3405,7 +3405,7 @@
 	<limits.h>
 	<errno.h>
 
-1740598226 source:c:\glydways\bl_tools\dfu_tools\common\src\fw_update_process.c
+1740690867 source:c:\glydways\bl_tools\dfu_tools\common\src\fw_update_process.c
 	"fw_update_process.h"
 	"async_timer.h"
 	"sequence_ops.h"
@@ -3453,7 +3453,7 @@
 	<crtdefs.h>
 	<stdlib.h>
 
-1740684640 source:c:\glydways\bl_tools\dfu_tools\dfu_tool.c
+1740697587 source:c:\glydways\bl_tools\dfu_tools\dfu_tool.c
 	<time.h>
 	<stdint.h>
 	<stdbool.h>

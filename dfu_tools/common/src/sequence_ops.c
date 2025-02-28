@@ -174,10 +174,9 @@ bool sequenceEndSession(dfuClientEnvStruct * dfuClient, char * dest)
 
     if ( (dfuClient) && (dest) )
     {
-        printf("\r\n Ending Session...");
         ret = dfuClientTransaction_CMD_END_SESSION(dfuClient,
-                                                 SO_TRANSACTION_TIMEOUT_MS,
-                                                 dest);
+                                                   SO_TRANSACTION_TIMEOUT_MS,
+                                                   dest);
 
         dfuSetSessionInActive(dfuClientGetDFU(dfuClient));
     }

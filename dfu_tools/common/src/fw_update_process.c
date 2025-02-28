@@ -60,7 +60,7 @@ apiErrorCodeEnum fwupdProcessFWManifestForDevice(dfuClientEnvStruct* dfuClient,
 
         if (openFWManifest(&fkvp, manifestPath) != NULL)
         {
-            // Get the fixec parameters we need from the manifest
+            // Get the fixed parameters we need from the manifest
             dfuDeviceTypeEnum   devType = FWMAN_DEV_TYPE(&fkvp);
             uint8_t             devVariant = FWMAN_DEV_VARIANT(&fkvp);
             uint8_t             imageCount = FWMAN_IMAGE_COUNT(&fkvp);

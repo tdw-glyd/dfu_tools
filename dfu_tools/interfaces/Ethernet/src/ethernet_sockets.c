@@ -1,6 +1,7 @@
 //#############################################################################
 //#############################################################################
 //#############################################################################
+//#############################################################################
 /*! \file
 **
 ** MODULE: platform_sockets.c
@@ -228,10 +229,6 @@ DEVICE_PATH GetPCAPDevicePathByFriendlyName(const char* friendlyName)
             snprintf(result.path, MAX_DEVICE_PATH, "\\Device\\NPF_%s",
                     pCurrent->AdapterName);
             result.found = 1;
-
-            printf("\r\nFound PCAP name for [%s]: %s", friendlyName, result.path);
-            fflush(stdout);
-
             break;
         }
         pCurrent = pCurrent->Next;
@@ -356,15 +353,15 @@ dfu_sock_t *create_raw_socket(const char *interface_name, dfu_sock_t *socketHand
                    pcap_set_promisc(socketHandle->handle, 1) == 0 &&
                    // Reduced timeout for better responsiveness
                    pcap_set_timeout(socketHandle->handle, 2) == 0 &&
-                   pcap_set_immediate_mode(socketHandle->handle, 1) == 0) 
+                   pcap_set_immediate_mode(socketHandle->handle, 1) == 0)
                {
                    // Activate the pcap handle
                    if (pcap_activate(socketHandle->handle) == 0)
                    {
                        // Verify/set correct datalink type
-                       if (pcap_datalink(socketHandle->handle) != DLT_EN10MB) 
+                       if (pcap_datalink(socketHandle->handle) != DLT_EN10MB)
                        {
-                           if (pcap_set_datalink(socketHandle->handle, DLT_EN10MB) != 0) 
+                           if (pcap_set_datalink(socketHandle->handle, DLT_EN10MB) != 0)
                            {
                                fprintf(stderr, "Failed to set datalink type: %s\n", pcap_geterr(socketHandle->handle));
                                pcap_close(socketHandle->handle);
@@ -387,15 +384,15 @@ dfu_sock_t *create_raw_socket(const char *interface_name, dfu_sock_t *socketHand
                                     socketHandle->myMAC[0], socketHandle->myMAC[1], socketHandle->myMAC[2],
                                     socketHandle->myMAC[3], socketHandle->myMAC[4], socketHandle->myMAC[5]);
 
-                           if (pcap_compile(socketHandle->handle, &fp, actual_filter, 0, PCAP_NETMASK_UNKNOWN) == 0) 
+                           if (pcap_compile(socketHandle->handle, &fp, actual_filter, 0, PCAP_NETMASK_UNKNOWN) == 0)
                            {
-                               if (pcap_setfilter(socketHandle->handle, &fp) != 0) 
+                               if (pcap_setfilter(socketHandle->handle, &fp) != 0)
                                {
                                    fprintf(stderr, "Failed to set filter: %s\n", pcap_geterr(socketHandle->handle));
                                }
                                pcap_freecode(&fp);
                            }
-                           else 
+                           else
                            {
                                fprintf(stderr, "Failed to compile filter: %s\n", pcap_geterr(socketHandle->handle));
                            }

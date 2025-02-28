@@ -74,6 +74,7 @@ bool xferImage(char *filenameStr,
             FILE *                      handle;
 
             printf("\r\n *** IMAGE TRANSFER ***");
+            printf("\r\n Destination   : %s", destStr);
             printf("\r\n Sending       : %s", filenameStr);
             printf("\r\n File size     : %u bytes", imageSize);
             printf("\r\n Image Index   : %d", imageIndex);

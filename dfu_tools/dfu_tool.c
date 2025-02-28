@@ -61,7 +61,7 @@
 #include "path_utils.h"
 
 #define DFUTOOL_INI_FILENAME                ("dfutool.ini")
-#define KEYHIT_DELAY_MS                     (10000)
+#define KEYHIT_DELAY_MS                     (5000)
 #define DEFAULT_DEVICE_LISTEN_TIMEOUT_MS    (8000)
 
 /*
@@ -69,8 +69,8 @@
 **
 */
 #define MAJOR_VERSION                       (0)
-#define MINOR_VERSION                       (1)
-#define PATCH_VERSION                       (1)
+#define MINOR_VERSION                       (5)
+#define PATCH_VERSION                       (4)
 #define DEFAULT_TRANSACTION_TIMEOUT_MS      (5000)
 
 /*
@@ -180,14 +180,26 @@ static bool mainHelpHandler(int argc, char **argv);
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
+///
+/// @fn: main
+///
+/// @details Application entry point.  Initializes the software and then
+///          examines command-line parameters to decide what the caller
+///          wants to do.
+///
+/// @param[in]
+/// @param[in]
+/// @param[in]
+/// @param[in]
+///
+/// @returns
+///
+/// @tracereq(@req{xxxxxxx}}
+///
 int main(int argc, char **argv)
 {
     char*                    paramVal = NULL;
     ASYNC_TIMER_STRUCT       keyhitTimer;
-    uint8_t                  imageFlags;
-    uint32_t                 imageAddress;
-    uint32_t                 imageSize;
-    uint8_t                  imageIndex;
 
     initINI();
     printApplicationBanner();
@@ -239,12 +251,13 @@ int main(int argc, char **argv)
                 **
                 */
                 FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
-                printf("\r\n\r\nPress a key...");
+                printf("\r\n\r\n Press a key...");
 
                 TIMER_Start(&keyhitTimer);
                 do
                 {
                 } while ( (!_kbhit()) && (!TIMER_Finished(&keyhitTimer, KEYHIT_DELAY_MS)) );
+                FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
 
                 // Put the API handle back
                 dfuClientAPIPut(apiHandle);
@@ -256,7 +269,7 @@ int main(int argc, char **argv)
         printf("\r\nNo command-line arguments provided!");
     }
 
-    printf("\r\n");
+    printf("\r\n\r\n");
     fflush(stdout);
 
     return 0;
@@ -350,7 +363,8 @@ static void installImageHelpHandler(char *arg)
     printf("\r\n    and VARIANT found in the image metadata that");
     printf("\r\n    is attached to the image file.  The software");
     printf("\r\n    waits to hear from a matching device and if");
-    printf("\r\n    it does hear from one, begins the process.");
+    printf("\r\n    it does hear from one, begins the transfer & ");
+    printf("\r\n    installation transaction sequence.");
 
     printf("\r\n");
     return;
@@ -397,7 +411,6 @@ static bool cmdlineHandlerListDevices(int argc, char **argv, char *paramVal, dfu
     {
         char                timeoutStr[24];
         uint32_t            timeoutMS = DEFAULT_DEVICE_LISTEN_TIMEOUT_MS*2;
-        apiErrorCodeEnum    err;
 
         // See if there was a timeout value
         if (getDesiredArgumentValue(argc,
@@ -419,8 +432,7 @@ static bool cmdlineHandlerListDevices(int argc, char **argv, char *paramVal, dfu
             bool                        first = true;
             uint32_t                    index = 1;
 
-            //printf("\r\n <<< DEVICES IN DFU MODE >>>\r\n");
-
+            printf("\r\n Listening for DFU-mode devices...");
             TIMER_Start(&timer);
             do
             {
@@ -429,6 +441,7 @@ static bool cmdlineHandlerListDevices(int argc, char **argv, char *paramVal, dfu
                     deviceRecord = dfuClientAPI_LL_GetFirstDevice(apiHandle);
                     if (deviceRecord)
                     {
+                        printf("\r                                         ");
                         first = false;
                     }
                 }
@@ -461,7 +474,6 @@ static bool cmdlineHandlerListDevices(int argc, char **argv, char *paramVal, dfu
                     printf("\r\n");
                 }
             } while (!TIMER_Finished(&timer, timeoutMS));
-
         }
     }
 
@@ -470,6 +482,12 @@ static bool cmdlineHandlerListDevices(int argc, char **argv, char *paramVal, dfu
 
 static void listDevicesHelpHandler(char *arg)
 {
+    printf("\r\n");
+    printf("\r\n    Listens for DFU-mode broadcasts from any devices");
+    printf("\r\n    on the network interface. Displays their data as");
+    printf("\r\n    as each is discovered.");
+
+    printf("\r\n");
     return;
 }
 
@@ -558,10 +576,34 @@ static int flag_srch(int argc, char **argv, const char *flag, int get_value, cha
 */
 static void printApplicationBanner(void)
 {
+    char            msgStr[128];
+    int             displayLastRun = 0;
+
+
     printf("\r\n::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
     printf("\r\n::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
-    printf("\r\n:::              Glydways DFU Test Tool Version: %02d.%02d.%02d                  :::", MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION);
+    sprintf(msgStr,
+            "\r\n:::              Glydways DFU Test Tool Version: %02d.%02d.%02d",
+            MAJOR_VERSION,
+            MINOR_VERSION,
+            PATCH_VERSION);
+    dfuToolPadStr(msgStr, 0x20, 77);
+    strcat(msgStr, ":::");
+    printf("%s", msgStr);
     printf("\r\n::: Copyright (c) 2024, 2025, 2026 by Glydways, Inc. All Rights Reserved.  :::");
+
+    displayLastRun = ini_gets("SYSTEM",
+                              "last_run",
+                              "",
+                              msgStr,
+                              sizeof(msgStr),
+                              iniFilename);
+    if (displayLastRun)
+    {
+        dfuToolPadStr(msgStr, 0x20, 44);
+        strcat(msgStr, ":::");
+        printf("\r\n:::                  Last Run: %s", msgStr);
+    }
     printf("\r\n::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
     printf("\r\n::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
 

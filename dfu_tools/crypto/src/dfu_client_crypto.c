@@ -25,6 +25,7 @@
 
 /* Platform-specific includes and definitions */
 #ifdef _WIN32
+    #include <winsock2.h>
     #include <windows.h>
 
     // Define fseeko and ftello for Windows

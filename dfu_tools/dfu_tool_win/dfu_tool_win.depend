@@ -168,11 +168,12 @@
 	"dfu_messages.h"
 	"dfu_lib_config.h"
 
-1738786257 source:c:\glydways\bl_tools\dfu_tools\platform\src\async_timer.c
+1740756097 source:c:\glydways\bl_tools\dfu_tools\platform\src\async_timer.c
 	<stddef.h>
 	<sys/time.h>
 	<unistd.h>
 	"async_timer.h"
+	<winsock2.h>
 	<windows.h>
 	<sysinfoapi.h>
 	<stdio.h>
@@ -1363,7 +1364,7 @@
 	"async_timer.h"
 	"dfu_messages.h"
 
-1740691348 source:c:\glydways\bl_tools\dfu_tools\crypto\src\dfu_client_crypto.c
+1740756088 source:c:\glydways\bl_tools\dfu_tools\crypto\src\dfu_client_crypto.c
 	<string.h>
 	<stdlib.h>
 	<openssl/crypto.h>
@@ -1373,6 +1374,7 @@
 	<openssl/err.h>
 	"dfu_client_crypto.h"
 	"image_metadata.h"
+	<winsock2.h>
 	<windows.h>
 	<unistd.h>
 
@@ -1620,7 +1622,7 @@
 	"dfu_proto_api.h"
 	"dfu_proto_config.h"
 
-1740704946 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client_api.c
+1740756323 source:c:\glydways\b2\dfu_protocol\dfu_client\src\dfu_client_api.c
 	<winsock2.h>
 	<windows.h>
 	<pthread.h>
@@ -3453,7 +3455,7 @@
 	<crtdefs.h>
 	<stdlib.h>
 
-1740697587 source:c:\glydways\bl_tools\dfu_tools\dfu_tool.c
+1740756026 source:c:\glydways\bl_tools\dfu_tools\dfu_tool.c
 	<time.h>
 	<stdint.h>
 	<stdbool.h>

@@ -472,6 +472,9 @@ static bool cmdlineHandlerListDevices(int argc, char **argv, char *paramVal, dfu
                            deviceRecord->blVersionPatch);
                     printf("\r\n       Last Update: %s", ctime(&deviceRecord->timestamp));
                     printf("\r\n");
+
+                    // Refresh the timer
+                    TIMER_Start(&timer);
                 }
             } while (!TIMER_Finished(&timer, timeoutMS));
         }

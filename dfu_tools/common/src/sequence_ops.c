@@ -87,7 +87,7 @@ bool sequenceBeginSession(dfuClientEnvStruct * dfuClient,
                           uint8_t devType,
                           uint8_t devVariant,
                           char * dest,
-                          char * challengePubKeyFilename)
+                          char * challengeKeyFilename)
 {
     bool                    ret = false;
 
@@ -122,7 +122,7 @@ bool sequenceBeginSession(dfuClientEnvStruct * dfuClient,
             ** encrypt it to a file.
             **
             */
-            encryptedChallenge = ENCRYPT_CHALLENGE(&challengePW, challengePubKeyFilename);
+            encryptedChallenge = HANDLE_CHALLENGE(&challengePW, challengeKeyFilename);
             if (encryptedChallenge != NULL)
             {
                 /*
@@ -131,7 +131,7 @@ bool sequenceBeginSession(dfuClientEnvStruct * dfuClient,
                 **
                 */
                 if (sequenceTransferAndInstallImage(dfuClient,
-                                                    DEFAULT_ENCRYPTED_CHALLENGE_FILENAME,
+                                                    SIGNATURE_FILENAME,
                                                     IMAGE_INDEX_SESSION_PASSWORD,
                                                     0,
                                                     dest))
@@ -141,7 +141,7 @@ bool sequenceBeginSession(dfuClientEnvStruct * dfuClient,
                     // its file and send the INSTALL_IMAGE command.  If that
                     // succeeds, the session has been established.
                     //
-                    DELETE_ENCRYPTED_CHALLENGE();
+                    DELETE_CHALLENGE();
 
                     // Set the Session state to ACTIVE
                     dfuSetSessionActive(dfuClientGetDFU(dfuClient));

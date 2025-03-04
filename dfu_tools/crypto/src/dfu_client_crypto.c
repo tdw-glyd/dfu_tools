@@ -424,3 +424,147 @@ cleanup:
 
     return(ret);
 }
+
+///
+/// @fn: signChallengeWithPrivateKey
+///
+/// @details
+///
+/// @param[in] privateKeyFile: Path to the PEM-encoded private key file
+/// @param[in] challenge: The 32-bit challenge value to sign
+/// @param[in] saveToFile: Boolean flag indicating whether to save the signature to a file
+/// @param[in] outputFile: If saveToFile is 1, the path to save the signature to
+///
+/// @returns If saveToFile is 0, returns pointer to the signature buffer.
+///          If saveToFile is 1, returns NULL after saving signature to file.
+///         Returns NULL on any failure.
+///
+/// @tracereq(@req{xxxxxxx}}
+///
+uint8_t* signChallengeWithPrivateKey(const char* privateKeyFile,
+                                     uint32_t* challenge,
+                                     bool saveToFile,
+                                     const char* outputFile)
+{
+    FILE*           keyFile = NULL;
+    EVP_PKEY*       pkey = NULL;
+    EVP_MD_CTX*     mdCtx = NULL;
+    unsigned char   challengeBytes[4];
+    unsigned char*  signature = NULL;
+    size_t          signatureLen = 0;
+    uint8_t*        ret = NULL;
+    FILE*           outFile = NULL;
+
+    /* Initialize OpenSSL */
+    OpenSSL_add_all_algorithms();
+    ERR_load_crypto_strings();
+
+    /* Convert challenge to bytes (little-endian representation) */
+    challengeBytes[3] = (unsigned char)((*challenge >> 24) & 0xFF);
+    challengeBytes[2] = (unsigned char)((*challenge >> 16) & 0xFF);
+    challengeBytes[1] = (unsigned char)((*challenge >> 8) & 0xFF);
+    challengeBytes[0] = (unsigned char)(*challenge & 0xFF);
+
+    /* Try an alternative method to load the key */
+    BIO *keyBio = BIO_new_file(privateKeyFile, "r");
+    if (!keyBio)
+    {
+        fprintf(stderr, "Error creating key BIO\n");
+        goto cleanup;
+    }
+
+    pkey = PEM_read_bio_PrivateKey(keyBio, NULL, NULL, NULL);
+    BIO_free(keyBio);
+
+    if (!pkey)
+    {
+        fprintf(stderr, "Error reading private key\n");
+        ERR_print_errors_fp(stderr);
+        goto cleanup;
+    }
+
+    /* Create signature context */
+    mdCtx = EVP_MD_CTX_new();
+    if (!mdCtx)
+    {
+        fprintf(stderr, "Error creating message digest context\n");
+        goto cleanup;
+    }
+
+    /* Initialize the signature operation */
+    if (EVP_DigestSignInit(mdCtx, NULL, EVP_sha256(), NULL, pkey) != 1)
+    {
+        fprintf(stderr, "Error initializing signature operation\n");
+        ERR_print_errors_fp(stderr);
+        goto cleanup;
+    }
+
+    /* Update with challenge data */
+    if (EVP_DigestSignUpdate(mdCtx, challengeBytes, sizeof(challengeBytes)) != 1)
+    {
+        fprintf(stderr, "Error updating signature data\n");
+        ERR_print_errors_fp(stderr);
+        goto cleanup;
+    }
+
+    /* Get signature length */
+    if (EVP_DigestSignFinal(mdCtx, NULL, &signatureLen) != 1)
+    {
+        fprintf(stderr, "Error determining signature length\n");
+        ERR_print_errors_fp(stderr);
+        goto cleanup;
+    }
+
+    /* Allocate memory for signature */
+    signature = (unsigned char*)OPENSSL_malloc(signatureLen);
+    if (!signature)
+    {
+        fprintf(stderr, "Error allocating memory for signature\n");
+        goto cleanup;
+    }
+
+    /* Get the signature */
+    if (EVP_DigestSignFinal(mdCtx, signature, &signatureLen) != 1)
+    {
+        fprintf(stderr, "Error creating signature\n");
+        ERR_print_errors_fp(stderr);
+        goto cleanup;
+    }
+
+    /* If requested, save signature to file */
+    if (saveToFile)
+    {
+        outFile = fopen(outputFile, "wb");
+        if (!outFile)
+        {
+            fprintf(stderr, "Error opening output file: %s\n", outputFile);
+            goto cleanup;
+        }
+
+        if (fwrite(signature, 1, signatureLen, outFile) != signatureLen)
+        {
+            fprintf(stderr, "Error writing signature to file\n");
+            goto cleanup;
+        }
+
+        /* Return NULL since signature is already saved to file */
+        ret = (uint8_t*)challenge;
+    }
+    else
+    {
+        /* Set return value to signature buffer */
+        ret = signature;
+        signature = NULL; /* Prevent signature from being freed */
+    }
+
+cleanup:
+    /* Clean up resources */
+    if (mdCtx) EVP_MD_CTX_free(mdCtx);
+    if (pkey) EVP_PKEY_free(pkey);
+    if (keyFile) fclose(keyFile);
+    if (outFile) fclose(outFile);
+    if (signature) OPENSSL_free(signature);
+
+    return ret;
+}
+

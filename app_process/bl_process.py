@@ -167,20 +167,9 @@ def extract_rsa_keys_for_embedded_little_endian(private_key_pem_path: str, outpu
     d_bin = d.to_bytes(RSA_PRIVATE_EXP_SIZE, byteorder='big')
     e_bin = e.to_bytes(RSA_EXPONENT_SIZE, byteorder='big')
 
-#    e_bin = e.to_bytes((e.bit_length() + 7) // 8, byteorder='big')
-#    e_len = len(e_bin)
-#    e_bin = e_bin.ljust(RSA_EXPONENT_SIZE, b'\x00')
-
     n_len = len(n_bin)
     d_len = len(d_bin)
     e_len = len(e_bin)
-
-    # Pack data into a binary format (little-endian)
-    # binary_data = (
-    #    struct.pack(f'<I{len(n_bin)}s', len(n_bin), n_bin) +  # Modulus (little-endian)
-    #    struct.pack(f'<I{RSA_EXPONENT_SIZE}s', e_len, e_bin) +  # Public exponent (little-endian)
-    #    struct.pack(f'<I{len(d_bin)}s', len(d_bin), d_bin)    # Private exponent (little-endian)
-    #)
 
     binary_data = (
         struct.pack(f'<I', n_len) + n_bin +  # Modulus (little-endian)

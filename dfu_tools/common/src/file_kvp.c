@@ -21,7 +21,6 @@
 #include "file_kvp.h"
 #include "general_utils.h"
 
-
 // Simple macro to validate the fkvpStruct pointer
 #define VALID_FKVP(kvp)  ( (kvp) && (((fkvpStruct*)kvp)->signature == FKVP_SIGNATURE) )
 
@@ -44,7 +43,7 @@
 ///
 /// @returns
 ///
-/// @tracereq(@req{xxxxxxx}}
+/// @tracereq @req{xxxxxxx}
 ///
 fkvpStruct* fkvpBegin(char* kvpFilePath, fkvpStruct* kvp)
 {

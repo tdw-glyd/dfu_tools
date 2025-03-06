@@ -1,0 +1,33 @@
+INPUT                  = .\file_kvp.c
+OUTPUT_DIRECTORY       = doxygen_test_file_kvp
+RECURSIVE              = NO
+EXTRACT_ALL            = YES
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+QUIET                  = NO
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_DOC_ERROR      = YES
+WARN_NO_PARAMDOC       = YES
+# Specific settings for your comment style
+INPUT_ENCODING         = UTF-8
+JAVADOC_BANNER         = NO 
+OPTIMIZE_OUTPUT_FOR_C  = YES
+MARKDOWN_SUPPORT       = YES
+AUTOLINK_SUPPORT       = YES
+MULTILINE_CPP_IS_BRIEF = NO
+INHERIT_DOCS           = YES
+TAB_SIZE               = 4
+# Custom tag support
+ALIASES                += "fn=\\fn"
+ALIASES                += "tracereq=\\xrefitem tracereq \"Trace Requirement\" \"Trace Requirements\""
+CREATE_SUBDIRS         = NO
+FULL_PATH_NAMES        = YES
+JAVADOC_AUTOBRIEF      = YES
+QT_AUTOBRIEF           = YES
+VERBATIM_HEADERS       = YES
+HTML_OUTPUT            = html
+GENERATE_TREEVIEW      = YES
+SEARCHENGINE           = YES
+GENERATE_XML           = YES
+XML_OUTPUT             = xml

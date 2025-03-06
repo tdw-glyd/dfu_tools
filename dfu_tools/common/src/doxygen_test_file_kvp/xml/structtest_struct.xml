@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.13.2" xml:lang="en-US">
+  <compounddef id="structtest_struct" kind="struct" language="C++" prot="public">
+    <compoundname>testStruct</compoundname>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structtest_struct_1a523ad5f20b3cfeca2fc9fd0552ca6b78" prot="public" static="no" mutable="no">
+        <type>uint32_t</type>
+        <definition>uint32_t testStruct::signature</definition>
+        <argsstring></argsstring>
+        <name>signature</name>
+        <qualifiedname>testStruct::signature</qualifiedname>
+        <briefdescription>
+<para>Validation signature. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="file_kvp.c" line="29" column="9" bodyfile="file_kvp.c" bodystart="29" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structtest_struct_1abd1425155f89131678d65cd25a981475" prot="public" static="no" mutable="no">
+        <type>uint32_t</type>
+        <definition>uint32_t testStruct::count</definition>
+        <argsstring></argsstring>
+        <name>count</name>
+        <qualifiedname>testStruct::count</qualifiedname>
+        <briefdescription>
+<para>Current counter. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="file_kvp.c" line="30" column="9" bodyfile="file_kvp.c" bodystart="30" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+<para>Test Structure To see how Doxygen handles this. </para>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="file_kvp.c" line="27" column="1" bodyfile="file_kvp.c" bodystart="28" bodyend="31"/>
+    <listofallmembers>
+      <member refid="structtest_struct_1abd1425155f89131678d65cd25a981475" prot="public" virt="non-virtual"><scope>testStruct</scope><name>count</name></member>
+      <member refid="structtest_struct_1a523ad5f20b3cfeca2fc9fd0552ca6b78" prot="public" virt="non-virtual"><scope>testStruct</scope><name>signature</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

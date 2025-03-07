@@ -1,20 +1,19 @@
 //#############################################################################
 //#############################################################################
 //#############################################################################
-//
+///
+/// @copyright 2024 Glydways, Inc
+/// @copyright https://glydways.com
+///
 /// @file fw_manifest.c
 /// @brief
 ///
 /// @details
 ///
-/// @copyright 2024 Glydways, Inc
-/// @copyright https://glydways.com
-//
 //#############################################################################
 //#############################################################################
 //#############################################################################
 #include "fw_manifest.h"
-
 
 //
 // Format strings for fetching image parameters. These build the keys
@@ -36,8 +35,6 @@
 /// @param[in]
 ///
 /// @returns
-///
-/// @tracereq(@req{xxxxxxx}}
 ///
 fkvpStruct* openFWManifest(fkvpStruct* fkvp, char* manifestPath)
 {
@@ -67,8 +64,6 @@ fkvpStruct* openFWManifest(fkvpStruct* fkvp, char* manifestPath)
 ///
 /// @returns
 ///
-/// @tracereq(@req{xxxxxxx}}
-///
 bool closeFWManifest(fkvpStruct *fkvp)
 {
     return fkvpEnd(fkvp);
@@ -85,8 +80,6 @@ bool closeFWManifest(fkvpStruct *fkvp)
 /// @param[in]
 ///
 /// @returns
-///
-/// @tracereq(@req{xxxxxxx}}
 ///
 char* getFWManifestValue(fkvpStruct* fkvp, char *keyname)
 {
@@ -116,8 +109,6 @@ char* getFWManifestValue(fkvpStruct* fkvp, char *keyname)
 ///
 /// @returns
 ///
-/// @tracereq(@req{xxxxxxx}}
-///
 char* getFWManifestCoreImageFilename(fkvpStruct *fkvp, uint32_t index)
 {
     char*               ret = NULL;
@@ -144,8 +135,6 @@ char* getFWManifestCoreImageFilename(fkvpStruct *fkvp, uint32_t index)
 /// @param[in]
 ///
 /// @returns
-///
-/// @tracereq(@req{xxxxxxx}}
 ///
 uint32_t getFWManifestCoreImageFlashAddress(fkvpStruct *fkvp, uint32_t index)
 {
@@ -179,8 +168,6 @@ uint32_t getFWManifestCoreImageFlashAddress(fkvpStruct *fkvp, uint32_t index)
 /// @param[in]
 ///
 /// @returns
-///
-/// @tracereq(@req{xxxxxxx}}
 ///
 uint8_t getFWManifestCoreImageIndex(fkvpStruct* fkvp, uint32_t index)
 {

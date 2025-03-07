@@ -70,7 +70,7 @@
 */
 #define MAJOR_VERSION                       (0)
 #define MINOR_VERSION                       (5)
-#define PATCH_VERSION                       (4)
+#define PATCH_VERSION                       (6)
 #define DEFAULT_TRANSACTION_TIMEOUT_MS      (5000)
 
 /*
@@ -286,6 +286,8 @@ int main(int argc, char **argv)
 ///          Needs command-line values (or INI-saved values):
 ///
 ///          1. "-t <timeout in mS">   <<-- Optional
+///          2. "-r <1 or true>"       <<-- Optional. If TRUE, reboots the
+///                                         board after successful update.
 ///
 ///          "paramVal" must contain the name of the file to send
 ///
@@ -313,6 +315,33 @@ static bool cmdlineHandlerInstallImage(int argc, char **argv, char *paramVal, df
         char                timeoutStr[24];
         uint32_t            timeoutMS = DEFAULT_DEVICE_LISTEN_TIMEOUT_MS;
         apiErrorCodeEnum    err;
+        char                shouldRebootStr[16];
+        bool                shouldReboot = false;
+
+        //
+        // Check to see if the caller wants to reboot the
+        // board after installation.
+        // Do NOT save this to the INI file, since that
+        // probably isn't something you want to happen
+        // automatically without explicit instruction
+        //
+        if (getDesiredArgumentValue(argc,
+                                    argv,
+                                    "-r",
+                                    "INSTALL_IMAGE",
+                                    "should_reboot",
+                                    shouldRebootStr,
+                                    sizeof(shouldRebootStr),
+                                    false))
+        {
+            if (
+                  (dfuToolStricmp("true", shouldRebootStr)==0) ||
+                  (dfuToolStricmp("1", shouldRebootStr)==0)
+               )
+            {
+                shouldReboot = true;
+            }
+        }
 
         // See if there was a timeout value
         if (getDesiredArgumentValue(argc,
@@ -345,7 +374,8 @@ static bool cmdlineHandlerInstallImage(int argc, char **argv, char *paramVal, df
         // Call the library function to install the image
         err = dfuClientAPI_HL_InstallCoreImage(apiHandle,
                                                scratch1,
-                                               timeoutMS);
+                                               timeoutMS,
+                                               shouldReboot);
         if (err != API_ERR_NONE)
         {
             printf("\r\n Image Installation Failure: [%d]", err);
@@ -585,11 +615,12 @@ static void printApplicationBanner(void)
 
     printf("\r\n::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
     printf("\r\n::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
-    sprintf(msgStr,
-            "\r\n:::              Glydways DFU Test Tool Version: %02d.%02d.%02d",
-            MAJOR_VERSION,
-            MINOR_VERSION,
-            PATCH_VERSION);
+    snprintf(msgStr,
+             sizeof(msgStr),
+             "\r\n:::              Glydways DFU Test Tool Version: %02d.%02d.%02d",
+             MAJOR_VERSION,
+             MINOR_VERSION,
+             PATCH_VERSION);
     dfuToolPadStr(msgStr, 0x20, 77);
     strcat(msgStr, ":::");
     printf("%s", msgStr);
@@ -1062,11 +1093,11 @@ static void _allCommandsHelp(void)
     int                     index = 0;
     char                    helpText[128];
 
-    printf("\r\n :: Available Primary Commands ::\r\n");
+    printf("\r\n :: Available Commands ::\r\n");
     while (cmdlineHandlers[index].handler != NULL)
     {
-        sprintf(helpText, "\r\n '%s' ('%s')", cmdlineHandlers[index].shortForm, cmdlineHandlers[index].longForm);
-        dfuToolPadStr(helpText, ' ', 20);
+        snprintf(helpText, sizeof(helpText), "\r\n '%s' ('%s')", cmdlineHandlers[index].shortForm, cmdlineHandlers[index].longForm);
+        dfuToolPadStr(helpText, ' ', 24);
         strcat(helpText, ": ");
         strcat(helpText, cmdlineHandlers[index].shortHelp != NULL ? cmdlineHandlers[index].shortHelp : "No Help");
         printf("%s", helpText);

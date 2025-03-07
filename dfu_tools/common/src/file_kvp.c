@@ -1,7 +1,10 @@
 //#############################################################################
 //#############################################################################
 //#############################################################################
-//
+///
+/// @copyright 2024 Glydways, Inc
+/// @copyright https://glydways.com
+///
 /// @file file_kvp.c
 /// @brief Parses a KVP file and passes the parsed KVP back to the caller
 ///        for each line it processes.
@@ -11,9 +14,10 @@
 ///          "search" operation that can walk the entire file to find a value
 ///          associated with a specified key.
 ///
-/// @copyright 2024 Glydways, Inc
-/// @copyright https://glydways.com
-//
+///          Since KVP isn't naturally hierarchical, no support for such
+///          concepts resides here.  If you rely on some other part of the
+///          KVP file, you must maintain that relationship yourself.
+///
 //#############################################################################
 //#############################################################################
 //#############################################################################
@@ -42,8 +46,6 @@
 /// @param[in]
 ///
 /// @returns
-///
-/// @tracereq @req{xxxxxxx}
 ///
 fkvpStruct* fkvpBegin(char* kvpFilePath, fkvpStruct* kvp)
 {
@@ -79,8 +81,6 @@ fkvpStruct* fkvpBegin(char* kvpFilePath, fkvpStruct* kvp)
 /// @param[in]
 ///
 /// @returns
-///
-/// @tracereq(@req{xxxxxxx}}
 ///
 bool fkvpEnd(fkvpStruct* kvp)
 {
@@ -119,8 +119,6 @@ bool fkvpEnd(fkvpStruct* kvp)
 ///          keys. That pointer can also be used to get the *count*
 ///          of keys that were parsed, using the "fkvpKeyCount()"
 ///          macro function.
-///
-/// @tracereq(@req{xxxxxxx}}
 ///
 PARSED_KVP* fkvpNext(fkvpStruct* kvp)
 {
@@ -191,8 +189,6 @@ PARSED_KVP* fkvpNext(fkvpStruct* kvp)
 ///
 /// @returns
 ///
-/// @tracereq(@req{xxxxxxx}}
-///
 char* fkvpFind(fkvpStruct* kvp, char* keyName, bool fromStart)
 {
     char*                   ret = NULL;
@@ -247,8 +243,6 @@ char* fkvpFind(fkvpStruct* kvp, char* keyName, bool fromStart)
 /// @param[in]
 ///
 /// @returns
-///
-/// @tracereq(@req{xxxxxxx}}
 ///
 bool fkvpRewind(fkvpStruct* kvp)
 {

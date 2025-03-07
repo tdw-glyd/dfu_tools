@@ -72,6 +72,9 @@
 			<Add directory="../../../../Program Files/OpenSSL/lib" />
 			<Add directory="../../../../msys64/mingw64/lib" />
 		</Linker>
+		<Unit filename="../../../B2/dfu_protocol/dfu_client/include/dev_list.h" />
+		<Unit filename="../../../B2/dfu_protocol/dfu_client/include/dfu_client.h" />
+		<Unit filename="../../../B2/dfu_protocol/dfu_client/include/dfu_client_api.h" />
 		<Unit filename="../../../B2/dfu_protocol/dfu_client/src/dev_list.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -91,6 +94,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../common/include/file_kvp.h" />
+		<Unit filename="../common/include/fw_manifest.h" />
 		<Unit filename="../common/include/general_utils.h" />
 		<Unit filename="../common/include/image_xfer.h" />
 		<Unit filename="../common/include/kvparse.h" />

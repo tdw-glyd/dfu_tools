@@ -1,15 +1,15 @@
 //#############################################################################
 //#############################################################################
 //#############################################################################
-//
+///
+/// @copyright 2024,2025 Glydways, Inc
+/// @copyright https://glydways.com
+///
 /// @file fw_manifest.h
 /// @brief
 ///
 /// @details
 ///
-/// @copyright 2024,2025 Glydways, Inc
-/// @copyright https://glydways.com
-//
 //#############################################################################
 //#############################################################################
 //#############################################################################
@@ -52,8 +52,6 @@ extern "C" {
 ///
 /// @returns
 ///
-/// @tracereq(@req{xxxxxxx}}
-///
 fkvpStruct* openFWManifest(fkvpStruct* fkvp, char* manifestPath);
 
 ///
@@ -67,8 +65,6 @@ fkvpStruct* openFWManifest(fkvpStruct* fkvp, char* manifestPath);
 /// @param[in]
 ///
 /// @returns
-///
-/// @tracereq(@req{xxxxxxx}}
 ///
 bool closeFWManifest(fkvpStruct *fkvp);
 
@@ -84,8 +80,6 @@ bool closeFWManifest(fkvpStruct *fkvp);
 ///
 /// @returns
 ///
-/// @tracereq(@req{xxxxxxx}}
-///
 char* getFWManifestValue(fkvpStruct* fkvp, char *keyname);
 
 ///
@@ -99,8 +93,6 @@ char* getFWManifestValue(fkvpStruct* fkvp, char *keyname);
 /// @param[in]
 ///
 /// @returns
-///
-/// @tracereq(@req{xxxxxxx}}
 ///
 char* getFWManifestCoreImageFilename(fkvpStruct *fkvp, uint32_t index);
 
@@ -116,7 +108,6 @@ char* getFWManifestCoreImageFilename(fkvpStruct *fkvp, uint32_t index);
 ///
 /// @returns
 ///
-/// @tracereq(@req{xxxxxxx}}
 ///
 uint32_t getFWManifestCoreImageFlashAddress(fkvpStruct *fkvp, uint32_t index);
 
@@ -132,8 +123,6 @@ uint32_t getFWManifestCoreImageFlashAddress(fkvpStruct *fkvp, uint32_t index);
 /// @param[in]
 ///
 /// @returns
-///
-/// @tracereq(@req{xxxxxxx}}
 ///
 uint8_t getFWManifestCoreImageIndex(fkvpStruct* fkvp, uint32_t index);
 

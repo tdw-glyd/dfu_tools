@@ -1,39 +1,36 @@
-/*
-** miniYaml.h - Minimal YAML parser for embedded systems
-** 
-** Features:
-** - No dynamic memory allocation
-** - No standard C string formatting functions
-** - Fixed buffer sizes configurable at compile time
-** - Supports basic YAML subset (scalars, mappings, sequences)
-** - Minimal dependencies
-*/
+//#############################################################################
+//#############################################################################
+//#############################################################################
+///
+/// @copyright 2024, 2025, 2026 Glydways, Inc
+/// @copyright https://glydways.com
+///
+/// @file miniYaml.h
+/// @brief Lightweight YAML parser for embedded systems
+/// @details A small, memory-efficient YAML parser with no external dependencies,
+///          designed for resource-constrained environments.
+///
+//#############################################################################
+//#############################################################################
+//#############################################################################
 
-#ifndef MINI_YAML_H
-#define MINI_YAML_H
+#pragma once
 
 #include <stdint.h>
 #include <stdbool.h>
 
-// Configurable parameters - adjust based on your system constraints
-#ifndef YAML_MAX_DEPTH
-#define YAML_MAX_DEPTH 8            // Maximum nesting level
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-#ifndef YAML_MAX_KEY_LENGTH
-#define YAML_MAX_KEY_LENGTH 32      // Maximum key length
-#endif
-
-#ifndef YAML_MAX_VALUE_LENGTH
-#define YAML_MAX_VALUE_LENGTH 64    // Maximum value length
-#endif
-
-#ifndef YAML_MAX_ITEMS
-#define YAML_MAX_ITEMS 32           // Maximum items in a mapping or sequence
-#endif
+// Configuration constants - adjust these as needed
+#define YAML_MAX_KEY_LENGTH    64      // Max length of mapping keys
+#define YAML_MAX_VALUE_LENGTH  256     // Max length of scalar values
+#define YAML_MAX_ITEMS         32      // Max items in a mapping or sequence
+#define YAML_MAX_DEPTH         8       // Max nesting depth
 
 // Error codes
-typedef enum 
+typedef enum
 {
     YAML_SUCCESS = 0,
     YAML_ERROR_MALFORMED,
@@ -41,92 +38,211 @@ typedef enum
     YAML_ERROR_BUFFER_OVERFLOW,
     YAML_ERROR_ITEMS_EXCEEDED,
     YAML_ERROR_INVALID_TYPE
-} yamlError_t;
+} yamlErrorEnum;
 
-// Value types
-typedef enum 
+// Node types
+typedef enum
 {
     YAML_TYPE_NONE = 0,
-    YAML_TYPE_NULL,
     YAML_TYPE_SCALAR,
     YAML_TYPE_MAPPING,
-    YAML_TYPE_SEQUENCE
-} yamlType_t;
+    YAML_TYPE_SEQUENCE,
+    YAML_TYPE_NULL
+} yamlNodeTypeEnum;
 
 // Forward declarations for recursive structures
-typedef struct yamlNode_s yamlNode_t;
-typedef struct yamlMapping_s yamlMapping_t;
-typedef struct yamlSequence_s yamlSequence_t;
+typedef struct yamlNode_s yamlNodeStruct;
 
-// Key-value pair for mappings
-typedef struct 
+// Sequence type
+typedef struct
+{
+    uint8_t count;
+    yamlNodeStruct* items[YAML_MAX_ITEMS];
+} yamlSequenceStruct;
+
+// Mapping key-value pair
+typedef struct
 {
     char key[YAML_MAX_KEY_LENGTH];
-    yamlNode_t* value;
-} yamlPair_t;
+    yamlNodeStruct* value;
+} yamlKeyValueStruct;
 
-// Mapping structure (key-value pairs)
-struct yamlMapping_s 
+// Mapping type
+typedef struct
 {
-    yamlPair_t items[YAML_MAX_ITEMS];
     uint8_t count;
-};
+    yamlKeyValueStruct items[YAML_MAX_ITEMS];
+} yamlMappingStruct;
 
-// Sequence structure (ordered list)
-struct yamlSequence_s 
+// Node structure
+struct yamlNode_s
 {
-    yamlNode_t* items[YAML_MAX_ITEMS];
-    uint8_t count;
-};
-
-// Node structure (represents any YAML value)
-struct yamlNode_s 
-{
-    yamlType_t type;
-    union 
+    yamlNodeTypeEnum type;
+    union
     {
         char scalar[YAML_MAX_VALUE_LENGTH];
-        yamlMapping_t mapping;
-        yamlSequence_t sequence;
+        yamlMappingStruct mapping;
+        yamlSequenceStruct sequence;
     } data;
 };
 
-// Parser context
-typedef struct 
+// Parser structure
+typedef struct
 {
     const char* buffer;
     uint16_t position;
     uint16_t length;
-    uint8_t line;
-    uint8_t column;
+    uint16_t line;
+    uint16_t column;
     uint8_t currentDepth;
-    
-    // Static memory pool for nodes
-    yamlNode_t nodes[YAML_MAX_ITEMS * 2];
-    uint8_t nodeCount;
-} yamlParser_t;
+    uint16_t nodeCount;
+    yamlNodeStruct nodes[YAML_MAX_ITEMS * 2]; // Node pool
+} yamlParserStruct;
 
-// Initialize parser with input buffer
-void yamlParserInit(yamlParser_t* parser, const char* buffer, uint16_t length);
+// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+//                         PUBLIC API DECLARATIONS
+// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-// Parse YAML document into root node
-yamlError_t yamlParse(yamlParser_t* parser, yamlNode_t** root);
+///
+/// @fn: yamlParserInit
+/// @details Initializes a YAML parser with the given buffer
+///
+/// @param[out] parser Pointer to the parser structure to initialize
+/// @param[in] buffer Pointer to the YAML text buffer to parse
+/// @param[in] length Length of the buffer in bytes
+///
+/// @returns None
+///
+void yamlParserInit(yamlParserStruct* parser, const char* buffer, uint16_t length);
 
-// Helper functions for accessing parsed data
-yamlNode_t* yamlMappingGet(const yamlMapping_t* mapping, const char* key);
-yamlNode_t* yamlSequenceGet(const yamlSequence_t* sequence, uint8_t index);
-bool yamlIsScalar(const yamlNode_t* node);
-bool yamlIsMapping(const yamlNode_t* node);
-bool yamlIsSequence(const yamlNode_t* node);
-bool yamlIsNull(const yamlNode_t* node);
-const char* yamlGetScalar(const yamlNode_t* node);
+///
+/// @fn: yamlParse
+/// @details Parses a YAML document and builds a node tree
+///
+/// @param[in/out] parser Pointer to an initialized parser structure
+/// @param[out] root Double pointer to receive the root node of the parsed document
+///
+/// @returns YAML_SUCCESS on successful parsing or an error code
+///
+yamlErrorEnum yamlParse(yamlParserStruct* parser, yamlNodeStruct** root);
 
-// Utility functions for specific scalar types
-bool yamlScalarToBool(const yamlNode_t* node, bool* value);
-yamlError_t yamlScalarToInt(const yamlNode_t* node, int32_t* value);
-yamlError_t yamlScalarToUint(const yamlNode_t* node, uint32_t* value);
+///
+/// @fn: yamlMappingGet
+/// @details Retrieves a node from a mapping by key
+///
+/// @param[in] mapping Pointer to the mapping structure to search
+/// @param[in] key The key string to look for in the mapping
+///
+/// @returns Pointer to the found node or NULL if not found
+///
+yamlNodeStruct* yamlMappingGet(const yamlMappingStruct* mapping, const char* key);
 
-// Get error description
-const char* yamlErrorString(yamlError_t error);
+///
+/// @fn: yamlSequenceGet
+/// @details Retrieves a node from a sequence by index
+///
+/// @param[in] sequence Pointer to the sequence structure
+/// @param[in] index Zero-based index of the item to retrieve
+///
+/// @returns Pointer to the node at the given index or NULL if index is out of bounds
+///
+yamlNodeStruct* yamlSequenceGet(const yamlSequenceStruct* sequence, uint8_t index);
 
-#endif // MINI_YAML_H
+///
+/// @fn: yamlIsScalar
+/// @details Checks if a node is a scalar value
+///
+/// @param[in] node Pointer to the node to check
+///
+/// @returns true if the node is a scalar, false otherwise
+///
+bool yamlIsScalar(const yamlNodeStruct* node);
+
+///
+/// @fn: yamlIsMapping
+/// @details Checks if a node is a mapping (key-value pairs)
+///
+/// @param[in] node Pointer to the node to check
+///
+/// @returns true if the node is a mapping, false otherwise
+///
+bool yamlIsMapping(const yamlNodeStruct* node);
+
+///
+/// @fn: yamlIsSequence
+/// @details Checks if a node is a sequence (array)
+///
+/// @param[in] node Pointer to the node to check
+///
+/// @returns true if the node is a sequence, false otherwise
+///
+bool yamlIsSequence(const yamlNodeStruct* node);
+
+///
+/// @fn: yamlIsNull
+/// @details Checks if a node is null or has the null type
+///
+/// @param[in] node Pointer to the node to check
+///
+/// @returns true if the node is null, false otherwise
+///
+bool yamlIsNull(const yamlNodeStruct* node);
+
+///
+/// @fn: yamlGetScalar
+/// @details Gets the string value of a scalar node
+///
+/// @param[in] node Pointer to the node to get the value from
+///
+/// @returns Pointer to the scalar string or NULL if the node is not a scalar
+///
+const char* yamlGetScalar(const yamlNodeStruct* node);
+
+///
+/// @fn: yamlScalarToBool
+/// @details Converts a scalar node to a boolean value
+///
+/// @param[in] node Pointer to the scalar node
+/// @param[out] value Pointer to store the resulting boolean value
+///
+/// @returns true if conversion was successful, false otherwise
+///
+bool yamlScalarToBool(const yamlNodeStruct* node, bool* value);
+
+///
+/// @fn: yamlScalarToInt
+/// @details Converts a scalar node to a signed 32-bit integer
+///
+/// @param[in] node Pointer to the scalar node
+/// @param[out] value Pointer to store the resulting integer value
+///
+/// @returns YAML_SUCCESS on successful conversion or an error code
+///
+yamlErrorEnum yamlScalarToInt(const yamlNodeStruct* node, int32_t* value);
+
+///
+/// @fn: yamlScalarToUint
+/// @details Converts a scalar node to an unsigned 32-bit integer
+///
+/// @param[in] node Pointer to the scalar node
+/// @param[out] value Pointer to store the resulting unsigned integer value
+///
+/// @returns YAML_SUCCESS on successful conversion or an error code
+///
+yamlErrorEnum yamlScalarToUint(const yamlNodeStruct* node, uint32_t* value);
+
+///
+/// @fn: yamlErrorString
+/// @details Converts a YAML error code to a human-readable string
+///
+/// @param[in] error The error code to convert
+///
+/// @returns Pointer to a constant string describing the error
+///
+const char* yamlErrorString(yamlErrorEnum error);
+
+#ifdef __cplusplus
+}
+#endif

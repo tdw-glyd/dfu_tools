@@ -60,6 +60,8 @@
 #include "dfu_client_crypto.h"
 #include "path_utils.h"
 
+#define APPLICATION_NAME                    ("Glydways Firmware Update Manager")
+
 #define DFUTOOL_INI_FILENAME                ("dfutool.ini")
 #define KEYHIT_DELAY_MS                     (5000)
 #define DEFAULT_DEVICE_LISTEN_TIMEOUT_MS    (8000)
@@ -70,7 +72,7 @@
 */
 #define MAJOR_VERSION                       (0)
 #define MINOR_VERSION                       (5)
-#define PATCH_VERSION                       (6)
+#define PATCH_VERSION                       (7)
 #define DEFAULT_TRANSACTION_TIMEOUT_MS      (5000)
 
 /*
@@ -111,6 +113,9 @@ typedef struct
 ** Command-line handler prototypes for the main command table.
 **
 */
+static bool cmdlineHandlerVersion(int argc, char **argv, char *paramVal, dfuClientAPI* apiHandle);
+static void versionHelpHandler(char *arg);
+
 static bool cmdlineHandlerInstallImage(int argc, char **argv, char *paramVal, dfuClientAPI* apiHandle);
 static void installImageHelpHandler(char *arg);
 
@@ -135,10 +140,12 @@ static void installVehicleHelpHandler(char *arg);
 */
 static cmdlineDispatchStruct cmdlineHandlers [] =
 {
-    {"-i", "--image", "Install a specified core-image file.", installImageHelpHandler, cmdlineHandlerInstallImage},
-    {"-m", "--manifest", "Transfer images specified in the manifest to target.", installFromManifestHelpHandler, cmdlineHandlerManifestInstall},
+    {"-i", "--image", "Install a specified core-image file.\n                        Requires access to the encryption key.", installImageHelpHandler, cmdlineHandlerInstallImage},
+    {"-m", "--manifest", "Installs images specified in the firmware manifest.", installFromManifestHelpHandler, cmdlineHandlerManifestInstall},
     {"-v", "--vehicle", "Install firmware on all vehicle boards.", installVehicleHelpHandler, cmdlineHandlerInstallVehicle},
     {"-d", "--devices", "Display list of devices in DFU mode", listDevicesHelpHandler, cmdlineHandlerListDevices},
+    {"-ver", "--version", "Display the version of the application.", versionHelpHandler, cmdlineHandlerVersion},
+
     {NULL, NULL, NULL, NULL, NULL}
 };
 
@@ -169,7 +176,8 @@ static char* getDesiredArgumentValue(int argc,
 
 static helpTypeEnum _getHelpType(int argc, char **argv, char **cmdForHelp);
 static void _allCommandsHelp(void);
-static void printApplicationBanner(void);
+static void printApplicationBanner(int argc, char** argv);
+static char *getApplicationNameAndVersion(char* srcBuffer, size_t bufferSize);
 static cmdlineHelpHandler _getHelpHandler(char *cmd);
 static bool mainHelpHandler(int argc, char **argv);
 
@@ -202,8 +210,15 @@ int main(int argc, char **argv)
     ASYNC_TIMER_STRUCT       keyhitTimer;
 
     initINI();
-    printApplicationBanner();
 
+    //
+    // Display app banner. If the caller provided "-ver" or
+    // "--version" on the command line, display basic info
+    // and exit.
+    //
+    printApplicationBanner(argc, argv);
+
+    // Client needed to pass something...
     if (argc > 0)
     {
         int                             index = 0;
@@ -385,6 +400,18 @@ static bool cmdlineHandlerInstallImage(int argc, char **argv, char *paramVal, df
     return ret;
 }
 
+///
+/// @fn: installImageHelpHandler
+/// @details Displays help for individual firmware file installation,
+///          without use of the manifest.
+///
+/// @param[in]
+/// @param[in]
+/// @param[in]
+/// @param[in]
+///
+/// @returns
+///
 static void installImageHelpHandler(char *arg)
 {
     printf("\r\n");
@@ -400,6 +427,22 @@ static void installImageHelpHandler(char *arg)
     return;
 }
 
+///
+/// @fn: cmdlineHandlerManifestInstall
+/// @details Installs all the files specified by the manifest,
+///          whose path is provided with the command-line arguments.
+///          Doesn't need the decryption key since it can determine
+///          the device type from the manifest data.
+///
+///          This only installs the files for a SINGLE board type/variant.
+///
+/// @param[in]
+/// @param[in]
+/// @param[in]
+/// @param[in]
+///
+/// @returns
+///
 static bool cmdlineHandlerManifestInstall(int argc, char **argv, char *paramVal, dfuClientAPI* apiHandle)
 {
     bool                    ret = true;
@@ -407,8 +450,28 @@ static bool cmdlineHandlerManifestInstall(int argc, char **argv, char *paramVal,
     return ret;
 }
 
+///
+/// @fn: installFromManifestHelpHandler
+/// @details Provides the help for board-level manifest installation.
+///
+/// @param[in]
+/// @param[in]
+/// @param[in]
+/// @param[in]
+///
+/// @returns
+///
 static void installFromManifestHelpHandler(char *arg)
 {
+    printf("\r\n");
+    printf("\r\n    Installs any core images described in the manifest,");
+    printf("\r\n    whose path is provided with the command-line arguments.");
+    printf("\r\n    The device TYPE & VARIANT are specified by the manifest.");
+    printf("\r\n    The program will wait to hear from devices that match.");
+    printf("\r\n");
+    printf("\r\n      Example: 'dfutool -m ./control_manifest.yaml'");
+
+    printf("\r\n");
     return;
 }
 
@@ -537,6 +600,45 @@ static void installVehicleHelpHandler(char *arg)
     return;
 }
 
+///
+/// @fn: cmdlineHandlerVersion
+/// @details Dummy "-ver" and "--version" command handler.  The
+///          "printApplicationBanner()" function actually handles
+///          those arguments, but since the dispatch table needs an
+///          entry in order to show help, we create these as placeholders.
+///
+/// @param[in]
+/// @param[in]
+/// @param[in]
+/// @param[in]
+///
+/// @returns
+///
+static bool cmdlineHandlerVersion(int argc, char **argv, char *paramVal, dfuClientAPI* apiHandle)
+{
+    return true;
+}
+
+///
+/// @fn: versionHelpHandler
+/// @details Displays the help for the "-ver" & "--version"
+///          command.
+///
+/// @param[in]
+/// @param[in]
+/// @param[in]
+/// @param[in]
+///
+/// @returns
+///
+static void versionHelpHandler(char *arg)
+{
+    printf("\r\n");
+    printf("\r\n    Displays the version of the program.");
+    printf("\r\n");
+
+    return;
+}
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 //                         INTERNAL SUPPORT FUNCTIONS
@@ -607,25 +709,51 @@ static int flag_srch(int argc, char **argv, const char *flag, int get_value, cha
 ** COMMENTS:
 **
 */
-static void printApplicationBanner(void)
+static void printApplicationBanner(int argc, char** argv)
 {
     char            msgStr[128];
     int             displayLastRun = 0;
+    char*           paramVal;
 
+    if (
+           (
+              (flag_srch(argc, argv, "-ver", true, &paramVal)) ||
+              (flag_srch(argc, argv, "--version", true, &paramVal))
+           ) &&
+           (
+              (!flag_srch(argc, argv, "-h", true, &paramVal)) &&
+              (!flag_srch(argc, argv, "--help", true, &paramVal))
+           )
+       )
+    {
+        printf("\r\n%s\r\n\r\n", getApplicationNameAndVersion(scratch1, sizeof(scratch1)));
+        exit(0);
+    }
 
     printf("\r\n::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
     printf("\r\n::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
-    snprintf(msgStr,
-             sizeof(msgStr),
-             "\r\n:::              Glydways DFU Test Tool Version: %02d.%02d.%02d",
+
+    // Display VERSION
+    snprintf(scratch1,
+             sizeof(scratch1),
+             "\r\n:::                          Version %02d.%02d.%02d",
              MAJOR_VERSION,
              MINOR_VERSION,
              PATCH_VERSION);
-    dfuToolPadStr(msgStr, 0x20, 77);
-    strcat(msgStr, ":::");
-    printf("%s", msgStr);
+    dfuToolPadStr(scratch1, ' ', 77);
+    strcat(scratch1, ":::");
+    printf(scratch1);
+
+    // Display APP NAME
+    snprintf(scratch1, sizeof(scratch1), "\r\n:::                   %s", APPLICATION_NAME);
+    dfuToolPadStr(scratch1, ' ', 77);
+    strcat(scratch1, ":::");
+    printf(scratch1);
+
+    // Copyright
     printf("\r\n::: Copyright (c) 2024, 2025, 2026 by Glydways, Inc. All Rights Reserved.  :::");
 
+    // Display the last date/time we ran the app
     displayLastRun = ini_gets("SYSTEM",
                               "last_run",
                               "",
@@ -643,6 +771,36 @@ static void printApplicationBanner(void)
 
     printf("\r\n");
     fflush(stdout);
+}
+
+///
+/// @fn: getApplicationNameAndVersion
+/// @details
+///
+/// @param[in]
+/// @param[in]
+/// @param[in]
+/// @param[in]
+///
+/// @returns
+///
+static char *getApplicationNameAndVersion(char* srcBuffer, size_t bufferSize)
+{
+    char*               ret = NULL;
+
+    if ( (srcBuffer) && (bufferSize > 0) )
+    {
+        snprintf(srcBuffer,
+                 bufferSize,
+                 "%s Version: %02d.%02d.%02d",
+                 APPLICATION_NAME,
+                 MAJOR_VERSION,
+                 MINOR_VERSION,
+                 PATCH_VERSION);
+        ret = srcBuffer;
+    }
+
+    return ret;
 }
 
 ///
@@ -1096,7 +1254,9 @@ static void _allCommandsHelp(void)
     printf("\r\n :: Available Commands ::\r\n");
     while (cmdlineHandlers[index].handler != NULL)
     {
-        snprintf(helpText, sizeof(helpText), "\r\n '%s' ('%s')", cmdlineHandlers[index].shortForm, cmdlineHandlers[index].longForm);
+        snprintf(helpText, sizeof(helpText), "\r\n '%s'", cmdlineHandlers[index].shortForm);
+        dfuToolPadStr(helpText, ' ', 10);
+        snprintf(helpText+strlen(helpText), sizeof(helpText), "(%s)", cmdlineHandlers[index].longForm);
         dfuToolPadStr(helpText, ' ', 24);
         strcat(helpText, ": ");
         strcat(helpText, cmdlineHandlers[index].shortHelp != NULL ? cmdlineHandlers[index].shortHelp : "No Help");

@@ -27,6 +27,7 @@
 					<Add directory="../../../B2/common/include" />
 					<Add directory="../ini/include" />
 					<Add directory="../ini/minIni/dev" />
+					<Add directory="../yaml/include" />
 				</Compiler>
 				<Linker>
 					<Add option="npcap-sdk-1.13\Lib\x64\wpcap.lib" />
@@ -147,6 +148,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../server.h" />
+		<Unit filename="../yaml/include/miniyaml.h" />
+		<Unit filename="../yaml/src/miniyaml.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>
